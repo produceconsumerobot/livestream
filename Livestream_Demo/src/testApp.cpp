@@ -4,15 +4,15 @@
 void testApp::setup(){
 	cout << "setup()" << endl;
 
+	// **** Setup sensor conversion variables **** //
+	maxSensorDist = settings.maxSensorDist;		// total range of sensor (ft)
+	maxOuputDist = settings.maxOuputDist;		// target output range of sensor (ft)
+	maxAnalogValue = 1024;		// ADC bit resolution
+	maxOutputValue = 127;		// maximum value of output
+
 	// **** Setup frame rate **** //
 	ofSetVerticalSync(true);
 	ofSetFrameRate(60);
-
-	// **** Setup sensor conversion variables **** //
-	maxSensorDist = 25.0;		// total range of sensor
-	maxOuputDist = 10.0;		// target output range of sensor
-	maxAnalogValue = 1024;		// ADC bit resolution
-	maxOutputValue = 127;		// maximum value of output
 
 	// **** Setup timers **** //
 	resendNote = true;
@@ -21,15 +21,7 @@ void testApp::setup(){
 	blink13On = true;
 	blinkCounter = 0;
 
-	// **** Setup arduino **** //
-	// Arduino Ports for Sean's Windows computer
-	string arduinoPorts_arr[nSensors] = 
-	{
-		"COM9",
-		"COM8"
-	};
-	// Copy array to a vector for safety
-	std::vector< string > arduinoPorts(arduinoPorts_arr, arduinoPorts_arr + nSensors);
+	std::vector< string > arduinoPorts = settings.arduinoPorts;
 	arduinos.resize(nSensors);
 	bSetupArduinos.resize(nSensors);
 	sensorAnalogPin = 0;
@@ -37,7 +29,6 @@ void testApp::setup(){
 	for (int i=0; i<nSensors; i++) {
 		cout << "Setting up " << arduinoPorts.at(i) << endl;
 		arduinos.at(i).connect(arduinoPorts.at(i), arduinoBaud);
-		//arduinos.at(i).connect("COM8", arduinoBaud);
 		bSetupArduinos.at(i) = false;				// it's not safe to send commands to Arduino
 		while(!arduinos.at(i).isArduinoReady());	// Wait till the Arduino is ready
 		setupArduino(arduinos.at(i));
@@ -46,8 +37,7 @@ void testApp::setup(){
 
 	// **** Setup midi **** //
 	// Midi Port
-	// midiPort = 0; // Mac
-	midiPort = 1; // PC
+	midiPort = settings.midiPort;
 	midiout.listPorts();
 	midiout.openPort(midiPort);
 	midiMapMode = false;
@@ -56,8 +46,10 @@ void testApp::setup(){
 	midiChannel = 1;
 	midiValue = 127;
 	int midiIds_arr[nSensors] = { // midiIDs that each sensor controls
-		60,
-		70
+		60,	//1
+		70,	//2
+		80,	//3
+		90,	//4
 	};
 	midiIds.resize(nSensors);
 	for (int i=0; i<nSensors; i++) { 
@@ -65,7 +57,7 @@ void testApp::setup(){
 		midiout.sendNoteOn(midiChannel, midiIds.at(i), midiValue);
 	}
 
-	soundCheck = 0;	// for debugging sound
+	soundCheck = settings.soundCheck;	// for debugging sound
 
 	// **** Filter Setup **** //
 	smoothData.resize(nSensors);
@@ -154,7 +146,7 @@ void testApp::draw(){
 		// If we're not in midiMapMode, send MIDI outputs
 		if (!midiMapMode) { 
 			midiout.sendControlChange(midiChannel, midiIds.at(i), 127-outputData);
-			cout << ", " << ofToString(127-outputData);
+			cout << ofToString(127-outputData) << ", ";
 
 			if (++soundCheck > 1024) {
 				soundCheck = 0;

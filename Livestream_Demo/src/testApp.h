@@ -2,11 +2,14 @@
 
 #include "ofMain.h"
 #include "ofxMidi.h"
+#include "livestreamDemoSettings.h"
 
-#define nSensors	2	// number of attached sensors
 
 class testApp : public ofBaseApp{
 	public:
+
+		LivestreamDemoSettings settings;	// Settings that change from computer to computer
+		static const int nSensors = LIVESTREAM_nSENSORS;
 
 		// Arduino variables
 		std::vector<ofArduino> arduinos;

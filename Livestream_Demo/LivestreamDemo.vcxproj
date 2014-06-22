@@ -114,6 +114,7 @@
     <ClInclude Include="..\..\..\addons\ofxMidi\src\ofxMidiMessage.h" />
     <ClInclude Include="..\..\..\addons\ofxMidi\src\ofxMidiOut.h" />
     <ClInclude Include="..\..\..\addons\ofxMidi\src\ofxMidiTypes.h" />
+    <ClInclude Include="src\livestreamDemoSettings.h" />
     <ClInclude Include="src\testApp.h" />
   </ItemGroup>
   <ItemGroup>

@@ -89,6 +89,9 @@
     <ClInclude Include="..\..\..\addons\ofxMidi\src\desktop\rtmidi\RtMidi.h">
       <Filter>addons\ofxMidi\src\desktop\rtmidi</Filter>
     </ClInclude>
+    <ClInclude Include="src\livestreamDemoSettings.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
