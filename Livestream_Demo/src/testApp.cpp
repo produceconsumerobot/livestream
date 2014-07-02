@@ -5,34 +5,36 @@ void testApp::setup(){
 	cout << "setup()" << endl;
 
 	// **** Setup sensor conversion variables **** //
-	maxSensorDist = settings.maxSensorDist;		// total range of sensor (ft)
-	maxOuputDist = settings.maxOuputDist;		// target output range of sensor (ft)
+	maxSensorDist = settings.maxSensorDist;	// total range of sensor (ft)
+	maxOuputDist = settings.maxOuputDist;	// target output range of sensor (ft)
 	maxAnalogValue = 1024;		// ADC bit resolution
-	maxOutputValue = 127;		// maximum value of output
+	maxMidiControlValue = 127;	// maximum value of output
 
 	// **** Setup frame rate **** //
 	ofSetVerticalSync(true);
 	ofSetFrameRate(60);
 
 	// **** Setup timers **** //
-	resendNote = true;
-	noteResendTime = ofGetFrameRate()*60; // duration between note resend events
-	noteResendCounter = 0;
 	blink13On = true;
 	blinkCounter = 0;
 
-	std::vector< string > arduinoPorts = settings.arduinoPorts;
-	arduinos.resize(nSensors);
-	bSetupArduinos.resize(nSensors);
-	sensorAnalogPin = 0;
+	//pipes.resize(settings.nSensors); 
+
+	// **** Setup Arduino **** //
+	for (int i=0; i<settings.nSensors; i++) {
+		settings.pipes.at(i).isArduinoSetup = false;				// it's not safe to send commands to Arduino
+	}
 	int arduinoBaud = 57600; // baud rate
-	for (int i=0; i<nSensors; i++) {
-		cout << "Setting up " << arduinoPorts.at(i) << endl;
-		arduinos.at(i).connect(arduinoPorts.at(i), arduinoBaud);
-		bSetupArduinos.at(i) = false;				// it's not safe to send commands to Arduino
-		while(!arduinos.at(i).isArduinoReady());	// Wait till the Arduino is ready
-		setupArduino(arduinos.at(i));
-		bSetupArduinos.at(i) = true;				// it is now safe to send commands to the Arduino
+	sensorAnalogPin = 0;
+	if (settings.usingDistanceSensors) {
+		for (int i=0; i<settings.nSensors; i++) {
+			cout << "Setting up " << settings.pipes.at(i).arduinoPort << endl;
+
+			settings.pipes.at(i).arduino.connect(settings.pipes.at(i).arduinoPort, arduinoBaud);	// connect to the Arduino
+			while(!settings.pipes.at(i).arduino.isArduinoReady());	// Wait till the Arduino is ready
+			setupArduino(settings.pipes.at(i).arduino);				// Setup Arduino
+			settings.pipes.at(i).isArduinoSetup = true;				// it is now safe to send commands to the Arduino
+		}
 	}
 
 	// **** Setup midi **** //
@@ -43,29 +45,33 @@ void testApp::setup(){
 	midiMapMode = false;
 
 	// MIDI parameters
-	midiChannel = 1;
-	midiValue = 127;
-	int midiIds_arr[nSensors] = { // midiIDs that each sensor controls
-		60,	//1
-		70,	//2
-		80,	//3
-		90,	//4
-	};
-	midiIds.resize(nSensors);
-	for (int i=0; i<nSensors; i++) { 
-		midiIds.at(i) = midiIds_arr[i]; // Copy array to a vector for safety
-		midiout.sendNoteOn(midiChannel, midiIds.at(i), midiValue);
-	}
+	midiDistControl = 0;
+
+	// MIDI Test Controls (for pairing with Ableton)
+	testMidiId = 0;
+	testMidiChannel = 0;
+	testMidiIdSlider.addListener(this, &testApp::testMidiIdSliderChanged);
+	testMidiChannelSlider.addListener(this, &testApp::testMidiChannelSliderChanged);
+	gui.setup();
+	gui.add(testMidiChannelSlider.setup("Test MIDI Channel", 1, 1, 16));
+	gui.add(testMidiIdSlider.setup("Test MIDI ID", 0, 0, 127));
+	// TODO: deal with crossChannelSustain that's too big
+	crossChannelSustainCounter = 0;
 
 	soundCheck = settings.soundCheck;	// for debugging sound
 
 	// **** Filter Setup **** //
-	smoothData.resize(nSensors);
+	smoothData.resize(settings.nSensors);
 	float Fs = ofGetFrameRate(); // sampling freq (Hz)
-	float smoothDuration = 1; // seconds
+	float smoothDuration = 0.5; // seconds
 	maxSamplesToSmooth = Fs*smoothDuration; // determines degree of smoothing
 	nSamplesToSmooth = 0; // starting with 0 and incrementing up to max converges smoothed average to initial values quickly
 
+	dataReadRate = settings.dataReadRate;		//milliseconds
+	dataMidiSendRate = settings.dataMidiSendRate;	//milliseconds
+	dataReadCounter = 0;
+	dataMidiSendCounter = 0;
+	dataSendHelper = 0;
 }
 
 // Setup the passed arduino
@@ -106,10 +112,32 @@ void testApp::analogPinChanged(const int & pinNum) {
 }
 
 //--------------------------------------------------------------
+void testApp::testMidiIdSliderChanged(int & tempMidiId){
+	testMidiId = tempMidiId;
+}
+
+//--------------------------------------------------------------
+void testApp::testMidiChannelSliderChanged(int & tempMidiChannel){
+	testMidiChannel = tempMidiChannel;
+}
+
+//--------------------------------------------------------------
 void testApp::update(){
 	//cout << "update()" << endl;
-	for (int i=0; i<nSensors; i++) {
-		arduinos.at(i).update();
+	for (int i=0; i<settings.nSensors; i++) {
+		if (settings.pipes.at(i).isArduinoSetup) {
+			settings.pipes.at(i).arduino.update();
+		}
+	}
+
+	// Update data read timer
+	dataReadCounter++;
+	if (dataReadCounter >= (dataReadRate * ofGetFrameRate()) / 1000 ) {
+		dataReadCounter = 0;
+		//cout << "Updating data" << endl;
+		for (int i=0; i<settings.nSensors; i++) {
+			settings.pipes.at(i).updateData();
+		}
 	}
 }
 
@@ -120,11 +148,11 @@ void testApp::draw(){
 	if (nSamplesToSmooth < maxSamplesToSmooth ) nSamplesToSmooth++; // increment up to max
 	float newWeight = 1/(nSamplesToSmooth); // weight by which new values contribute to the smoothed average
 
-	// Loop through sensors, read data, filter, map and send outputs
-	for (int i=0; i<nSensors; i++) {
+	// Loop through sensors, read data, filter, map and send output controls
+	for (int i=0; i<settings.nSensors; i++) {
 		int sensorData = 0;
-		if (bSetupArduinos.at(i)) {
-			sensorData = arduinos.at(i).getAnalog(sensorAnalogPin); // get sensor data
+		if (settings.pipes.at(i).isArduinoSetup) {
+			sensorData = settings.pipes.at(i).arduino.getAnalog(sensorAnalogPin); // get sensor data
 		}
 		float newVal = (float) sensorData; // convert to float
 		// Smoothing occurs every time a new data point is obtained //
@@ -133,20 +161,20 @@ void testApp::draw(){
 
 		// Map sensor data to output range
 		float dist2Value = maxOuputDist/maxSensorDist*maxAnalogValue;		// distance to analog value ratio
-		int outputData = ofClamp(sensorData, 0, dist2Value);				// clamp to maxOuputDist
-		outputData = ofMap(outputData, 0, dist2Value, 0, maxOutputValue);	// map onto output range
+		int controlValue = ofClamp(sensorData, 0, dist2Value);				// clamp to maxOuputDist
+		controlValue = ofMap(controlValue, 0, dist2Value, 0, maxMidiControlValue);	// map onto output range
 
 		// Set screen color to reflect incoming data
-		
-		//ofBackground(255-(2*outputData), 0, 0);
-		ofSetColor(255-(2*outputData), 0, 0);
+		ofSetColor(255-(2*controlValue), 0, 0);
 		ofFill();
-		ofRect(ofGetWindowWidth()/nSensors*i, 0, ofGetWindowWidth()/nSensors, ofGetWindowHeight());
+		ofRect(ofGetWindowWidth()/settings.nSensors*i, 0, ofGetWindowWidth()/settings.nSensors, ofGetWindowHeight());
 		
 		// If we're not in midiMapMode, send MIDI outputs
 		if (!midiMapMode) { 
-			midiout.sendControlChange(midiChannel, midiIds.at(i), 127-outputData);
-			cout << ofToString(127-outputData) << ", ";
+			// hack to deal with same note MIDI sustain in Live
+			//int outChannel = crossChannelSustainCounter * settings.pipes.size() + settings.pipes.at(i).midiChannel; 
+			midiout.sendControlChange(settings.pipes.at(i).midiChannel, midiDistControl, 127-controlValue);
+			cout << ofToString(127-controlValue) << ", ";
 
 			if (++soundCheck > 1024) {
 				soundCheck = 0;
@@ -159,15 +187,44 @@ void testApp::draw(){
 	}
 
 	// Periodically resend midi note
-	if (resendNote && !midiMapMode) {
-		if (++noteResendCounter > noteResendTime) {
-			noteResendCounter = 0;
-			cout << "Resend Midi Notes: ";
-			for (int i=0; i<nSensors; i++) {
-				cout << ofToString(i) << "," << midiIds.at(i) << "; ";
-				midiout.sendNoteOff(midiChannel, midiIds.at(i), midiValue );
-				midiout.sendNoteOn(midiChannel, midiIds.at(i), midiValue );
+	//if (resendNote && !midiMapMode) {
+	//	if (++noteResendCounter > noteResendTime) {
+	//		noteResendCounter = 0;
+	//		cout << "Resend Midi Notes: ";
+	//		for (int i=0; i<settings.nSensors; i++) {
+	//			cout << ofToString(i) << "," << midiIds.at(i) << "; ";
+	//			midiout.sendNoteOff(midiChannel, midiIds.at(i), midiValue );
+	//			midiout.sendNoteOn(midiChannel, midiIds.at(i), midiValue );
+	//		}
+	//		cout << endl;
+	//	}
+	//}
+
+	// Increment MIDI send timer
+	if (!midiMapMode) { 
+		dataMidiSendCounter++;
+		if (dataMidiSendCounter >= (dataMidiSendRate * ofGetFrameRate()) / 1000) {
+			dataMidiSendCounter = 0;
+			cout << "data: ";
+			for (int i=0; i<settings.nSensors; i++) {
+				float tempData = settings.pipes.at(i).getData();
+				cout << ofToString(tempData) << ", ";
+				int tempPitch = ofMap(tempData, 
+					settings.pipes.at(i).dataRange.min, 
+					settings.pipes.at(i).dataRange.max,
+					settings.pipes.at(i).midiNoteRange.min,
+					settings.pipes.at(i).midiNoteRange.max);
+				dataSendHelper++;
+				if (dataSendHelper > 10) dataSendHelper = 0;
+				// hack to deal with same note MIDI sustain in Live
+				int outChannel = settings.pipes.at(i).midiChannel;
+				if (crossChannelSustainCounter > 0) {
+					outChannel = outChannel + settings.crossChannelSustain;
+				}
+				midiout.sendNoteOn(outChannel, tempPitch, settings.midiNoteAttack);
 			}
+			// hack to deal with same note MIDI sustain in Live
+			crossChannelSustainCounter = (crossChannelSustainCounter + 1) % 2;
 			cout << endl;
 		}
 	}
@@ -176,16 +233,18 @@ void testApp::draw(){
 	if (++blinkCounter > ofGetFrameRate()/2) { // 1Hz
 		blinkCounter = 0;
 		blink13On = !blink13On;
-		for (int i=0; i<nSensors; i++) {
-			if (bSetupArduinos.at(i)) {
+		for (int i=0; i<settings.nSensors; i++) {
+			if (settings.pipes.at(i).isArduinoSetup) {
 				if (blink13On) {
-					arduinos.at(i).sendDigital(13, ARD_HIGH);
+					settings.pipes.at(i).arduino.sendDigital(13, ARD_HIGH);
 				} else {
-					arduinos.at(i).sendDigital(13, ARD_LOW);
+					settings.pipes.at(i).arduino.sendDigital(13, ARD_LOW);
 				}
 			}
 		}
 	}
+
+	gui.draw();
 }
 
 //--------------------------------------------------------------
@@ -201,31 +260,29 @@ void testApp::keyReleased(int key){
 	}
 
 	// test MIDI control change commands
-	char controlKeys[8] = {'1', '2', '3', '4', '5', '6', '7', '8'};
-	for (int i=0; i<nSensors; i++) {
-		if (((char) key) ==  controlKeys[i]) {
-			midiout.sendControlChange(midiChannel, midiIds.at(i), midiValue);
-			cout << ofToString( controlKeys[i] );
-		}
-	} 
+	if (((char) key) ==  '1') {
+		midiout.sendControlChange(testMidiChannel, testMidiId, midiValue);
+		cout << ofToString( '1' );
+	}
 
 	// test MIDI send note on commands
-	char noteOnKeys[8] = {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i'};
-	for (int i=0; i<nSensors; i++) {
-		if (((char) key) ==  noteOnKeys[i]) {
-			midiout.sendNoteOn(midiChannel, midiIds.at(i), midiValue);
-			cout << ofToString( noteOnKeys[i] );
-		}
-	} 
+	if (((char) key) ==  'q') {
+		midiout.sendNoteOn(testMidiChannel, testMidiId, midiValue);
+		cout << ofToString( 'q' );
+	}
 
 	// test MIDI send note off commands
-	char noteOffKeys[8] = {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k'};
-	for (int i=0; i<nSensors; i++) {
-		if (((char) key) ==  noteOffKeys[i]) {
-			midiout.sendNoteOff(midiChannel, midiIds.at(i), midiValue);
-			cout << ofToString( noteOffKeys[i] );
-		}
-	} 
+	if (((char) key) ==  'a') {
+		midiout.sendNoteOff(testMidiChannel, testMidiId, midiValue);
+		cout << ofToString( 'a' );
+	}
+	
+	// test MIDI program change commands
+	if (((char) key) ==  'z') {
+		midiout.sendProgramChange(midiChannel, testMidiId);
+		cout << ofToString( 'z' );
+	}
+
 
 	if ( key == 'm') {
 		ofToggleFullscreen();
@@ -272,11 +329,11 @@ void testApp::dragEvent(ofDragInfo dragInfo){
 void testApp::exit(){
 	printf("exit()\n");
 
-	for (int i=0; i<nSensors; i++) {
-		midiout.sendNoteOff(midiChannel, midiIds.at(i), midiValue );
-		if (bSetupArduinos.at(i)) {
-			arduinos.at(i).disconnect();
-		}
+	for (int i=0; i<settings.nSensors; i++) {
+		//midiout.sendNoteOff(midiChannel, midiIds.at(i), midiValue );
+		//if (settings.pipes.at(i).isArduinoSetup) {
+			//settings.pipes.at(i).arduino.disconnect();
+		//}
 	}
 	if (midiout.isOpen()) {
 		midiout.closePort();
