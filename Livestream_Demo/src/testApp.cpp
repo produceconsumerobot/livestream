@@ -67,11 +67,10 @@ void testApp::setup(){
 	maxSamplesToSmooth = Fs*smoothDuration; // determines degree of smoothing
 	nSamplesToSmooth = 0; // starting with 0 and incrementing up to max converges smoothed average to initial values quickly
 
-	dataReadRate = settings.dataReadRate;		//milliseconds
-	dataMidiSendRate = settings.dataMidiSendRate;	//milliseconds
-	dataReadCounter = 0;
-	dataMidiSendCounter = 0;
-	dataSendHelper = 0;
+	//dataSendHelper = 0;
+	for (int i=1; i<5; i++) {
+		midiout.sendControlChange(i, 64, 127); // trying to get get a "sustain pedal" control signal
+	}
 }
 
 // Setup the passed arduino
@@ -131,11 +130,12 @@ void testApp::update(){
 	}
 
 	// Update data read timer
-	dataReadCounter++;
-	if (dataReadCounter >= (dataReadRate * ofGetFrameRate()) / 1000 ) {
-		dataReadCounter = 0;
-		//cout << "Updating data" << endl;
-		for (int i=0; i<settings.nSensors; i++) {
+	for (int i=0; i<settings.nSensors; i++) {
+		settings.pipes.at(i).dataReadCounter++;
+		if (settings.pipes.at(i).dataReadCounter >= (settings.pipes.at(i).dataReadRate * ofGetFrameRate()) / 1000 ) {
+			settings.pipes.at(i).dataReadCounter = 0;
+			//cout << "Updating data" << endl;
+		
 			settings.pipes.at(i).updateData();
 		}
 	}
@@ -202,31 +202,43 @@ void testApp::draw(){
 
 	// Increment MIDI send timer
 	if (!midiMapMode) { 
-		dataMidiSendCounter++;
-		if (dataMidiSendCounter >= (dataMidiSendRate * ofGetFrameRate()) / 1000) {
-			dataMidiSendCounter = 0;
-			cout << "data: ";
-			for (int i=0; i<settings.nSensors; i++) {
-				float tempData = settings.pipes.at(i).getData();
+		for (int i=0; i<settings.nSensors; i++) {		
+			settings.pipes.at(i).dataMidiSendCounter++;
+			if (settings.pipes.at(i).dataMidiSendCounter >= (settings.pipes.at(i).dataMidiSendRate * ofGetFrameRate()) / 1000) {
+				// The send counter has tripped... send a note!
+				settings.pipes.at(i).dataMidiSendCounter = 0; // reset the counter
+				cout << "data: ";
+				float tempData = settings.pipes.at(i).getData(); // get a new datapoint
 				cout << ofToString(tempData) << ", ";
+				// Map the data onto the ouput range
 				int tempPitch = ofMap(tempData, 
 					settings.pipes.at(i).dataRange.min, 
 					settings.pipes.at(i).dataRange.max,
 					settings.pipes.at(i).midiNoteRange.min,
 					settings.pipes.at(i).midiNoteRange.max);
-				dataSendHelper++;
-				if (dataSendHelper > 10) dataSendHelper = 0;
+				//dataSendHelper++;
+				//if (dataSendHelper > 10) dataSendHelper = 0;
 				// hack to deal with same note MIDI sustain in Live
 				int outChannel = settings.pipes.at(i).midiChannel;
-				if (crossChannelSustainCounter > 0) {
-					outChannel = outChannel + settings.crossChannelSustain;
+				if (settings.pipes.at(i).crossChannelSustainCounter > 0) {
+					outChannel = outChannel + settings.crossChannelSustainGap;
 				}
+				settings.pipes.at(i).crossChannelSustainCounter = (settings.pipes.at(i).crossChannelSustainCounter + 1) % 2;
+				
 				midiout.sendNoteOn(outChannel, tempPitch, settings.midiNoteAttack);
 			}
-			// hack to deal with same note MIDI sustain in Live
-			crossChannelSustainCounter = (crossChannelSustainCounter + 1) % 2;
-			cout << endl;
+			
 		}
+		cout << endl;
+		// hack to deal with same note MIDI sustain in Live
+		
+	}
+
+		//dataSendHelper = 0;
+	for (int i=1; i<5; i++) {
+		//midiout.sendControlChange(i, 64, 127); // trying to get get a "sustain pedal" control signal
+		//midiout.sendControlChange(i, 66, 127); // trying to get get a "sustain pedal" control signal
+		//midiout.sendControlChange(i, 69, 127); // trying to get get a "sustain pedal" control signa6
 	}
 
 	// heartbeat blink digital channel 13 to verify arduino is working
@@ -283,7 +295,6 @@ void testApp::keyReleased(int key){
 		cout << ofToString( 'z' );
 	}
 
-
 	if ( key == 'm') {
 		ofToggleFullscreen();
 	}
@@ -331,9 +342,9 @@ void testApp::exit(){
 
 	for (int i=0; i<settings.nSensors; i++) {
 		//midiout.sendNoteOff(midiChannel, midiIds.at(i), midiValue );
-		//if (settings.pipes.at(i).isArduinoSetup) {
-			//settings.pipes.at(i).arduino.disconnect();
-		//}
+		if (settings.pipes.at(i).isArduinoSetup) {
+			settings.pipes.at(i).arduino.disconnect();
+		}
 	}
 	if (midiout.isOpen()) {
 		midiout.closePort();

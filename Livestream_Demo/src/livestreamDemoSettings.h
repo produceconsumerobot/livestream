@@ -62,6 +62,48 @@ private:
 	ofBuffer buffer;
 };
 
+class LivestreamDataSound {
+private:
+	LivestreamData data;
+
+public:
+	string dataName;
+	int midiChannel;
+	Range dataRange;
+	Range midiNoteRange;
+	int dataReadRate; // milliseconds
+	int dataMidiSendRate; // milliseconds
+	int dataReadCounter;
+	int dataMidiSendCounter;
+	int crossChannelSustainCounter;
+
+	LivestreamDataSound() {
+	}
+
+	void setup(string _dataName, int _dataReadRate, int _dataMidiSendRate, int _midiChannel, Range _dataRange, Range _midiNoteRange) {
+		dataName = _dataName;
+		midiChannel = _midiChannel;
+		dataRange = _dataRange;
+		midiNoteRange = _midiNoteRange;
+		data = LivestreamData(dataName);
+		dataReadRate = _dataReadRate;
+		dataMidiSendRate = _dataMidiSendRate;
+		dataReadCounter = 0;
+		dataMidiSendCounter = 0;
+		crossChannelSustainCounter = 0;
+	}
+
+	float getData() {
+		return data.data;
+	}
+
+	void updateData() {
+		data.update();
+	}
+};
+
+
+
 class LivestreamPipe {
 private:
 	LivestreamData data;
@@ -74,17 +116,27 @@ public:
 	string arduinoPort;
 	ofArduino arduino;
 	bool isArduinoSetup;
+	int dataReadRate; // milliseconds
+	int dataMidiSendRate; // milliseconds
+	int dataReadCounter;
+	int dataMidiSendCounter;
+	int crossChannelSustainCounter;
 
 	LivestreamPipe() {
 	}
 
-	void setup(string _dataName, string _arduinoPort, int _midiChannel, Range _dataRange, Range _midiNoteRange) {
+	void setup(string _dataName, int _dataReadRate, int _dataMidiSendRate, string _arduinoPort, int _midiChannel, Range _dataRange, Range _midiNoteRange) {
 		dataName = _dataName;
 		arduinoPort = _arduinoPort;
 		midiChannel = _midiChannel;
 		dataRange = _dataRange;
 		midiNoteRange = _midiNoteRange;
 		data = LivestreamData(dataName);
+		dataReadRate = _dataReadRate;
+		dataMidiSendRate = _dataMidiSendRate;
+		dataReadCounter = 0;
+		dataMidiSendCounter = 0;
+		crossChannelSustainCounter = 0;
 	}
 
 	float getData() {
@@ -102,6 +154,7 @@ class LivestreamDemoSettings
 public:
 
 	std::vector< LivestreamPipe > pipes;
+	LivestreamDataSound idleSound;
 
 	//std::vector< std::vector < float > > data;
 	std::vector< float > data;
@@ -111,7 +164,7 @@ public:
 	int soundCheck;
 	float maxSensorDist;
 	float maxOuputDist;
-	int crossChannelSustain;
+	int crossChannelSustainGap;
 
 	int dataReadRate;		//milliseconds
 	int dataMidiSendRate;	//milliseconds
@@ -122,13 +175,13 @@ public:
 
 	LivestreamDemoSettings() 
 	{
-		usingDistanceSensors = true;
+		usingDistanceSensors = false;
 
-		nSensors = 2;
+		nSensors = 3;
 		pipes.resize(nSensors); 
-		pipes.at(0).setup("Field Conductivity", "COM8", 2, Range(0, 3500), Range(0, 9));
-		pipes.at(1).setup("Field pH", "COM9", 1, Range(5, 10), Range(0, 4));
-		//pipes.at(1) = LivestreamPipe("Field Temperature", "COM9", 3, Range(0, 30), Range(0, 4));
+		pipes.at(0).setup("Field Conductivity", 2500, 2500, "COM8", 2, Range(0, 3500), Range(0, 9));
+		pipes.at(1).setup("Field pH", 2000, 2000, "COM9", 1, Range(5, 10), Range(0, 4));
+		pipes.at(2).setup("Field Temperature", 1000, 1000, "COM10", 4, Range(0, 27), Range(0, 4));
 		
 		// **** Setup midi **** //
 		// Midi Port
@@ -136,16 +189,16 @@ public:
 		midiPort = 1; // PC
 		midiNoteAttack = 127;
 		
-		dataReadRate = 2500;		//milliseconds
-		dataMidiSendRate = 2500;	//milliseconds
+		//dataReadRate = 2500;		//milliseconds
+		//dataMidiSendRate = 2500;	//milliseconds
 
 		soundCheck = 0;	// for debugging sound
 
 		// **** Setup sensor conversion variables **** //
 		maxSensorDist = 25.0;		// total range of sensor (ft)
-		maxOuputDist = 20.0;		// target output range of sensor (ft)
+		maxOuputDist = 10.0;		// target output range of sensor (ft)
 
-		crossChannelSustain = 4; // >0 alternates between channels to create same note sustain
+		crossChannelSustainGap = 4; // >0 alternates between channels to create same note sustain
 	}
 
 

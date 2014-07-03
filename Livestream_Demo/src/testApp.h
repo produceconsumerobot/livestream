@@ -15,11 +15,11 @@ class testApp : public ofBaseApp{
 		//std::vector< LivestreamPipe > pipes;
 
 		// Data variabless
-		int dataReadRate;		//milliseconds
-		int dataMidiSendRate;	//milliseconds
-		int dataReadCounter;
-		int dataMidiSendCounter;
-		int dataSendHelper;
+		//int dataReadRate;		//milliseconds
+		//int dataMidiSendRate;	//milliseconds
+		//int dataReadCounter;
+		//int dataMidiSendCounter;
+		//int dataSendHelper;
 
 		//std::vector< float > data; 
 
