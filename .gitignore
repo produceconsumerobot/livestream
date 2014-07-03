@@ -1,3 +1,18 @@
+# Livestream files
+exampleOutput/*
+firmataExample/*
+guiExample/*
+widgetsExample/*
+*/obj/*
+*.kgs
+*/src/old/*
+
+# Visual Studio files
+*.sdf
+*.exe
+*.opensdf
+*.exp
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
