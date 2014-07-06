@@ -12,6 +12,7 @@ widgetsExample/*
 *.exe
 *.opensdf
 *.exp
+*.suo
 
 # Windows image file caches
 Thumbs.db

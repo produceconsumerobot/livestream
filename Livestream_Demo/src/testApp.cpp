@@ -95,6 +95,11 @@ void testApp::setupArduino(ofArduino & ard) {
 
 	// set pin D13 as digital output
 	ard.sendDigitalPinMode(13, ARD_OUTPUT);
+
+	// set pin D7 as digital output and high to enable automatic range sampling on sensor
+	ard.sendDigitalPinMode(7, ARD_OUTPUT);
+	ard.sendDigital(7, ARD_HIGH);
+
 	
     // Listen for changes on the digital and analog pins
 	// Not sure how to make listener work with multiple arduinos

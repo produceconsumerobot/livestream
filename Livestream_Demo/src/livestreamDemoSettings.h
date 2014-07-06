@@ -175,13 +175,13 @@ public:
 
 	LivestreamDemoSettings() 
 	{
-		usingDistanceSensors = false;
+		usingDistanceSensors = true;
 
 		nSensors = 3;
 		pipes.resize(nSensors); 
-		pipes.at(0).setup("Field Conductivity", 2500, 2500, "COM8", 2, Range(0, 3500), Range(0, 9));
-		pipes.at(1).setup("Field pH", 2000, 2000, "COM9", 1, Range(5, 10), Range(0, 4));
-		pipes.at(2).setup("Field Temperature", 1000, 1000, "COM10", 4, Range(0, 27), Range(0, 4));
+		pipes.at(0).setup("Field Conductivity", 2500, 2500, "COM12", 2, Range(0, 3500), Range(0, 9));
+		pipes.at(1).setup("Field pH", 2000, 2000, "COM13", 1, Range(5, 10), Range(0, 4));
+		pipes.at(2).setup("Field Temperature", 1000, 1000, "COM14", 4, Range(0, 27), Range(0, 4));
 		
 		// **** Setup midi **** //
 		// Midi Port
