@@ -3,7 +3,6 @@
 #include "ofMain.h"
 #include "ofxMidi.h"
 #include "livestreamDemoSettings.h"
-#include "livestream.h"
 #include "ofxGui.h"
 
 #define LIVESTREAM_nData	10	//number of data points
