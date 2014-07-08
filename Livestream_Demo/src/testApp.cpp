@@ -12,7 +12,7 @@ void testApp::setup(){
 
 	// **** Setup frame rate **** //
 	ofSetVerticalSync(true);
-	ofSetFrameRate(60);
+	ofSetFrameRate(5);
 
 	// **** Setup timers **** //
 	blink13On = true;
@@ -96,10 +96,23 @@ void testApp::setupArduino(ofArduino & ard) {
 	// set pin D13 as digital output
 	ard.sendDigitalPinMode(13, ARD_OUTPUT);
 
-	// set pin D7 as digital output and high to enable automatic range sampling on sensor
+	// set pin D7 as digital output 
 	ard.sendDigitalPinMode(7, ARD_OUTPUT);
-	ard.sendDigital(7, ARD_HIGH);
 
+	if (settings.triggeredSensorPolling) {
+		// Trigger the sensor so that data is ready on first update loop
+		ard.sendDigital(7, ARD_LOW);
+		ard.update();
+		ofSleepMillis(200);
+		ard.sendDigital(7, ARD_HIGH); // Trigger the sensor to read new data
+		ard.update();
+		ofSleepMillis(1); // Sleep >20uSec to trigger sensor to make a reading
+		ard.sendDigital(7, ARD_LOW); // Pull low to stay in real-time/trigger mode
+		ard.update();
+		ofSleepMillis(200);
+	} else {
+		ard.sendDigital(7, ARD_HIGH); // set high to enable automatic range sampling on sensor
+	}
 	
     // Listen for changes on the digital and analog pins
 	// Not sure how to make listener work with multiple arduinos
@@ -127,9 +140,27 @@ void testApp::testMidiChannelSliderChanged(int & tempMidiChannel){
 
 //--------------------------------------------------------------
 void testApp::update(){
+	// Update smoothing weights
+	if (nSamplesToSmooth < maxSamplesToSmooth ) nSamplesToSmooth++; // increment up to max
+	float newWeight = 1/(nSamplesToSmooth); // weight by which new values contribute to the smoothed average
+
 	//cout << "update()" << endl;
 	for (int i=0; i<settings.nSensors; i++) {
 		if (settings.pipes.at(i).isArduinoSetup) {
+			// Read new data point from the arduino analog pin
+			float newVal = (float) settings.pipes.at(i).arduino.getAnalog(sensorAnalogPin); // get sensor data
+
+			// Smoothing occurs every time a new data point is obtained //
+			smoothData.at(i) = newVal*newWeight + smoothData.at(i)*(1-newWeight); // smooth a running average on the incoming data
+
+			if (settings.triggeredSensorPolling) {
+				// Trigger the sensor to poll a new datapoint
+				settings.pipes.at(i).arduino.sendDigital(7, ARD_HIGH);
+				settings.pipes.at(i).arduino.update();
+				ofSleepMillis(1); // Sleep >20uSec to trigger sensor to make a reading
+				settings.pipes.at(i).arduino.sendDigital(7, ARD_LOW); // Pull low to stay in real-time/trigger mode
+			}
+
 			settings.pipes.at(i).arduino.update();
 		}
 	}
@@ -148,25 +179,12 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	
-	// Update smoothing weights
-	if (nSamplesToSmooth < maxSamplesToSmooth ) nSamplesToSmooth++; // increment up to max
-	float newWeight = 1/(nSamplesToSmooth); // weight by which new values contribute to the smoothed average
 
 	// Loop through sensors, read data, filter, map and send output controls
 	for (int i=0; i<settings.nSensors; i++) {
-		int sensorData = 0;
-		if (settings.pipes.at(i).isArduinoSetup) {
-			sensorData = settings.pipes.at(i).arduino.getAnalog(sensorAnalogPin); // get sensor data
-		}
-		float newVal = (float) sensorData; // convert to float
-		// Smoothing occurs every time a new data point is obtained //
-		smoothData.at(i) = newVal*newWeight + smoothData.at(i)*(1-newWeight); // smooth a running average on the incoming data
-		sensorData = (int) smoothData.at(i); // convert back to int
-
 		// Map sensor data to output range
 		float dist2Value = maxOuputDist/maxSensorDist*maxAnalogValue;		// distance to analog value ratio
-		int controlValue = ofClamp(sensorData, 0, dist2Value);				// clamp to maxOuputDist
+		int controlValue = ofClamp((int) smoothData.at(i), 0, dist2Value);				// clamp to maxOuputDist
 		controlValue = ofMap(controlValue, 0, dist2Value, 0, maxMidiControlValue);	// map onto output range
 
 		// Set screen color to reflect incoming data

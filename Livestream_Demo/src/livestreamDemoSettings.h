@@ -169,13 +169,15 @@ public:
 	int dataReadRate;		//milliseconds
 	int dataMidiSendRate;	//milliseconds
 
-	bool usingDistanceSensors;
+	bool usingDistanceSensors;		// toggles whether you're using the distance sensors
+	bool triggeredSensorPolling;	// tottles whether distance sensors are triggered or automatic
 
 	int nSensors;
 
 	LivestreamDemoSettings() 
 	{
 		usingDistanceSensors = true;
+		triggeredSensorPolling = true;
 
 		nSensors = 3;
 		pipes.resize(nSensors); 
