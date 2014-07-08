@@ -181,6 +181,7 @@ public:
 
 		nSensors = 3;
 		pipes.resize(nSensors); 
+		// setup(dataName, dataReadRate, dataMidiSendRate, arduinoPort, midiChannel, dataRange, midiNoteRange) 
 		pipes.at(0).setup("Field Conductivity", 2500, 2500, "COM12", 2, Range(0, 3500), Range(0, 9));
 		pipes.at(1).setup("Field pH", 2000, 2000, "COM13", 1, Range(5, 10), Range(0, 4));
 		pipes.at(2).setup("Field Temperature", 1000, 1000, "COM14", 4, Range(0, 27), Range(0, 4));
@@ -190,9 +191,6 @@ public:
 		// midiPort = 0; // Mac
 		midiPort = 1; // PC
 		midiNoteAttack = 127;
-		
-		//dataReadRate = 2500;		//milliseconds
-		//dataMidiSendRate = 2500;	//milliseconds
 
 		soundCheck = 0;	// for debugging sound
 
