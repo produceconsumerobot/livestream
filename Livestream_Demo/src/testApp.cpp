@@ -12,7 +12,8 @@ void testApp::setup(){
 
 	// **** Setup frame rate **** //
 	ofSetVerticalSync(true);
-	ofSetFrameRate(5);
+	Fs = 4; // sampling freq (Hz)
+	ofSetFrameRate(Fs);
 
 	// **** Setup timers **** //
 	blink13On = true;
@@ -62,8 +63,7 @@ void testApp::setup(){
 
 	// **** Filter Setup **** //
 	smoothData.resize(settings.nSensors);
-	float Fs = ofGetFrameRate(); // sampling freq (Hz)
-	float smoothDuration = 0.5; // seconds
+	float smoothDuration = 1.5; // seconds
 	maxSamplesToSmooth = Fs*smoothDuration; // determines degree of smoothing
 	nSamplesToSmooth = 0; // starting with 0 and incrementing up to max converges smoothed average to initial values quickly
 
@@ -140,6 +140,9 @@ void testApp::testMidiChannelSliderChanged(int & tempMidiChannel){
 
 //--------------------------------------------------------------
 void testApp::update(){
+	cout << "LoopTime= " << ofGetElapsedTimeMillis() - elapsedTime << ", ";
+	elapsedTime = ofGetElapsedTimeMillis();
+
 	// Update smoothing weights
 	if (nSamplesToSmooth < maxSamplesToSmooth ) nSamplesToSmooth++; // increment up to max
 	float newWeight = 1/(nSamplesToSmooth); // weight by which new values contribute to the smoothed average
@@ -157,8 +160,9 @@ void testApp::update(){
 				// Trigger the sensor to poll a new datapoint
 				settings.pipes.at(i).arduino.sendDigital(7, ARD_HIGH);
 				settings.pipes.at(i).arduino.update();
-				ofSleepMillis(1); // Sleep >20uSec to trigger sensor to make a reading
+				ofSleepMillis(2); // Sleep >20uSec to trigger sensor to make a reading
 				settings.pipes.at(i).arduino.sendDigital(7, ARD_LOW); // Pull low to stay in real-time/trigger mode
+				ofSleepMillis(2); // Wait between sensor triggering (dunno if it might help prevent cross talk)
 			}
 
 			settings.pipes.at(i).arduino.update();
@@ -168,9 +172,8 @@ void testApp::update(){
 	// Update data read timer
 	for (int i=0; i<settings.nSensors; i++) {
 		settings.pipes.at(i).dataReadCounter++;
-		if (settings.pipes.at(i).dataReadCounter >= (settings.pipes.at(i).dataReadRate * ofGetFrameRate()) / 1000 ) {
+		if (settings.pipes.at(i).dataReadCounter >= (settings.pipes.at(i).dataReadRate * Fs) / 1000 ) {
 			settings.pipes.at(i).dataReadCounter = 0;
-			//cout << "Updating data" << endl;
 		
 			settings.pipes.at(i).updateData();
 		}
@@ -179,7 +182,7 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-
+	cout << "distance= ";
 	// Loop through sensors, read data, filter, map and send output controls
 	for (int i=0; i<settings.nSensors; i++) {
 		// Map sensor data to output range
@@ -227,12 +230,11 @@ void testApp::draw(){
 	if (!midiMapMode) { 
 		for (int i=0; i<settings.nSensors; i++) {		
 			settings.pipes.at(i).dataMidiSendCounter++;
-			if (settings.pipes.at(i).dataMidiSendCounter >= (settings.pipes.at(i).dataMidiSendRate * ofGetFrameRate()) / 1000) {
+			if (settings.pipes.at(i).dataMidiSendCounter >= (settings.pipes.at(i).dataMidiSendRate * Fs) / 1000) {
 				// The send counter has tripped... send a note!
 				settings.pipes.at(i).dataMidiSendCounter = 0; // reset the counter
-				cout << "data: ";
 				float tempData = settings.pipes.at(i).getData(); // get a new datapoint
-				cout << ofToString(tempData) << ", ";
+				cout << settings.pipes.at(i).dataName << "= " << ofToString(tempData) << endl;
 				// Map the data onto the ouput range
 				int tempPitch = ofMap(tempData, 
 					settings.pipes.at(i).dataRange.min, 
@@ -252,9 +254,6 @@ void testApp::draw(){
 			}
 			
 		}
-		cout << endl;
-		// hack to deal with same note MIDI sustain in Live
-		
 	}
 
 		//dataSendHelper = 0;
@@ -265,7 +264,7 @@ void testApp::draw(){
 	}
 
 	// heartbeat blink digital channel 13 to verify arduino is working
-	if (++blinkCounter > ofGetFrameRate()/2) { // 1Hz
+	if (++blinkCounter > Fs/2) { // 1Hz
 		blinkCounter = 0;
 		blink13On = !blink13On;
 		for (int i=0; i<settings.nSensors; i++) {

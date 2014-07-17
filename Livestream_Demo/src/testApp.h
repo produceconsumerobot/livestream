@@ -24,7 +24,9 @@ class testApp : public ofBaseApp{
 		//std::vector< float > data; 
 
 		LivestreamDemoSettings settings;	// Settings that change from computer to computer
-		//static const int nSensors = LIVESTREAM_nSENSORS;
+		
+		int Fs; // sampling freq (Hz)
+		unsigned long long elapsedTime; 
 
 		// Arduino variables
 		//std::vector<ofArduino> arduinos;
