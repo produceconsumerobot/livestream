@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-//#include "ofxGPIO.h"
+#include "ofxGPIO.h"
 #include "lidarLite.h"
 #include "DS18B20.h"
 
@@ -56,4 +56,11 @@ class ofApp : public ofBaseApp{
 		
 		DS18B20 tempSensor;
 		int nSensors;
+		
+		// Blink LED
+		bool gpio15outState;
+		bool gpio21outState;
+		
+		GPIO* gpio15;
+		GPIO* gpio21;
 };

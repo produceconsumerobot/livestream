@@ -10,26 +10,17 @@ void ofApp::setup(){
 	logTimer = ofGetElapsedTimeMillis();
 	
 	// Setup GPIOs
-	/*
-	gpioOutLed  = new GPIO("26");
-	gpioOutLed->export_gpio();
-	gpioOutLed->setdir_gpio("out");
-
-	gpioBlinkLed  = new GPIO("3");
-	gpioBlinkLed->export_gpio();
-	gpioBlinkLed->setdir_gpio("out");
+	gpio15  = new GPIO("15");
+	gpio15->export_gpio();
+	gpio15->setdir_gpio("out");
+	gpio15->setval_gpio("0");
+	gpio15outState = false;
 	
-	gpioPwmIn  = new GPIO("21");
-	gpioPwmIn->export_gpio();
-	gpioPwmIn->setdir_gpio("in");
-	
-	// Set GPIO outputs
-	gpioOutLed->setval_gpio("0");
-	gpioOutLedState = false;
-	
-	gpioBlinkLed->setval_gpio("0");
-	gpioBlinkLedState = false;
-	*/
+	gpio21  = new GPIO("21");
+	gpio21->export_gpio();
+	gpio21->setdir_gpio("out");
+	gpio21->setval_gpio("0");
+	gpio21outState = false;
 
 	// PWM smoothing parameters
 	nSamplesToSmooth = 0;
@@ -112,15 +103,22 @@ void ofApp::draw(){
 		//cout << ofGetSystemTimeMicros() << "," << blinkTimer << endl;
 		if (ofGetSystemTimeMicros() - blinkTimer >= 200000) {
 			
-			/*
-			if (gpioBlinkLedState) {
-				gpioBlinkLed->setval_gpio("0");
-				gpioBlinkLedState = false;
+			// Blink the LED
+			if (gpio15outState) {
+				gpio15->setval_gpio("0");
+				gpio15outState = false;
 			} else {
-				gpioBlinkLed->setval_gpio("1");
-				gpioBlinkLedState = true;
+				gpio15->setval_gpio("1");
+				gpio15outState = true;
 			}
-			*/
+			
+			if (gpio21outState) {
+				gpio21->setval_gpio("0");
+				gpio21outState = false;
+			} else {
+				gpio21->setval_gpio("1");
+				gpio21outState = true;
+			}
 			
 			// Play sound
 			pitchSound.play();
@@ -128,7 +126,13 @@ void ofApp::draw(){
 			pitchSound.setSpeed( soundSpeed );
 			//ofSoundSetVolume(ofClamp(0.5f + smoothPwm, 0, 1));
 			cout << getDateTimeString() << ", " << counter << " loops, " << ofGetFrameRate() 
-				<< "Hz , " << smoothPwm << " cm" << " , " << soundSpeed <<", " << st << endl;
+				<< "Hz , " << smoothPwm << " cm" << " , " << soundSpeed <<", " << st;
+			if (gpio15outState){
+				cout << ",LED=ON";
+			} else {
+				cout << ",LED=OFF";
+			}
+			cout << endl;
 			
 			blinkTimer = ofGetSystemTimeMicros();
 			counter = 0;
@@ -139,8 +143,31 @@ void ofApp::draw(){
 		if (ofGetSystemTimeMicros() - blinkTimer >= 1000000) {
 			volSound.play();
 			
+			// Blink the LED
+			if (gpio15outState) {
+				gpio15->setval_gpio("0");
+				gpio15outState = false;
+			} else {
+				gpio15->setval_gpio("1");
+				gpio15outState = true;
+			}
+			
+			if (gpio21outState) {
+				gpio21->setval_gpio("0");
+				gpio21outState = false;
+			} else {
+				gpio21->setval_gpio("1");
+				gpio21outState = true;
+			}
+			
 			cout << getDateTimeString() << ", " << counter << " loops, " << ofGetFrameRate() 
-				<< "Hz , " << smoothPwm << " cm" << " , " << soundVolume <<", " << st << endl;
+				<< "Hz , " << smoothPwm << " cm" << " , " << soundVolume <<", " << st;
+			if (gpio15outState){
+				cout << ",LED=ON";
+			} else {
+				cout << ",LED=OFF";
+			}
+			cout << endl;
 				
 			blinkTimer = ofGetSystemTimeMicros();
 			counter = 0;
@@ -151,6 +178,8 @@ void ofApp::draw(){
 	
 	// Log data to file
 	if (ofGetElapsedTimeMillis() - logTimer >= 60000) {
+
+		
 		// Get the temperature
 		FILE *temperatureFile;
 		double T;
@@ -175,7 +204,8 @@ void ofApp::draw(){
 			float tempData = tempSensor.read(j);
 			mFile << ",T" << j << "," << tempData;
 		}
-		mFile << ",DL," << smoothPwm << " cm" << ",LR," << ofGetFrameRate() << "Hz" << endl;
+		mFile << ",DL," << smoothPwm << " cm" << ",LR," << ofGetFrameRate() << "Hz,";
+		mFile << endl;
 		mFile.close();
 	}
 }
