@@ -288,3 +288,10 @@ void ofApp::gotMessage(ofMessage msg){
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
 }
+
+//--------------------------------------------------------------
+void ofApp::exit(){ 
+	cout << "EXIT" << endl;
+	gpio15->setval_gpio("0");
+	gpio21->setval_gpio("0");
+}
