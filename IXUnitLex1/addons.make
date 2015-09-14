@@ -1,0 +1,4 @@
+ofxDS18B20
+ofxGPIO
+ofxLidarLite
+ofxNetwork
