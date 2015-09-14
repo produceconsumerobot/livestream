@@ -3,7 +3,9 @@
 
 #include <string>
 #include "ofMain.h"
+#include "ofxNetwork.h"
 #include "Range.h"
+#include "LivestreamNetwork.h"
 
 using namespace std;
 
@@ -36,13 +38,19 @@ public:
 	int heartbeatInterval;		// Interval (ms) to pulse heartbeats
 	bool eyeSafetyOn;			// Tracks whether eye safety is on
 	int distSensorStatus;		// Status of the distance sensor
+	unsigned long long nPacketsSent;
+	int packetProtocolVersion;
+	
+	ofxUDPManager udpSender;
 
 	void setDistance(int distance, int signalStrength);
+	float calculateVolume();
 	void setTemperature(int temp);
 
-	int parseUdpPacket(char * packet); 
+	void parseUdpPacket(char * udpMessage); 
 
 	int getSmoothedDistance();
+	int getVolume();
 	int getRawDistance();
 	int getTemperature();
 	int getLowTemperature();
@@ -59,99 +67,3 @@ private:
 	int highTemperature;		// Highest recorded temperature
 };
 
-// ---------------------------------------------------------------------------- //
-// Constructor
-// ---------------------------------------------------------------------------- //
-LivestreamInteractionUnit::LivestreamInteractionUnit() {
-	
-	id = -1;
-	dataName = "none";
-	sensorLocation = "none";
-	ipAddress = "0.0.0.0";
-	volume = 0.f;						// 0 to 1
-	volumeRange = Range(0.f, 1.f);		// 0 to 1
-	sustainPedal = true;
-	waterDataRange = Range(0, 1);		// Range of data
-	noteRange = Range(1, 2);			// number of note files
-	waterDataReadInterval = 3000;		// ms
-	notePlayInterval = 1000;			// ms
-	distanceReadInterval = 1000/60;		// ms
-	rawDistance = 0;					// cm
-	smoothedDistance = 0;				// cm
-	distanceRange = Range(30, 20*30);	// cm
-	distanceSignalStrength = 0;			// 0 to 255
-	signalStrengthRange = Range(20, 80);	// 0 to 255
-	minSignalWeight = 0.05f;			// 0 to 1
-	noiseDistance = 20;					// cm
-	distSamplesToSmooth = 0;			// Start at zero and increment to maxDistSamplesToSmooth
-	maxDistSamplesToSmooth = 1;		
-	temperature = -1;
-	lowTemperature = -1;
-	highTemperature = -1;
-	heartbeat = 1;
-	heartbeatInterval = 1000;			// ms
-	eyeSafetyOn = false;
-	distSensorStatus = 0;	
-
-
-};
-
-// ---------------------------------------------------------------------------- //
-// 
-// ---------------------------------------------------------------------------- //
-void LivestreamInteractionUnit::setDistance(int distance, int signalStrength) {
-	// set the raw distance
-	rawDistance = distance;
-	// set the signal strength
-	distanceSignalStrength = signalStrength;
-
-	// increment up to max smoothing (deals with initial state)
-	if (distSamplesToSmooth < maxDistSamplesToSmooth ) distSamplesToSmooth++; 
-	// Calculate the weight of new value
-	float newWeight = ((float)1)/((float) distSamplesToSmooth); 
-
-	if (rawDistance < noiseDistance) {
-		// Handle strange case where lidar reports 1cm when should be infinity
-		distance = distanceRange.max*2;
-
-		// We're within the noise distance
-		// Ignore signal strength and go toward newVal quickly
-		newWeight = newWeight * (1.f - signalStrengthRange.min);
-	} else {
-		// Weight by the signal strength
-		newWeight = newWeight * ofMap(signalStrength, signalStrengthRange.min, signalStrengthRange.max, minSignalWeight, 1.f, true);
-	}
-
-	// Calculate the smoothed PWM value
-	smoothedDistance = ((float) rawDistance)*newWeight + smoothedDistance*(1-newWeight);
-}
-
-// ---------------------------------------------------------------------------- //
-// setTemperature
-// ---------------------------------------------------------------------------- //
-void LivestreamInteractionUnit::setTemperature(int temp) {
-	temperature = temp;
-	lowTemperature = min(temperature, lowTemperature);
-	highTemperature = max(temperature, highTemperature);
-}
-
-// ---------------------------------------------------------------------------- //
-// getTemperature
-// ---------------------------------------------------------------------------- //
-int LivestreamInteractionUnit::getTemperature() {
-	return temperature;
-}
-
-// ---------------------------------------------------------------------------- //
-// getLowTemperature
-// ---------------------------------------------------------------------------- //
-int LivestreamInteractionUnit::getLowTemperature() {
-	return lowTemperature;
-}
-
-// ---------------------------------------------------------------------------- //
-// getHighTemperature
-// ---------------------------------------------------------------------------- //
-int LivestreamInteractionUnit::getHighTemperature() {
-	return highTemperature;
-}

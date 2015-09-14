@@ -6,7 +6,7 @@ void ofApp::setup(){
 	//ofSetVerticalSync(true);
 	//ofSetFrameRate(60);
 
-    //create the socket and bind to port 11999
+  //create the socket and bind to port 11999
 	udpReceiver.Create();
 	udpReceiver.Bind(11999);
 	udpReceiver.SetNonBlocking(true);

@@ -7,18 +7,66 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxTCPManager.cpp">
+      <Filter>addons\ofxNetwork\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxUDPManager.cpp">
+      <Filter>addons\ofxNetwork\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxTCPClient.cpp">
+      <Filter>addons\ofxNetwork\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxTCPServer.cpp">
+      <Filter>addons\ofxNetwork\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LivestreamInteractionUnit.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LivestreamUtils\src\LivestreamNetwork.cpp">
+      <Filter>LivestreamUtils\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
       <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons">
+      <UniqueIdentifier>{71834F65-F3A9-211E-73B8-DC85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxNetwork">
+      <UniqueIdentifier>{01A15744-29A6-108D-08E9-83A7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxNetwork\src">
+      <UniqueIdentifier>{3D1C10C7-8F35-E796-9C70-F5F3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LivestreamUtils">
+      <UniqueIdentifier>{4e960cf8-3edc-4908-a8f4-50cf0928e460}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LivestreamUtils\src">
+      <UniqueIdentifier>{edfa147d-41a1-4248-bbe6-587f1fcdb98e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ofApp.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\LivestreamNetwork.h">
-      <Filter>src</Filter>
+    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxTCPManager.h">
+      <Filter>addons\ofxNetwork\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxTCPClient.h">
+      <Filter>addons\ofxNetwork\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxUDPManager.h">
+      <Filter>addons\ofxNetwork\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxNetwork.h">
+      <Filter>addons\ofxNetwork\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxTCPServer.h">
+      <Filter>addons\ofxNetwork\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\addons\ofxNetwork\src\ofxNetworkUtils.h">
+      <Filter>addons\ofxNetwork\src</Filter>
     </ClInclude>
     <ClInclude Include="src\LivestreamInteractionUnit.h">
       <Filter>src</Filter>
@@ -26,8 +74,11 @@
     <ClInclude Include="src\LivestreamSettings.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Range.h">
-      <Filter>src</Filter>
+    <ClInclude Include="..\LivestreamUtils\src\LivestreamNetwork.h">
+      <Filter>LivestreamUtils\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LivestreamUtils\src\Range.h">
+      <Filter>LivestreamUtils\src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
