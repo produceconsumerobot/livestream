@@ -16,8 +16,11 @@ LivestreamInteractionUnit::LivestreamInteractionUnit() {
 	waterDataRange = Range(0, 1);		// Range of data
 	noteRange = Range(1, 2);			// number of note files
 	waterDataReadInterval = 3000;		// ms
+	waterDataReadTime = ofGetElapsedTimeMillis();
 	notePlayInterval = 1000;			// ms
+	notePlayTime = ofGetElapsedTimeMillis();
 	distanceReadInterval = 1000/60;		// ms
+	distanceReadTime = ofGetElapsedTimeMillis();
 	rawDistance = 0;					// cm
 	smoothedDistance = 0;				// cm
 	distanceRange = Range(30, 20*30);	// cm
@@ -32,6 +35,7 @@ LivestreamInteractionUnit::LivestreamInteractionUnit() {
 	highTemperature = -1;
 	heartbeat = 1;
 	heartbeatInterval = 1000;			// ms
+	heartbeatTime = ofGetElapsedTimeMillis();
 	eyeSafetyOn = false;
 	distSensorStatus = 0;	
 	nPacketsSent = 0;
@@ -162,5 +166,10 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 				sizeof(outPacket.hdr.typeTag[0]));
 			ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << ipAddress << endl;	
 
+		} else if (memcmp( header->typeTag, LivestreamNetwork::TEMPERATURE, 
+			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
+			LivestreamNetwork::PacketTemperature_V1* inPacket = (LivestreamNetwork::PacketTemperature_V1 *) udpMessage;
+			ofLog(OF_LOG_VERBOSE) << "T" << inPacket->sensorDesignator << ", " << inPacket->temperature << endl;
+			setTemperature(inPacket->temperature);
 		}
 }

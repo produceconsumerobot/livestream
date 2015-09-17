@@ -26,12 +26,16 @@ class ofApp : public ofBaseApp{
 		unsigned long long nPacketsSent;
 		int packetProtocolVersion;
 
+		string maestroIpAddress;
+
 		vector<LivestreamInteractionUnit> interXUnit;
 		int nInterXUnits;
 
 		ofTrueTypeFont  mono;
 		ofTrueTypeFont  monosm;
 		vector<ofPoint> stroke;
+
+		bool testLED;
 
 };
 

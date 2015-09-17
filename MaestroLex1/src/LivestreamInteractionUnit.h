@@ -40,6 +40,11 @@ public:
 	int distSensorStatus;		// Status of the distance sensor
 	unsigned long long nPacketsSent;
 	int packetProtocolVersion;
+
+	unsigned long long waterDataReadTime;
+	unsigned long long notePlayTime;
+	unsigned long long distanceReadTime;
+	unsigned long long heartbeatTime;
 	
 	ofxUDPManager udpSender;
 
