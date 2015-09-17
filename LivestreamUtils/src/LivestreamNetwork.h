@@ -10,27 +10,29 @@ public:
 
 	// ---------------------------------------------
 	// Packet Type Tags
+	static const char MODE_SLAVE[2];			// MS x
+	static const char MODE_MASTER[2];			// MM x
 	static const char SET_SUSTAIN_PEDAL[2];		// SP
-	static const char SET_MAESTRO_ADDRESS[2];	// MA
-	static const char GET_DISTANCE[2];			// GD
-	static const char GET_SIGNAL_STRENGTH[2];	// GS
-	static const char DISTANCE[2];				// LD
-	static const char SIGNAL_STRENGTH[2];		// LS 
-	static const char SET_VOLUME[2];			// SV
-	static const char PING[2];					// PI
-	static const char SET_LED[2];				// SL
+	static const char SET_MAESTRO_ADDRESS[2];	// MA *
+	static const char GET_DISTANCE[2];			// GD x
+	static const char GET_SIGNAL_STRENGTH[2];	// GS [deprecated, use GET_DISTANCE]
+	static const char DISTANCE[2];				// LD x
+	static const char SIGNAL_STRENGTH[2];		// LS [deprecated, use DISTANCE]
+	static const char SET_VOLUME[2];			// SV x
+	static const char PING[2];					// PI x
+	static const char SET_LED[2];				// SL x
 	static const char GET_EYE_SAFETY[2];		// GE
 	static const char GET_TRANSMIT_POWER[2];	// GP
 	static const char GET_STATUS[2];			// GU
-	static const char GET_LOOP_RATE[2];			// GL
-	static const char PONG[2];					// PO
+	static const char GET_LOOP_RATE[2];			// GL [deprecated?]
+	static const char PONG[2];					// PO x
 	static const char EYE_SAFETY[2];			// LE
 	static const char TRANSMIT_POWER[2];		// LT
 	static const char STATUS[2];				// LU
-	static const char LOOP_RATE[2];				// LR
-	static const char PLAY_SOUND[2];			// PS
-	static const char GET_ALL_TEMPS[2];			// GT
-	static const char TEMPERATURE[2];			// TN
+	static const char LOOP_RATE[2];				// LR [deprecated?]
+	static const char PLAY_NOTE[2];				// PS x
+	static const char GET_ALL_TEMPS[2];			// GT x
+	static const char TEMPERATURE[2];			// TN x
 
 	// ---------------------------------------------
 	// Packet Definitions
@@ -69,7 +71,7 @@ public:
 	// Packet structure for sending an IP address
 	struct PacketIPAddress_V1 {
 		PacketHeader_V1 hdr;
-		char ipAddress[16];
+		char ipAddress[20];
 	};
 
 	// Packet structure for sending a file path

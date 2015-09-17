@@ -83,4 +83,11 @@ class ofApp : public ofBaseApp{
 		int packetProtocolVersion;
 		
 		float volume;
+		
+		int debugTest;
+		
+		static const int NO_LIDAR = 1;
+		static const int NO_TEMP = 2;
+		static const int NO_GPIO = 3;
+		static const int NO_SOUND = 4;
 };

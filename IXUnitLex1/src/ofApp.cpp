@@ -1,10 +1,15 @@
+#include <stdlib.h>
+#include <cstdio>
 #include "ofApp.h"
 #include "LivestreamNetwork.h"
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	slaveMode = true;  // Slave mode follows UDP commands to run
+	slaveMode = false;  // Slave mode follows UDP commands to run
 	ofSetLogLevel(OF_LOG_VERBOSE);
+	
+	// debugTest used to isolate parts of code
+	debugTest = NO_LIDAR;
 	
 	//***********************************************************
 	// Variables for "Master" Mode (not requiring UDP input)
@@ -44,38 +49,44 @@ void ofApp::setup(){
 	ofSetVerticalSync(false);
 	//ofSetFrameRate(10000)
 	
-	// Setup GPIOs
-	gpio15  = new GPIO("15");
-	gpio15->export_gpio();
-	gpio15->setdir_gpio("out");
-	gpio15->setval_gpio("0");
-	gpio15outState = false;
+	if (debugTest != NO_GPIO) {
+		// Setup GPIOs
+		gpio15  = new GPIO("15");
+		gpio15->export_gpio();
+		gpio15->setdir_gpio("out");
+		gpio15->setval_gpio("0");
+		gpio15outState = false;
+		
+		gpio21  = new GPIO("21");
+		gpio21->export_gpio();
+		gpio21->setdir_gpio("out");
+		gpio21->setval_gpio("0");
+		gpio21outState = false;
+	}
 	
-	gpio21  = new GPIO("21");
-	gpio21->export_gpio();
-	gpio21->setdir_gpio("out");
-	gpio21->setval_gpio("0");
-	gpio21outState = false;
-	
-	// Sound output setup
-	volSound.loadSound("sounds/Tp10.wav");
-	volume = 0.0f;
-	volSound.setVolume(volume);
-	volSound.setMultiPlay(true);
-	ofSoundSetVolume(volume);
+	if (debugTest != NO_SOUND) {
+		// Sound output setup
+		volSound.loadSound("sounds/Tp10.wav");
+		volume = 0.0f;
+		volSound.setVolume(volume);
+		volSound.setMultiPlay(true);
+		ofSoundSetVolume(volume);
+	}
 
 	// Init LidarLite
-	myLidarLite = LidarLite();
-	myLidarLite.logLevel = LidarLite::INFO;
-	myLidarLite.begin(0);
 	int lidarConfig = 0; // 2=low sensitivity, low noise
-	myLidarLite.configure(lidarConfig);
-	// Exit if the lidar lite didn't initialize properly
-	if (!myLidarLite.hasBegun()) ofApp::exit();
-	
-	// Print the hardware version of the Lidar Lite
-	cout << "LIDAR Lite hardware version: " << myLidarLite.hardwareVersion() << endl;
-	cout << "LIDAR Lite software version: " << myLidarLite.softwareVersion() << endl;
+	if (debugTest != NO_LIDAR) {
+		myLidarLite = LidarLite();
+		myLidarLite.logLevel = LidarLite::INFO;
+		myLidarLite.begin(0);
+		myLidarLite.configure(lidarConfig);
+		// Exit if the lidar lite didn't initialize properly
+		if (!myLidarLite.hasBegun()) ofApp::exit();
+		
+		// Print the hardware version of the Lidar Lite
+		cout << "LIDAR Lite hardware version: " << myLidarLite.hardwareVersion() << endl;
+		cout << "LIDAR Lite software version: " << myLidarLite.softwareVersion() << endl;
+	}
 	
 	// Get the host name
 	int z;  
@@ -93,69 +104,92 @@ void ofApp::setup(){
 	nSensors = tempSensor.listDevices();
 	
 	// Set the delay between loop cycles
-	loopInterval = 25;
+	loopInterval = 5;
+	
+
 	
 	// Write initialization to the log
 	string logFileName = "/logs/livestream/livestream_" + hostname + ".log";
 	ofstream mFile;
 	mFile.open(logFileName.c_str(), ios::out | ios::app);
-	mFile << getDateTimeString() << ",INITILIZATION, LH, " << myLidarLite.hardwareVersion() 
-		<< " , LV, " << myLidarLite.softwareVersion()
-		<< ", LC, " << lidarConfig << ", TN, " << nSensors << endl;
+	mFile << getDateTimeString() << ",INITILIZATION";
+	if (debugTest != NO_LIDAR) {
+		mFile	<< ", LH, " << myLidarLite.hardwareVersion();
+		mFile	<< " , LV, " << myLidarLite.softwareVersion();
+		mFile	<< ", LC, " << lidarConfig;
+	}
+	mFile << ", TN, " << nSensors; 
+	mFile << endl;
 	mFile.close();
 	
-	cout << getDateTimeString() << ",INITILIZATION " << hostname << " , LH, " << myLidarLite.hardwareVersion() 
-	  << " , LV, " << myLidarLite.softwareVersion()
-		<< ", LC, " << lidarConfig << ", TN, " << nSensors << endl;
+	cout << getDateTimeString() << ",INITILIZATION " << hostname;
+	if (debugTest != NO_LIDAR) {
+		cout << " , LH, " << myLidarLite.hardwareVersion(); 
+		cout << " , LV, " << myLidarLite.softwareVersion();
+		cout << ", LC, " << lidarConfig;
+	}
+	cout << ", TN, " << nSensors;
+	cout << endl;
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
 	// update the sound playing system:
-	ofSoundUpdate();
+	if (debugTest != NO_SOUND) {
+		ofSoundUpdate();
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
 	ofSleepMillis(loopInterval);
 	
-	if (slaveMode) {
-		if (ofGetSystemTimeMicros() - blinkTimer >= 1000000) {
-				volSound.play();
-				volSound.setVolume(volume);
-				ofSoundSetVolume(volume);
-				blinkTimer = ofGetSystemTimeMicros();
-		}
+	// Check incoming UDP messages
+	char udpMessage[100000];
+	udpReceiver.Receive(udpMessage,100000);
+	string message=udpMessage;
+	
+	if(message!=""){
+		// We got a message!
+		char udpAddress[20];
+		// Get the sender's address
+		udpReceiver.GetRemoteAddr(udpAddress);
+		string address = udpAddress;
 		
-		char udpMessage[100000];
-		udpReceiver.Receive(udpMessage,100000);
-		string message=udpMessage;
+		// Convert the UDP message to read its type tag from the header section
+		LivestreamNetwork::PacketHeader_V1* header = 
+			(LivestreamNetwork::PacketHeader_V1 *) &udpMessage;
+		// Convert the typeTage char[2] to a string for logging
+		string typeTag(header->typeTag, header->typeTag + sizeof header->typeTag / sizeof header->typeTag[0]);
+		ofLog(OF_LOG_VERBOSE) << typeTag << "<<" << address << endl;			
 		
-		if(message!=""){
-			// We got a message!
-			char udpAddress[20];
-			// Get the sender's address
-			udpReceiver.GetRemoteAddr(udpAddress);
-			string address = udpAddress;
-			
-			// Convert the UDP message to read its type tag from the header section
-			LivestreamNetwork::PacketHeader_V1* header = 
-				(LivestreamNetwork::PacketHeader_V1 *) &udpMessage;
-			// Convert the typeTage char[2] to a string for logging
-			string typeTag(header->typeTag, header->typeTag + sizeof header->typeTag / sizeof header->typeTag[0]);
-			ofLog(OF_LOG_VERBOSE) << typeTag << "<<" << address << endl;			
-			
-			if (memcmp( header->typeTag, LivestreamNetwork::SET_MAESTRO_ADDRESS, 
-				sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
-				// SET_MAESTRO_ADDRESS packet type
-				// TODO: Reconnect the udpSender to the new address
-			} else {
-				if (address.compare(maestroIpAddress) == 0) {
-					// Only look at messages from maestroIpAddress
-					
-					if (memcmp( header->typeTag, LivestreamNetwork::GET_DISTANCE, 
+		if(memcmp( header->typeTag, LivestreamNetwork::SET_MAESTRO_ADDRESS, 
+			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
+			// ********** SET_MAESTRO_ADDRESS packet type ********** //
+			// Get the data
+			LivestreamNetwork::PacketIPAddress_V1* inPacket = (LivestreamNetwork::PacketIPAddress_V1 *) &udpMessage;
+			// Set the maestroIpAddress
+			maestroIpAddress = inPacket->ipAddress;
+		} else {
+			if (address.compare(maestroIpAddress) == 0) {
+				// Only look at messages from maestroIpAddress
+				
+				if (!slaveMode) {
+					// If we're in MODE_MASTER, only listen to MODE_SLAVE messages
+					if(memcmp( header->typeTag, LivestreamNetwork::MODE_SLAVE, 
 						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
-						// **** GET_DISTANCE packet type **** //
+						// ********** MODE_SLAVE packet type ********** //
+						slaveMode = true;
+					}
+				} else {
+					// We're in MODE_SLAVE, Listen up!!
+					if(memcmp( header->typeTag, LivestreamNetwork::MODE_MASTER, 
+						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
+						// ********** MODE_MASTER packet type ********** //
+						slaveMode = false;
+					} else if (memcmp( header->typeTag, LivestreamNetwork::GET_DISTANCE, 
+						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
+						// ********** GET_DISTANCE packet type ********** //
 						
 						// Read data from the LidarLite
 						int rawDist = myLidarLite.distance();
@@ -172,7 +206,7 @@ void ofApp::draw() {
 						outPacket.signalStrength = signalStrength;
 							
 						// Send the packet
-						udpSender.Send((char*) &outPacket, sizeof(LivestreamNetwork::PacketDistance_V1));
+						udpSender.Send((char*) &outPacket, sizeof(outPacket));
 						// Convert the typeTage char[2] to a string for logging
 						typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
 							sizeof(outPacket.hdr.typeTag[0]));
@@ -180,7 +214,7 @@ void ofApp::draw() {
 						
 					} else if(memcmp( header->typeTag, LivestreamNetwork::PING, 
 						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
-						// **** PING packet type **** //
+						// ********** PING packet type ********** //
 						
 						// Load the packet data
 						LivestreamNetwork::PacketNoPayload_V1 outPacket;
@@ -191,15 +225,14 @@ void ofApp::draw() {
 							sizeof LivestreamNetwork::PONG / sizeof LivestreamNetwork::PONG[0]);
 							
 						// Send the packet
-						udpSender.Send((char*) &outPacket, sizeof(LivestreamNetwork::PacketNoPayload_V1));
+						udpSender.Send((char*) &outPacket, sizeof(outPacket));
 						// Convert the typeTage char[2] to a string for logging
 						typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
 							sizeof(outPacket.hdr.typeTag[0]));
 						ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << maestroIpAddress << endl;		
 					} else if(memcmp( header->typeTag, LivestreamNetwork::SET_VOLUME, 
 						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
-						// **** SET_VOLUME packet type **** //
-						
+						// ********** SET_VOLUME packet type ********** //
 						// Get the Volume data
 						LivestreamNetwork::PacketUInt8_V1* inPacket = (LivestreamNetwork::PacketUInt8_V1 *) &udpMessage;
 						// Set the Volume
@@ -207,17 +240,92 @@ void ofApp::draw() {
 						volSound.setVolume(volume);
 						ofSoundSetVolume(volume);
 						ofLog(OF_LOG_VERBOSE) << "SV, " << (int) inPacket->u << endl;			
+						
+					} else if(memcmp( header->typeTag, LivestreamNetwork::GET_ALL_TEMPS, 
+						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
+						// ********** GET_ALL_TEMPS packet type ********** //
+						
+						// Get the CPU temperature
+						FILE *temperatureFile;
+						double T;
+						temperatureFile = fopen ("/sys/class/thermal/thermal_zone0/temp", "r");
+						if (temperatureFile == NULL) {
+							cout << "Failed to read temp file\n";
+						} else {
+							fscanf (temperatureFile, "%lf", &T);
+							T /= 1000;
+							fclose (temperatureFile);
+						}
+						
+						// Load the packet data
+						LivestreamNetwork::PacketTemperature_V1 outPacket;
+						outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
+						outPacket.hdr.packetCount = ++nPacketsSent;
+						outPacket.hdr.protocolVersion = packetProtocolVersion;
+						strncpy(outPacket.hdr.typeTag, LivestreamNetwork::TEMPERATURE, 
+							sizeof LivestreamNetwork::TEMPERATURE / sizeof LivestreamNetwork::TEMPERATURE[0]);
+							
+						// Send the CPU temperature
+						outPacket.temperature = (int) T;
+						outPacket.sensorDesignator = 'C';
+						udpSender.Send((char*) &outPacket, sizeof(outPacket));
+						
+						// Send data from the other temperature sensors
+						for (int j=0; j<nSensors; j++) {
+							// Send the temperature
+							outPacket.temperature = (int) tempSensor.read(j);
+							char sensorDesignator[5];
+							//itoa( j, sensorDesignator, 10 );
+							sprintf(sensorDesignator, "%i", j);
+							outPacket.sensorDesignator = sensorDesignator[0];
+							udpSender.Send((char*) &outPacket, sizeof(outPacket));
+						}
+					
+					} else if(memcmp( header->typeTag, LivestreamNetwork::SET_LED, 
+						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
+						// ********** SET_LED packet type ********** //
+						
+						// Get the LED data
+						LivestreamNetwork::PacketBool_V1* inPacket = (LivestreamNetwork::PacketBool_V1 *) &udpMessage;
+						// Set the LED outputs
+						if (inPacket->b) {
+							// Blink the LED
+							gpio15->setval_gpio("1");
+							gpio15outState = true;
+							gpio21->setval_gpio("1");
+							gpio21outState = true;
+						} else {							
+							gpio15->setval_gpio("0");
+							gpio15outState = false;
+							gpio21->setval_gpio("0");
+							gpio21outState = false;
+						}
+					} else if(memcmp( header->typeTag, LivestreamNetwork::PLAY_NOTE, 
+						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
+						// ********** PLAY_NOTE packet type ********** //
+						volSound.play();
+						volSound.setVolume(volume);
+						ofSoundSetVolume(volume);
 					}
-				} //address.compare(maestroIpAddress) == 0
-			} // !SET_MAESTRO_ADDRESS
-		} // message!=""
-	} else { 
-		// Master mode
-		int rawDist = myLidarLite.distance();
+				}
+			} //address.compare(maestroIpAddress) == 0
+		} // !SET_MAESTRO_ADDRESS
+	} // message!=""
+	if (!slaveMode) {
+		// **** Master mode **** //
+		int rawDist;
+		int signalStrength;
+		if (debugTest == NO_LIDAR) {
+			// Isolate the LidarLite measurements for debug
+			rawDist = 101;
+			signalStrength = 101;
+		} else {
+			rawDist = myLidarLite.distance();
+			signalStrength = myLidarLite.signalStrength();
+		}
 		int newVal = rawDist;
-		int signalStrength = myLidarLite.signalStrength();
-		int maxNoise = myLidarLite.maxNoise();
-		int corrPeakVal = myLidarLite.correlationPeakValue();
+		//int maxNoise = myLidarLite.maxNoise();
+		//int corrPeakVal = myLidarLite.correlationPeakValue();
 
 		if (rawDist < noiseDist) {
 			// Handle strange case where lidar reports 1cm when should be infinity
@@ -239,50 +347,19 @@ void ofApp::draw() {
 		// Calculate the smoothed PWM value
 		smoothPwm = ((float) newVal)*newWeight + smoothPwm*(1-newWeight);
 		
-		counter++;
+		float soundVolume;
+		if (debugTest != NO_SOUND) {
+			soundVolume = 1.f - ofMap(smoothPwm, minDist, maxDist, 0.f, 1.f, true);
+		} else {
+			soundVolume = .101f;
+		}
 		
-		if (pitchBend) { // Pitch bend mode
-			//cout << ofGetSystemTimeMicros() << "," << blinkTimer << endl;
-			if (ofGetSystemTimeMicros() - blinkTimer >= 200000) {
-				
-				// Blink the LED
-				if (gpio15outState) {
-					gpio15->setval_gpio("0");
-					gpio15outState = false;
-				} else {
-					gpio15->setval_gpio("1");
-					gpio15outState = true;
-				}
-				
-				if (gpio21outState) {
-					gpio21->setval_gpio("0");
-					gpio21outState = false;
-				} else {
-					gpio21->setval_gpio("1");
-					gpio21outState = true;
-				}
-				
-				// Play sound
-				pitchSound.play();
-				float soundSpeed = 1.5f - ofMap(smoothPwm, minDist, maxDist, 0.f, 1.f, true);
-				pitchSound.setSpeed( soundSpeed );
-				//ofSoundSetVolume(ofClamp(0.5f + smoothPwm, 0, 1));
-				cout << getDateTimeString() << setprecision(3) << ", LR, " << ofGetFrameRate();
-				cout << ", LD, " << rawDist << ", LW, " << (int) smoothPwm;
-				cout << ", AV, " << soundSpeed << ", LS, " << signalStrength; 
-				cout << ", LN, " << maxNoise << ", LP, " << corrPeakVal;
-				cout << ", HS, " << gpio15outState;
-				cout << endl;
-				
-				blinkTimer = ofGetSystemTimeMicros();
-				counter = 0;
-			}
-		} else if (volBend) { // Volume bend mode
-			float soundVolume = 1.f - ofMap(smoothPwm, minDist, maxDist, 0.f, 1.f, true);
-			
-			if (ofGetSystemTimeMicros() - blinkTimer >= 1000000) {
+		if (ofGetSystemTimeMicros() - blinkTimer >= 1000000) {
+			if (debugTest != NO_SOUND) {
 				volSound.play();
-				
+			}
+			
+			if (debugTest != NO_GPIO) {
 				// Blink the LED
 				if (gpio15outState) {
 					gpio15->setval_gpio("0");
@@ -299,58 +376,67 @@ void ofApp::draw() {
 					gpio21->setval_gpio("1");
 					gpio21outState = true;
 				}
-			
-				cout << getDateTimeString() << setprecision(3) << ", LR, " << ofGetFrameRate();
-				cout << ", LD, " << rawDist << ", LW, " << (int) smoothPwm;
-				cout << ", AV, " << soundVolume << ", LS, " << signalStrength; 
-				cout << ", LN, " << maxNoise << ", LP, " << corrPeakVal;
-				cout << ", HS, " << gpio15outState;
-				cout << endl;
-					
-				blinkTimer = ofGetSystemTimeMicros();
-				counter = 0;
 			}
+		
+			cout << getDateTimeString() << setprecision(3) << ", LR, " << ofGetFrameRate();
+			cout << ", LD, " << rawDist << ", LW, " << (int) smoothPwm;
+			cout << ", AV, " << soundVolume << ", LS, " << signalStrength; 
+			//cout << ", LN, " << maxNoise << ", LP, " << corrPeakVal;
+			cout << ", HS, " << gpio15outState;
+			cout << endl;
+				
+			blinkTimer = ofGetSystemTimeMicros();
+		}
+		if (debugTest != NO_SOUND) {
 			volSound.setVolume(soundVolume);
 			ofSoundSetVolume(soundVolume);
 		}
 		
 			// Log data to file
 		if (ofGetElapsedTimeMillis() - logTimer >= 60000) {
-
+			logTimer = ofGetElapsedTimeMillis();
 			
-			// Get the temperature
-			FILE *temperatureFile;
 			double T;
-			temperatureFile = fopen ("/sys/class/thermal/thermal_zone0/temp", "r");
-			if (temperatureFile == NULL) {
-				cout << "Failed to read temp file\n";
+			if (debugTest == NO_TEMP) {
+				// Isolate the temperature measurements from the code for debug
+				T = 101;
 			} else {
-				fscanf (temperatureFile, "%lf", &T);
-				T /= 1000;
-				//printf ("The temperature is %6.3f C.\n", T);
-				fclose (temperatureFile);
+				// Get the temperature
+				FILE *temperatureFile;
+				temperatureFile = fopen ("/sys/class/thermal/thermal_zone0/temp", "r");
+				if (temperatureFile == NULL) {
+					cout << "Failed to read temp file\n";
+				} else {
+					fscanf (temperatureFile, "%lf", &T);
+					T /= 1000;
+					//printf ("The temperature is %6.3f C.\n", T);
+					fclose (temperatureFile);
+				}
 			}
 			
 			// Log the data
-			logTimer = ofGetElapsedTimeMillis();
-			//string logFileName = "/logs/livestream/livestream01.log";
 			string logFileName = "/logs/livestream/livestream_" + hostname + ".log";
 			ofstream mFile;
 			mFile.open(logFileName.c_str(), ios::out | ios::app);
 			mFile << getDateTimeString() << setprecision(3) << ", TC, " << T;
 			for (int j=0; j<nSensors; j++) {
-				float tempData = tempSensor.read(j);
+				float tempData;
+				if (debugTest == NO_TEMP) {
+					// Isolate the temperature measurements from the code for debug
+					tempData = 101;
+				} else {
+					tempData = tempSensor.read(j);
+				}
 				mFile << ", T" << j << ", " << tempData;
 			}
 			mFile << ", LD, " << rawDist  << ", LW, " << (int) smoothPwm << ", LR, " << ofGetFrameRate();
-			mFile << ", LS, " << signalStrength << ", LN, " << maxNoise << ", LP, " << corrPeakVal;
+			mFile << ", LS, " << signalStrength << ", LN, "; 
+			//<< maxNoise << ", LP, " << corrPeakVal;
 			mFile << endl;
 			mFile.close();
 		}
 	}
-	}
-	
-
+}
 
 string ofApp::getDateTimeString() {
 	string output = "";
@@ -434,6 +520,10 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 //--------------------------------------------------------------
 void ofApp::exit(){ 
 	cout << "EXIT" << endl;
-	gpio15->setval_gpio("0");
-	gpio21->setval_gpio("0");
+	volSound.unloadSound();
+	ofSoundShutdown();
+	if (debugTest != NO_GPIO) {
+		gpio15->setval_gpio("0");
+		gpio21->setval_gpio("0");
+	}
 }
