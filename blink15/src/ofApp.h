@@ -21,6 +21,7 @@ class ofApp : public ofBaseApp{
 		
 		int counter;
 		unsigned long long sysMicros;
+		
 		bool gpio15outState;
 		bool gpio21outState;
 		

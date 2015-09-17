@@ -38,7 +38,7 @@ void ofApp::setup(){
 	volSound.setVolume(0.3f);
 	volSound.setMultiPlay(true);
 	
-	ofSoundSetVolume(.5f);
+	ofSoundSetVolume(1.0f);
 
 	volBend = true;
 	pitchBend = false;
@@ -89,6 +89,11 @@ void ofApp::draw(){
 	//ver = lidar_version(fd);
 	//printf("%3.0d cm \n", res);
 	lidar_status_print(st);
+
+	if (newVal < 2) {
+		// Handle strange case where lidar reports 1cm when should be infinity
+		newVal = 10000;
+	}
 	
 	// increment up to max smoothing (deals with initial state)
 	if (nSamplesToSmooth < maxSamplesToSmooth ) nSamplesToSmooth++; 
@@ -126,7 +131,7 @@ void ofApp::draw(){
 			pitchSound.setSpeed( soundSpeed );
 			//ofSoundSetVolume(ofClamp(0.5f + smoothPwm, 0, 1));
 			cout << getDateTimeString() << ", " << counter << " loops, " << ofGetFrameRate() 
-				<< "Hz , " << smoothPwm << " cm" << " , " << soundSpeed <<", " << st;
+				<< "Hz , " << smoothPwm << " cm" << " , " << soundSpeed <<", " << (int) st;
 			if (gpio15outState){
 				cout << ",LED=ON";
 			} else {
@@ -161,7 +166,7 @@ void ofApp::draw(){
 			}
 			
 			cout << getDateTimeString() << ", " << counter << " loops, " << ofGetFrameRate() 
-				<< "Hz , " << smoothPwm << " cm" << " , " << soundVolume <<", " << st;
+				<< "Hz , " << smoothPwm << " cm" << " , " << soundVolume <<", " << (int) st;
 			if (gpio15outState){
 				cout << ",LED=ON";
 			} else {

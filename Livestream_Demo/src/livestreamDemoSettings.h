@@ -125,7 +125,8 @@ public:
 	LivestreamPipe() {
 	}
 
-	void setup(string _dataName, int _dataReadRate, int _dataMidiSendRate, string _arduinoPort, int _midiChannel, Range _dataRange, Range _midiNoteRange) {
+	void setup(string _dataName, int _dataReadRate, int _dataMidiSendRate, string _arduinoPort, 
+		int _midiChannel, Range _dataRange, Range _midiNoteRange) {
 		dataName = _dataName;
 		arduinoPort = _arduinoPort;
 		midiChannel = _midiChannel;
