@@ -22,12 +22,12 @@ void ofApp::setup(){
 	string logFileName = "/logs/livestream/livestream_" + hostname + ".log";
 	ofstream mFile;
 	mFile.open(logFileName.c_str(), ios::out | ios::app);
-	mFile << getDateTimeString() << ",INITILIZATION";
+	mFile << getDateTimeString() << ",INITIALIZATION";
 	mFile << endl;
 	mFile.close();
 
 
-	cout << getDateTimeString() << ",INITILIZATION " << hostname;
+	cout << getDateTimeString() << ",INITIALIZATION " << hostname;
 	cout << endl;
 	
 	logTimer = ofGetElapsedTimeMillis();
