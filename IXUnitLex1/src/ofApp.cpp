@@ -9,7 +9,7 @@ void ofApp::setup(){
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	
 	// debugTest used to isolate parts of code
-	debugTest = NO_LIDAR;
+	debugTest = 0;
 	
 	//***********************************************************
 	// Variables for "Master" Mode (not requiring UDP input)
