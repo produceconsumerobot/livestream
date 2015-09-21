@@ -70,7 +70,7 @@ void ofApp::setup(){
 		volume = 0.0f;
 		volSound.setVolume(volume);
 		volSound.setMultiPlay(true);
-		ofSoundSetVolume(volume);
+		//ofSoundSetVolume(volume);
 	}
 
 	// Init LidarLite
@@ -136,7 +136,7 @@ void ofApp::setup(){
 void ofApp::update(){
 	// update the sound playing system:
 	if (debugTest != NO_SOUND) {
-		ofSoundUpdate();
+		//ofSoundUpdate();
 	}
 }
 
@@ -151,10 +151,13 @@ void ofApp::draw() {
 	
 	if(message!=""){
 		// We got a message!
-		char udpAddress[20];
+		//char udpAddress[20];
+		string address;
+		int udpPort;
 		// Get the sender's address
-		udpReceiver.GetRemoteAddr(udpAddress);
-		string address = udpAddress;
+		//udpReceiver.GetRemoteAddr(udpAddress, &udpPort);
+		udpReceiver.GetRemoteAddr(address, udpPort);
+		//string address = udpAddress;
 		
 		// Convert the UDP message to read its type tag from the header section
 		LivestreamNetwork::PacketHeader_V1* header = 
@@ -238,7 +241,7 @@ void ofApp::draw() {
 						// Set the Volume
 						volume = (float) inPacket->u / 255.f;
 						volSound.setVolume(volume);
-						ofSoundSetVolume(volume);
+						//ofSoundSetVolume(volume);
 						ofLog(OF_LOG_VERBOSE) << "SV, " << (int) inPacket->u << endl;			
 						
 					} else if(memcmp( header->typeTag, LivestreamNetwork::GET_ALL_TEMPS, 
@@ -305,7 +308,7 @@ void ofApp::draw() {
 						// ********** PLAY_NOTE packet type ********** //
 						volSound.play();
 						volSound.setVolume(volume);
-						ofSoundSetVolume(volume);
+						//ofSoundSetVolume(volume);
 					}
 				}
 			} //address.compare(maestroIpAddress) == 0
@@ -389,7 +392,7 @@ void ofApp::draw() {
 		}
 		if (debugTest != NO_SOUND) {
 			volSound.setVolume(soundVolume);
-			ofSoundSetVolume(soundVolume);
+			//ofSoundSetVolume(soundVolume);
 		}
 		
 			// Log data to file
