@@ -2,7 +2,8 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	ofSetLogLevel(OF_LOG_NOTICE);
+	//ofSetLogLevel(OF_LOG_NOTICE);
+	ofSetLogLevel(OF_LOG_VERBOSE);
 	
 	loopInterval = 5;
 
