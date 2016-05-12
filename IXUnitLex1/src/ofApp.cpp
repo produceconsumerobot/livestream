@@ -5,7 +5,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	slaveMode = true;  // Slave mode follows UDP commands to run
+	slaveMode = false;  // Slave mode follows UDP commands to run
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	
 	// debugTest used to isolate parts of code

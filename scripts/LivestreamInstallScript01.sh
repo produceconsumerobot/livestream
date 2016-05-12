@@ -19,7 +19,7 @@ tar vxfz of_v0.9.3_linuxarmv6l_release.tar.gz -C openFrameworks --strip-componen
 cd /home/pi/openFrameworks/scripts/linux/debian
 sudo ./install_dependencies.sh
 make Release -C /home/pi/openFrameworks/libs/openFrameworksCompiled/project
-printf 'export MAKEFLAGS=-j2 PLATFORM_VARIANT=rpi2\n' | sudo tee --append ~/.profile
+#printf 'export MAKEFLAGS=-j2 PLATFORM_VARIANT=rpi2\n' | sudo tee --append ~/.profile
 cp ~/openFrameworks/examples/3d/3DPrimitivesExample/ ~/openFrameworks/apps/myApps/ -r
 
 
@@ -54,8 +54,13 @@ git clone https://github.com/produceconsumerobot/ofxLidarLite.git
 #printf 'w1-gpio\nw1-therm' | sudo tee --append /etc/modules
 
 # Make log directory
-sudo mkdir -p /logs/livestream/
-sudo chmod a+w /logs/livestream/
+sudo mkdir -p /livestream/logs/
+sudo chmod a+w /livestream/logs/
+sudo mkdir -p /livestream/audio/
+sudo chmod a+w /livestream/audio/
+
+sudo mkdir -p /livestream
+
 
 # install logmein hamachi
 sudo wget https://secure.logmein.com/labs/logmein-hamachi_2.1.0.139-1_armhf.deb
@@ -66,6 +71,14 @@ sudo dpkg -i logmein-hamachi_2.1.0.139-1_armhf.deb
 
 # install remote desktop
 sudo apt-get -y install xrdp
+
+# install Colormake
+cd ~
+mkdir src
+cd ~/src
+git clone https://github.com/pagekite/Colormake.git
+cd Colormake
+sudo cp -fa colormake.pl colormake colormake-short clmake clmake-short /usr/bin/
 
 # Configure the USB audio card
 # https://learn.adafruit.com/usb-audio-cards-with-a-raspberry-pi?view=all#cm-headphone-type
