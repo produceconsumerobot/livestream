@@ -51,7 +51,7 @@ void ofApp::setup(){
 	
 	if (debugTest != NO_GPIO) {
 		// Setup GPIOs
-		blinkLED  = new GPIO("15");
+		blinkLED  = new GPIO("7");
 		blinkLED->export_gpio();
 		blinkLED->setdir_gpio("out");
 		blinkLED->setval_gpio("0");
