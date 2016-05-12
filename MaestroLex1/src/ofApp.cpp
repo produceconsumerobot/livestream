@@ -43,9 +43,11 @@ void ofApp::update(){
 	string message=udpMessage;
 	if(message!=""){
 		// We got a message!
-		char udpAddress[20];
+		//char udpAddress[20];
+		string udpAddress;
+		int port;
 		// Get the sender's address
-		udpReceiver.GetRemoteAddr(udpAddress);
+		udpReceiver.GetRemoteAddr(udpAddress, port);
 		string address = udpAddress;
 		ofLog(OF_LOG_VERBOSE) << "UDP MESSAGE << " << address << endl;
 
