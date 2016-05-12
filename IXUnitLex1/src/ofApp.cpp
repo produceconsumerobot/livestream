@@ -5,7 +5,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	slaveMode = false;  // Slave mode follows UDP commands to run
+	slaveMode = true;  // Slave mode follows UDP commands to run
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	
 	// debugTest used to isolate parts of code
@@ -35,7 +35,7 @@ void ofApp::setup(){
 	udpReceiver.SetNonBlocking(true);
 
 	// create the receiver socket and bind to the maestro address 11999
-	maestroIpAddress = "10.0.0.3";
+	maestroIpAddress = "192.168.0.201";
 	udpSender.Create();
 	udpSender.Connect(maestroIpAddress.c_str(),11999);
 	udpSender.SetNonBlocking(true);
@@ -51,17 +51,17 @@ void ofApp::setup(){
 	
 	if (debugTest != NO_GPIO) {
 		// Setup GPIOs
-		gpio15  = new GPIO("15");
-		gpio15->export_gpio();
-		gpio15->setdir_gpio("out");
-		gpio15->setval_gpio("0");
-		gpio15outState = false;
+		blinkLED  = new GPIO("16");
+		blinkLED->export_gpio();
+		blinkLED->setdir_gpio("out");
+		blinkLED->setval_gpio("0");
+		blinkLEDoutState = false;
 		
-		gpio21  = new GPIO("21");
-		gpio21->export_gpio();
-		gpio21->setdir_gpio("out");
-		gpio21->setval_gpio("0");
-		gpio21outState = false;
+		netLED  = new GPIO("15");
+		netLED->export_gpio();
+		netLED->setdir_gpio("out");
+		netLED->setval_gpio("0");
+		netLEDoutState = false;
 	}
 	
 	if (debugTest != NO_SOUND) {
@@ -107,7 +107,6 @@ void ofApp::setup(){
 	loopInterval = 5;
 	
 
-	
 	// Write initialization to the log
 	string logFileName = "/logs/livestream/livestream_" + hostname + ".log";
 	ofstream mFile;
@@ -130,6 +129,10 @@ void ofApp::setup(){
 	}
 	cout << ", TN, " << nSensors;
 	cout << endl;
+    
+    // Setup blink timer
+    blinkInterval = 1000000;
+    blinkTimer = ofGetSystemTimeMicros();
 }
 
 //--------------------------------------------------------------
@@ -143,6 +146,21 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw() {
 	ofSleepMillis(loopInterval);
+    
+    // Handle blinking the blinkLED
+    if (ofGetSystemTimeMicros() - blinkTimer >= blinkInterval) {       
+        if (debugTest != NO_GPIO) {
+            // Blink the LED
+            if (blinkLEDoutState) {
+                blinkLED->setval_gpio("0");
+                blinkLEDoutState = false;
+            } else {
+                blinkLED->setval_gpio("1");
+                blinkLEDoutState = true;
+            }
+        }            
+        blinkTimer = ofGetSystemTimeMicros();
+    }
 	
 	// Check incoming UDP messages
 	char udpMessage[100000];
@@ -273,6 +291,7 @@ void ofApp::draw() {
 						outPacket.sensorDesignator = 'C';
 						udpSender.Send((char*) &outPacket, sizeof(outPacket));
 						
+                        /*
 						// Send data from the other temperature sensors
 						for (int j=0; j<nSensors; j++) {
 							// Send the temperature
@@ -283,6 +302,7 @@ void ofApp::draw() {
 							outPacket.sensorDesignator = sensorDesignator[0];
 							udpSender.Send((char*) &outPacket, sizeof(outPacket));
 						}
+                        */
 					
 					} else if(memcmp( header->typeTag, LivestreamNetwork::SET_LED, 
 						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
@@ -293,15 +313,15 @@ void ofApp::draw() {
 						// Set the LED outputs
 						if (inPacket->b) {
 							// Blink the LED
-							gpio15->setval_gpio("1");
-							gpio15outState = true;
-							gpio21->setval_gpio("1");
-							gpio21outState = true;
+							//blinkLED->setval_gpio("1");
+							//blinkLEDoutState = true;
+							netLED->setval_gpio("1");
+							netLEDoutState = true;
 						} else {							
-							gpio15->setval_gpio("0");
-							gpio15outState = false;
-							gpio21->setval_gpio("0");
-							gpio21outState = false;
+							//blinkLED->setval_gpio("0");
+							//blinkLEDoutState = false;
+							netLED->setval_gpio("0");
+							netLEDoutState = false;
 						}
 					} else if(memcmp( header->typeTag, LivestreamNetwork::PLAY_NOTE, 
 						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
@@ -357,27 +377,27 @@ void ofApp::draw() {
 			soundVolume = .101f;
 		}
 		
-		if (ofGetSystemTimeMicros() - blinkTimer >= 1000000) {
+		if (ofGetSystemTimeMicros() - blinkTimer >= blinkInterval) {
 			if (debugTest != NO_SOUND) {
 				volSound.play();
 			}
 			
 			if (debugTest != NO_GPIO) {
 				// Blink the LED
-				if (gpio15outState) {
-					gpio15->setval_gpio("0");
-					gpio15outState = false;
+				if (blinkLEDoutState) {
+					//blinkLED->setval_gpio("0");
+					//blinkLEDoutState = false;
 				} else {
-					gpio15->setval_gpio("1");
-					gpio15outState = true;
+					//blinkLED->setval_gpio("1");
+					//blinkLEDoutState = true;
 				}
 				
-				if (gpio21outState) {
-					gpio21->setval_gpio("0");
-					gpio21outState = false;
+				if (netLEDoutState) {
+					//netLED->setval_gpio("0");
+					//netLEDoutState = false;
 				} else {
-					gpio21->setval_gpio("1");
-					gpio21outState = true;
+					//netLED->setval_gpio("1");
+					//netLEDoutState = true;
 				}
 			}
 		
@@ -385,7 +405,7 @@ void ofApp::draw() {
 			cout << ", LD, " << rawDist << ", LW, " << (int) smoothPwm;
 			cout << ", AV, " << soundVolume << ", LS, " << signalStrength; 
 			//cout << ", LN, " << maxNoise << ", LP, " << corrPeakVal;
-			cout << ", HS, " << gpio15outState;
+			cout << ", HS, " << blinkLEDoutState;
 			cout << endl;
 				
 			blinkTimer = ofGetSystemTimeMicros();
@@ -526,7 +546,7 @@ void ofApp::exit(){
 	volSound.unloadSound();
 	ofSoundShutdown();
 	if (debugTest != NO_GPIO) {
-		gpio15->setval_gpio("0");
-		gpio21->setval_gpio("0");
+		blinkLED->setval_gpio("0");
+		netLED->setval_gpio("0");
 	}
 }

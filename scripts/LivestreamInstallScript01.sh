@@ -2,23 +2,29 @@ Install script for Livestream Rasberry Pi
 
 # Get the sound lib
 sudo apt-get -y install libmpg123-dev
+sudo apt-get -y install alsa-utils mpg123
 
+# Update Raspbian
+sudo apt-get clean
+sudo apt-get update
+sudo apt-get upgrade
 
 mkdir ~/scripts
 
 # Get openframworks and install 
 cd ~
-curl -O http://www.openframeworks.cc/versions/v0.8.4/of_v0.8.4_linuxarmv7l_release.tar.gz
-tar xvf of_v0.8.4_linuxarmv7l_release.tar.gz
-curl https://raw.githubusercontent.com/openframeworks/openFrameworks/master/libs/openFrameworksCompiled/project/linuxarmv7l/config.linuxarmv7l.rpi2.mk -o of_v0.8.4_linuxarmv7l_release/libs/openFrameworksCompiled/project/linuxarmv7l/config.linuxarmv7l.rpi2.mk
-cd ~/of_v0.8.4_linuxarmv7l_release/scripts/linux/debian/
-cp -f ~/scripts/install_dependencies.sh .
+wget http://openframeworks.cc/versions/v0.9.3/of_v0.9.3_linuxarmv6l_release.tar.gz
+mkdir openFrameworks
+tar vxfz of_v0.9.3_linuxarmv6l_release.tar.gz -C openFrameworks --strip-components 1
+cd /home/pi/openFrameworks/scripts/linux/debian
 sudo ./install_dependencies.sh
-printf 'export MAKEFLAGS=-j4 PLATFORM_VARIANT=rpi2\n' | sudo tee --append ~/.profile
-cp ~/of_v0.8.4_linuxarmv7l_release/examples/3d/3DPrimitivesExample/ ~/of_v0.8.4_linuxarmv7l_release/apps/myApps/ -r
+make Release -C /home/pi/openFrameworks/libs/openFrameworksCompiled/project
+printf 'export MAKEFLAGS=-j2 PLATFORM_VARIANT=rpi2\n' | sudo tee --append ~/.profile
+cp ~/openFrameworks/examples/3d/3DPrimitivesExample/ ~/openFrameworks/apps/myApps/ -r
+
 
 # Get the livestream repo
-cd ~/of_v0.8.4_linuxarmv7l_release/apps/
+cd ~/openFrameworks/apps/
 git clone https://github.com/produceconsumerobot/livestream.git
 
 # Install I2C library and projects
@@ -33,19 +39,19 @@ cd wiringPi
 sudo apt-get -y install cmake
 
 # Add I2C lines to modules file
-printf 'i2c_bcm2708\ni2c-dev\n' | sudo tee --append /etc/modules
+printf 'i2c_bcm2708\n' | sudo tee --append /etc/modules
 # sudo adduser pi i2c
 
 # Get OF addons
-cd ~/of_v0.8.4_linuxarmv7l_release/addons/
+cd ~/openFrameworks/addons/
 git clone https://github.com/produceconsumerobot/ofxGPIO.git
 git clone https://github.com/produceconsumerobot/ofxLidarLite.git
-git clone https://github.com/produceconsumerobot/ofxDS18B20.git
+#git clone https://github.com/produceconsumerobot/ofxDS18B20.git
 
 
 # Add lines for 1-wire protocol to modules file
-printf 'dtoverlay=w1-gpio\n' | sudo tee --append /boot/config.txt
-printf 'w1-gpio\nw1-therm' | sudo tee --append /etc/modules
+#printf 'dtoverlay=w1-gpio\n' | sudo tee --append /boot/config.txt
+#printf 'w1-gpio\nw1-therm' | sudo tee --append /etc/modules
 
 # Make log directory
 sudo mkdir -p /logs/livestream/
@@ -61,4 +67,7 @@ sudo dpkg -i logmein-hamachi_2.1.0.139-1_armhf.deb
 # install remote desktop
 sudo apt-get -y install xrdp
 
-
+# Configure the USB audio card
+# https://learn.adafruit.com/usb-audio-cards-with-a-raspberry-pi?view=all#cm-headphone-type
+printf 'pcm.!default  {\n type hw card 1\n}\nctl.!default {\n type hw card 1\n}\n' | sudo tee --append /etc/asound.conf
+speaker-test -c2

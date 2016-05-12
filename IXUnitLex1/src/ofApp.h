@@ -32,9 +32,10 @@ class ofApp : public ofBaseApp{
 		int counter;
 		unsigned long long blinkTimer;
 		unsigned long long logTimer;
-		bool gpioOutLedState;
-		bool gpioBlinkLedState;
-		string gpioPwmInState;
+        unsigned long long blinkInterval;
+		//bool gpioOutLedState;
+		//bool gpioBlinkLedState;
+		//string gpioPwmInState;
 		
 		//GPIO* gpioOutLed;
 		//GPIO* gpioBlinkLed;
@@ -64,15 +65,15 @@ class ofApp : public ofBaseApp{
 		
 		string hostname;
 		
-		DS18B20 tempSensor;
-		int nSensors;
+		//DS18B20 tempSensor;
+		//int nSensors;
 		
 		// Blink LED
-		bool gpio15outState;
-		bool gpio21outState;
+		bool blinkLEDoutState;
+		bool netLEDoutState;
 		
-		GPIO* gpio15;
-		GPIO* gpio21;
+		GPIO* blinkLED;
+		GPIO* netLED;
 		
 		LidarLite myLidarLite;
 		
