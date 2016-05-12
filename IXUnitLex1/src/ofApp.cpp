@@ -232,7 +232,7 @@ void ofApp::draw() {
 						// Convert the typeTage char[2] to a string for logging
 						typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
 							sizeof(outPacket.hdr.typeTag[0]));
-						ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << maestroIpAddress << endl;		
+						ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << maestroIpAddress << ", " << rawDist << ", " << signalStrength << endl;		
 						
 					} else if(memcmp( header->typeTag, LivestreamNetwork::PING, 
 						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
