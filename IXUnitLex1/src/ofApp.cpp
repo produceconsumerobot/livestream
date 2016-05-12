@@ -51,13 +51,13 @@ void ofApp::setup(){
 	
 	if (debugTest != NO_GPIO) {
 		// Setup GPIOs
-		blinkLED  = new GPIO("16");
+		blinkLED  = new GPIO("15");
 		blinkLED->export_gpio();
 		blinkLED->setdir_gpio("out");
 		blinkLED->setval_gpio("0");
 		blinkLEDoutState = false;
 		
-		netLED  = new GPIO("15");
+		netLED  = new GPIO("16");
 		netLED->export_gpio();
 		netLED->setdir_gpio("out");
 		netLED->setval_gpio("0");
