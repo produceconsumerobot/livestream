@@ -16,9 +16,9 @@ cd ~
 wget http://openframeworks.cc/versions/v0.9.3/of_v0.9.3_linuxarmv6l_release.tar.gz
 mkdir openFrameworks
 tar vxfz of_v0.9.3_linuxarmv6l_release.tar.gz -C openFrameworks --strip-components 1
-cd /home/pi/openFrameworks/scripts/linux/debian
+cd ~/openFrameworks/scripts/linux/debian
 sudo ./install_dependencies.sh
-make Release -C /home/pi/openFrameworks/libs/openFrameworksCompiled/project
+make Release -C ~/openFrameworks/libs/openFrameworksCompiled/project
 #printf 'export MAKEFLAGS=-j2 PLATFORM_VARIANT=rpi2\n' | sudo tee --append ~/.profile
 cp ~/openFrameworks/examples/3d/3DPrimitivesExample/ ~/openFrameworks/apps/myApps/ -r
 
