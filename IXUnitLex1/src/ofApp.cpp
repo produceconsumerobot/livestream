@@ -101,7 +101,7 @@ void ofApp::setup(){
 	}
 	
 	// Get the number of temperature sensors
-	nSensors = tempSensor.listDevices();
+	//nSensors = tempSensor.listDevices();
 	
 	// Set the delay between loop cycles
 	loopInterval = 5;
@@ -117,7 +117,7 @@ void ofApp::setup(){
 		mFile	<< " , LV, " << myLidarLite.softwareVersion();
 		mFile	<< ", LC, " << lidarConfig;
 	}
-	mFile << ", TN, " << nSensors; 
+	//mFile << ", TN, " << nSensors; 
 	mFile << endl;
 	mFile.close();
 	
@@ -127,7 +127,7 @@ void ofApp::setup(){
 		cout << " , LV, " << myLidarLite.softwareVersion();
 		cout << ", LC, " << lidarConfig;
 	}
-	cout << ", TN, " << nSensors;
+	//cout << ", TN, " << nSensors;
 	cout << endl;
     
     // Setup blink timer
@@ -442,7 +442,7 @@ void ofApp::draw() {
 			ofstream mFile;
 			mFile.open(logFileName.c_str(), ios::out | ios::app);
 			mFile << getDateTimeString() << setprecision(3) << ", TC, " << T;
-			for (int j=0; j<nSensors; j++) {
+			/*for (int j=0; j<nSensors; j++) {
 				float tempData;
 				if (debugTest == NO_TEMP) {
 					// Isolate the temperature measurements from the code for debug
@@ -451,7 +451,7 @@ void ofApp::draw() {
 					tempData = tempSensor.read(j);
 				}
 				mFile << ", T" << j << ", " << tempData;
-			}
+			}*/
 			mFile << ", LD, " << rawDist  << ", LW, " << (int) smoothPwm << ", LR, " << ofGetFrameRate();
 			mFile << ", LS, " << signalStrength << ", LN, "; 
 			//<< maxNoise << ", LP, " << corrPeakVal;
