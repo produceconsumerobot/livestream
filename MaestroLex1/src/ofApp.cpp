@@ -8,7 +8,7 @@ void ofApp::setup(){
 	// we don't want to be running to fast
 	ofSetVerticalSync(false);
 	//ofSetFrameRate(60);
-	ofSetLogLevel(OF_LOG_WARNING);
+	ofSetLogLevel(OF_LOG_VERBOSE);
 
     //create the socket and set to send to 127.0.0.1:11999
 	udpSender.Create();
