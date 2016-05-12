@@ -4,7 +4,7 @@
 #include "ofxNetwork.h"
 #include "ofxGPIO.h"
 #include "LidarLite.hpp"
-#include "DS18B20.h"
+//#include "DS18B20.h"
 
 
 class ofApp : public ofBaseApp{
