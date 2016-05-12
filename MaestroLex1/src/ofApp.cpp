@@ -62,7 +62,7 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	//ofSleepMillis(1);
+	ofSleepMillis(1000);
 
 	for (int j=0; j<interXUnit.size(); j++) {
 		if (ofGetElapsedTimeMillis() - interXUnit.at(j).distanceReadTime > interXUnit.at(j).distanceReadInterval) {
