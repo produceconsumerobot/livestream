@@ -166,20 +166,6 @@ void ofApp::draw() {
             } else {
                 blinkLED->setval_gpio("1");
                 blinkLEDoutState = true;
-                // Load the packet data
-                LivestreamNetwork::PacketNoPayload_V1 outPacket;
-                outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
-                outPacket.hdr.packetCount = ++nPacketsSent;
-                outPacket.hdr.protocolVersion = packetProtocolVersion;
-                strncpy(outPacket.hdr.typeTag, LivestreamNetwork::PONG, 
-                sizeof LivestreamNetwork::PONG / sizeof LivestreamNetwork::PONG[0]);
-            
-                // Send the packet
-                udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
-                // Convert the typeTage char[2] to a string for logging
-                string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
-                    sizeof(outPacket.hdr.typeTag[0]));
-                ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "Broadcast" << endl;
             }
         }            
         ofLog(OF_LOG_VERBOSE) << "reset blink timer" << endl;
