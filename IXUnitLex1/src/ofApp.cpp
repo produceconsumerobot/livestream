@@ -140,8 +140,8 @@ void ofApp::setup(){
 	cout << endl;
     
     // Setup blink timer
-    blinkInterval = 1000;
-    blinkTimer = ofGetSystemTimeMillis();
+    blinkInterval = 1000000;
+    blinkTimer = ofGetSystemTimeMicros();
 }
 
 //--------------------------------------------------------------
@@ -156,10 +156,10 @@ void ofApp::update(){
 void ofApp::draw() {
 	ofSleepMillis(loopInterval);
     
-    ofLog(OF_LOG_VERBOSE) << ofGetSystemTimeMillis() - blinkTimer << endl;
+    ofLog(OF_LOG_VERBOSE) << ofGetSystemTimeMicros() - blinkTimer << endl;
     
     // Handle blinking the blinkLED
-    if (ofGetSystemTimeMillis() - blinkTimer >= blinkInterval) {       
+    if (ofGetSystemTimeMicros() - blinkTimer >= blinkInterval) {       
         if (debugTest != NO_GPIO) {
             // Blink the LED
             if (blinkLEDoutState) {
@@ -179,13 +179,13 @@ void ofApp::draw() {
                 // Send the packet
                 udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
                 // Convert the typeTage char[2] to a string for logging
-                typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
+                string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
                     sizeof(outPacket.hdr.typeTag[0]));
                 ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "Broadcast" << endl;
             }
         }            
         ofLog(OF_LOG_VERBOSE) << "reset blink timer" << endl;
-        blinkTimer = ofGetSystemTimeMillis();
+        blinkTimer = ofGetSystemTimeMicros();
     }
 	
 	// Check incoming UDP messages
@@ -411,7 +411,7 @@ void ofApp::draw() {
 			soundVolume = .101f;
 		}
 		
-		if (ofGetSystemTimeMillis() - blinkTimer >= blinkInterval) {
+		if (ofGetSystemTimeMicros() - blinkTimer >= blinkInterval) {
 			if (debugTest != NO_SOUND) {
 				volSound.play();
 			}
@@ -442,7 +442,7 @@ void ofApp::draw() {
 			cout << ", HS, " << blinkLEDoutState;
 			cout << endl;
 				
-			blinkTimer = ofGetSystemTimeMillis();
+			blinkTimer = ofGetSystemTimeMicros();
 		}
 		if (debugTest != NO_SOUND) {
 			volSound.setVolume(soundVolume);
@@ -536,7 +536,7 @@ void ofApp::keyPressed(int key){
             sizeof LivestreamNetwork::PONG / sizeof LivestreamNetwork::PONG[0]);
             
         // Send the packet
-        udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
+        string udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
         // Convert the typeTage char[2] to a string for logging
         typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
             sizeof(outPacket.hdr.typeTag[0]));
