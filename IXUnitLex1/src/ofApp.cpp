@@ -200,7 +200,7 @@ void ofApp::draw() {
 			LivestreamNetwork::PacketIPAddress_V1* inPacket = (LivestreamNetwork::PacketIPAddress_V1 *) &udpMessage;
 			// Set the maestroIpAddress
 			maestroIpAddress = inPacket->ipAddress;
-            udpSender.close();
+            udpSender.Close();
             udpSender.Create();
             udpSender.SetEnableBroadcast(true);
             udpSender.Connect(maestroIpAddress.c_str(),11999);
