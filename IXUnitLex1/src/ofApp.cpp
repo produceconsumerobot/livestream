@@ -140,8 +140,8 @@ void ofApp::setup(){
 	cout << endl;
     
     // Setup blink timer
-    blinkInterval = 1000000;
-    blinkTimer = ofGetSystemTimeMicros();
+    blinkInterval = 1000;
+    blinkTimer = ofGetSystemTimeMillis();
 }
 
 //--------------------------------------------------------------
@@ -182,7 +182,7 @@ void ofApp::draw() {
                 ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "Broadcast" << endl;
             }
         }            
-        blinkTimer = ofGetSystemTimeMicros();
+        blinkTimer = ofGetSystemTimeMillis();
     }
 	
 	// Check incoming UDP messages
@@ -439,7 +439,7 @@ void ofApp::draw() {
 			cout << ", HS, " << blinkLEDoutState;
 			cout << endl;
 				
-			blinkTimer = ofGetSystemTimeMicros();
+			blinkTimer = ofGetSystemTimeMillis();
 		}
 		if (debugTest != NO_SOUND) {
 			volSound.setVolume(soundVolume);
