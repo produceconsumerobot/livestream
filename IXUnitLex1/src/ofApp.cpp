@@ -35,10 +35,11 @@ void ofApp::setup(){
 	udpReceiver.SetNonBlocking(true);
 
 	// create the receiver socket and bind to the maestro address 11999
-	maestroIpAddress = "192.168.0.201";
+	maestroIpAddress = "192.168.254.5";
 	udpSender.Create();
     udpSender.SetEnableBroadcast(true);
-	udpSender.Connect(maestroIpAddress.c_str(),11999);
+	//udpSender.Connect(maestroIpAddress.c_str(),11999);
+    udpSender.Connect("192.168.254.255",11999);
 	udpSender.SetNonBlocking(true);
 
     udpBroadcaster = "192.168.254.255";
@@ -199,11 +200,11 @@ void ofApp::draw() {
 			LivestreamNetwork::PacketIPAddress_V1* inPacket = (LivestreamNetwork::PacketIPAddress_V1 *) &udpMessage;
 			// Set the maestroIpAddress
 			maestroIpAddress = inPacket->ipAddress;
-            udpSender.close();
-            udpSender.Create();
-            udpSender.SetEnableBroadcast(true);
-            udpSender.Connect(maestroIpAddress.c_str(),11999);
-            udpSender.SetNonBlocking(true);
+            //udpSender.close();
+            //udpSender.Create();
+            //udpSender.SetEnableBroadcast(true);
+            //udpSender.Connect(maestroIpAddress.c_str(),11999);
+            //udpSender.SetNonBlocking(true);
 		} else {
 			if (address.compare(maestroIpAddress) == 0) {
 				// Only look at messages from maestroIpAddress
