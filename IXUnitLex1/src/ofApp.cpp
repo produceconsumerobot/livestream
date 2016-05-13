@@ -536,9 +536,9 @@ void ofApp::keyPressed(int key){
             sizeof LivestreamNetwork::PONG / sizeof LivestreamNetwork::PONG[0]);
             
         // Send the packet
-        string udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
+        udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
         // Convert the typeTage char[2] to a string for logging
-        typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
+        string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
             sizeof(outPacket.hdr.typeTag[0]));
         ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "Broadcast" << endl;		
 	 } 
