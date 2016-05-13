@@ -37,9 +37,9 @@ void ofApp::setup(){
 	// create the receiver socket and bind to the maestro address 11999
 	maestroIpAddress = "192.168.254.5";
 	udpSender.Create();
-    udpSender.SetEnableBroadcast(true);
-	//udpSender.Connect(maestroIpAddress.c_str(),11999);
-    udpSender.Connect("192.168.254.255",11999);
+    udpSender.SetEnableBroadcast(false);
+	udpSender.Connect(maestroIpAddress.c_str(),11999);
+    //udpSender.Connect("192.168.254.255",11999);
 	udpSender.SetNonBlocking(true);
 
     udpBroadcastAddress = "192.168.254.255";
