@@ -13,10 +13,10 @@ void ofApp::setup(){
     //create the socket and set to send to 127.0.0.1:11999
 	udpSender.Create();
 	udpSender.SetEnableBroadcast(true);
-	udpSender.Connect("192.168.0.255",11999);
+	udpSender.Connect("192.168.254.255",11999);
 	udpSender.SetNonBlocking(true);
 
-	maestroIpAddress = "192.168.0.201";
+	maestroIpAddress = "192.168.254.5";
 
 	udpReceiver.Create();
 	udpReceiver.Bind(11999);
@@ -27,7 +27,7 @@ void ofApp::setup(){
 
 	nInterXUnits = 1;
 	interXUnit.resize(1);
-	interXUnit.at(0).ipAddress = "192.168.0.101";
+	interXUnit.at(0).ipAddress = "192.168.254.2";
 	interXUnit.at(0).udpSender.Create();
 	interXUnit.at(0).udpSender.SetEnableBroadcast(false);
 	interXUnit.at(0).udpSender.Connect(interXUnit.at(0).ipAddress.c_str(),11999);
