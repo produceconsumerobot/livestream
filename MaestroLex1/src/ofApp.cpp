@@ -32,7 +32,6 @@ void ofApp::setup(){
 	interXUnit.at(0).udpSender.SetEnableBroadcast(false);
 	interXUnit.at(0).udpSender.Connect(interXUnit.at(0).ipAddress.c_str(),11999);
 	interXUnit.at(0).udpSender.SetNonBlocking(true);
-
 	testLED = false;
 }
 
@@ -48,8 +47,8 @@ void ofApp::update(){
 		int port;
 		// Get the sender's address
 		udpReceiver.GetRemoteAddr(udpAddress, port);
-		string address = udpAddress;
-		ofLog(OF_LOG_VERBOSE) << "UDP MESSAGE << " << address << endl;
+		//string address = udpAddress;
+		ofLog(OF_LOG_VERBOSE) << "UDP MESSAGE << " << udpAddress << endl;
 
 		for (int j=0; j<interXUnit.size(); j++) {
 			if (interXUnit.at(j).ipAddress.compare(udpAddress) == 0) {

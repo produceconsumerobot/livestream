@@ -192,6 +192,10 @@ void ofApp::draw() {
 			LivestreamNetwork::PacketIPAddress_V1* inPacket = (LivestreamNetwork::PacketIPAddress_V1 *) &udpMessage;
 			// Set the maestroIpAddress
 			maestroIpAddress = inPacket->ipAddress;
+            udpSender.close();
+            udpSender.Create();
+            udpSender.Connect(maestroIpAddress.c_str(),11999);
+            udpSender.SetNonBlocking(true);
 		} else {
 			if (address.compare(maestroIpAddress) == 0) {
 				// Only look at messages from maestroIpAddress
