@@ -182,6 +182,7 @@ void ofApp::draw() {
                 ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "Broadcast" << endl;
             }
         }            
+        ofLog(OF_LOG_VERBOSE) << "reset blink timer" << endl;
         blinkTimer = ofGetSystemTimeMillis();
     }
 	
