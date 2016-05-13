@@ -156,8 +156,6 @@ void ofApp::update(){
 void ofApp::draw() {
 	ofSleepMillis(loopInterval);
     
-    ofLog(OF_LOG_VERBOSE) << ofGetSystemTimeMicros() - blinkTimer << endl;
-    
     // Handle blinking the blinkLED
     if (ofGetSystemTimeMicros() - blinkTimer >= blinkInterval) {       
         if (debugTest != NO_GPIO) {
