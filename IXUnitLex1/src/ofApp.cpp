@@ -42,11 +42,11 @@ void ofApp::setup(){
     udpSender.Connect("192.168.254.255",11999);
 	udpSender.SetNonBlocking(true);
 
-    udpBroadcaster = "192.168.254.255";
-    udpSender.Create();
-    udpSender.SetEnableBroadcast(true);
-	udpSender.Connect(maestroIpAddress.c_str(),11999);
-	udpSender.SetNonBlocking(true);
+    udpBroadcastAddress = "192.168.254.255";
+    udpBroadcaster.Create();
+    udpBroadcaster.SetEnableBroadcast(true);
+	udpBroadcaster.Connect(udpBroadcastAddress.c_str(),11999);
+	udpBroadcaster.SetNonBlocking(true);
 	
 	nPacketsSent = 0;
 	packetProtocolVersion = 1;
