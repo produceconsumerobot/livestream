@@ -5,7 +5,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	slaveMode = false;  // Slave mode follows UDP commands to run
+	slaveMode = true;  // Slave mode follows UDP commands to run
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	
 	// debugTest used to isolate parts of code
@@ -157,7 +157,7 @@ void ofApp::draw() {
 	ofSleepMillis(loopInterval);
     
     // Handle blinking the blinkLED
-    if (ofGetSystemTimeMicros() - blinkTimer >= blinkInterval) {       
+    if (ofGetSystemTimeMillis() - blinkTimer >= blinkInterval) {       
         if (debugTest != NO_GPIO) {
             // Blink the LED
             if (blinkLEDoutState) {
@@ -408,7 +408,7 @@ void ofApp::draw() {
 			soundVolume = .101f;
 		}
 		
-		if (ofGetSystemTimeMicros() - blinkTimer >= blinkInterval) {
+		if (ofGetSystemTimeMillis() - blinkTimer >= blinkInterval) {
 			if (debugTest != NO_SOUND) {
 				volSound.play();
 			}
