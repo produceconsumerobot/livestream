@@ -41,6 +41,11 @@ void ofApp::setup(){
 	udpSender.Connect(maestroIpAddress.c_str(),11999);
 	udpSender.SetNonBlocking(true);
 
+    udpBroadcaster = "192.168.254.255";
+    udpSender.Create();
+    udpSender.SetEnableBroadcast(true);
+	udpSender.Connect(maestroIpAddress.c_str(),11999);
+	udpSender.SetNonBlocking(true);
 	
 	nPacketsSent = 0;
 	packetProtocolVersion = 1;
@@ -504,11 +509,21 @@ void ofApp::keyPressed(int key){
 		 volBend = true;
 		 pitchBend = false;
 	 } else if (key == 'p'){
-		 cout << "Pitch Bend Mode" << endl;
-		 volBend = false;
-		 pitchBend = true; 
-		 //ofSoundSetVolume(.5f);
-	 }
+		 // Load the packet data
+        LivestreamNetwork::PacketNoPayload_V1 outPacket;
+        outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
+        outPacket.hdr.packetCount = ++nPacketsSent;
+        outPacket.hdr.protocolVersion = packetProtocolVersion;
+        strncpy(outPacket.hdr.typeTag, LivestreamNetwork::PONG, 
+            sizeof LivestreamNetwork::PONG / sizeof LivestreamNetwork::PONG[0]);
+            
+        // Send the packet
+        udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
+        // Convert the typeTage char[2] to a string for logging
+        typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
+            sizeof(outPacket.hdr.typeTag[0]));
+        ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "Broadcast" << endl;		
+	 } 
 }
 
 //--------------------------------------------------------------

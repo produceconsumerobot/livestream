@@ -27,6 +27,7 @@ class ofApp : public ofBaseApp{
 		
 		ofxUDPManager udpReceiver;
 		ofxUDPManager udpSender;
+        ofxUDPManager udpBroadcaster;
 		string maestroIpAddress;
 		
 		int counter;
