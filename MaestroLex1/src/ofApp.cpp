@@ -52,7 +52,7 @@ void ofApp::update(){
 		ofLog(OF_LOG_VERBOSE) << "UDP MESSAGE << " << address << endl;
 
 		for (int j=0; j<interXUnit.size(); j++) {
-			if (interXUnit.at(j).ipAddress.compare(address) == 0) {
+			if (interXUnit.at(j).ipAddress.compare(udpAddress) == 0) {
 				ofLog(OF_LOG_VERBOSE) << "Address Match << " << interXUnit.at(j).ipAddress << ", " << address << endl;
 				interXUnit.at(j).parseUdpPacket(udpMessage);
 			}
