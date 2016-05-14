@@ -16,7 +16,7 @@ void ofApp::setup(){
 	udpSender.Connect("192.168.254.255",11999);
 	udpSender.SetNonBlocking(true);
 
-	maestroIpAddress = "192.168.254.5";
+	maestroIpAddress = "192.168.254.3";
 
 	udpReceiver.Create();
 	udpReceiver.Bind(11999);
