@@ -27,7 +27,7 @@ void ofApp::setup(){
 
 	nInterXUnits = 1;
 	interXUnit.resize(1);
-	interXUnit.at(0).ipAddress = "192.168.254.2";
+	interXUnit.at(0).ipAddress = "192.168.254.1";
 	interXUnit.at(0).udpSender.Create();
 	interXUnit.at(0).udpSender.SetEnableBroadcast(false);
 	interXUnit.at(0).udpSender.Connect(interXUnit.at(0).ipAddress.c_str(),11999);
