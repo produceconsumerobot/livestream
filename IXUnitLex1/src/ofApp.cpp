@@ -79,7 +79,7 @@ void ofApp::setup(){
 		volume = 0.0f;
 		volSound.setVolume(volume);
 		volSound.setMultiPlay(true);
-		//ofSoundSetVolume(volume);
+		ofSoundSetVolume(volume);
 	}
 
 	// Init LidarLite
@@ -231,7 +231,7 @@ void ofApp::draw() {
 						int signalStrength = myLidarLite.signalStrength();
 						
 						// Load the packet data
-						LivestreamNetwork::PacketDistance_V1 outPacket;
+						LivestreamNetwork::Packet_DISTANCE_V1 outPacket;
 						outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 						outPacket.hdr.packetCount = ++nPacketsSent;
 						outPacket.hdr.protocolVersion = packetProtocolVersion;
@@ -252,7 +252,7 @@ void ofApp::draw() {
 						// ********** PING packet type ********** //
 						
 						// Load the packet data
-						LivestreamNetwork::PacketNoPayload_V1 outPacket;
+						LivestreamNetwork::Packet_PONG_V1 outPacket;
 						outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 						outPacket.hdr.packetCount = ++nPacketsSent;
 						outPacket.hdr.protocolVersion = packetProtocolVersion;
@@ -269,12 +269,12 @@ void ofApp::draw() {
 						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
 						// ********** SET_VOLUME packet type ********** //
 						// Get the Volume data
-						LivestreamNetwork::PacketUInt8_V1* inPacket = (LivestreamNetwork::PacketUInt8_V1 *) &udpMessage;
+						LivestreamNetwork::Packet_SET_VOLUME_V1* inPacket = (LivestreamNetwork::Packet_SET_VOLUME_V1 *) &udpMessage;
 						// Set the Volume
-						volume = (float) inPacket->u / 255.f;
+						volume = (float) inPacket->volume / 255.f;
 						volSound.setVolume(volume);
-						//ofSoundSetVolume(volume);
-						ofLog(OF_LOG_VERBOSE) << "SV, " << (int) inPacket->u << endl;			
+						ofSoundSetVolume(volume);
+						ofLog(OF_LOG_VERBOSE) << "SV, " << (int) inPacket->volume << endl;			
 						
 					} else if(memcmp( header->typeTag, LivestreamNetwork::GET_ALL_TEMPS, 
 						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
@@ -293,7 +293,7 @@ void ofApp::draw() {
 						}
 						
 						// Load the packet data
-						LivestreamNetwork::PacketTemperature_V1 outPacket;
+						LivestreamNetwork::Packet_TEMPERATURE_V1 outPacket;
 						outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 						outPacket.hdr.packetCount = ++nPacketsSent;
 						outPacket.hdr.protocolVersion = packetProtocolVersion;
@@ -323,9 +323,9 @@ void ofApp::draw() {
 						// ********** SET_LED packet type ********** //
 						
 						// Get the LED data
-						LivestreamNetwork::PacketBool_V1* inPacket = (LivestreamNetwork::PacketBool_V1 *) &udpMessage;
+						LivestreamNetwork::Packet_SET_LED_V1* inPacket = (LivestreamNetwork::Packet_SET_LED_V1 *) &udpMessage;
 						// Set the LED outputs
-						if (inPacket->b) {
+						if (inPacket->state) {
 							// Blink the LED
 							//blinkLED->setval_gpio("1");
 							//blinkLEDoutState = true;
@@ -341,9 +341,11 @@ void ofApp::draw() {
 						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
 						// ********** PLAY_NOTE packet type ********** //
                         //volSound.loadSound("/livestream/audio/Tp10.wav");
+                        volSound.setVolume(volume);
+						ofSoundSetVolume(volume);
 						volSound.play();
 						volSound.setVolume(volume);
-						//ofSoundSetVolume(volume);
+						ofSoundSetVolume(volume);
 					}
 				}
 			} //address.compare(maestroIpAddress) == 0

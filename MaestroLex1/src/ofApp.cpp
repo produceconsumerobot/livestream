@@ -101,7 +101,7 @@ void ofApp::keyReleased(int key){
 		// ********** PING packet type ********** //
 		// Load the packet data
 
-		LivestreamNetwork::PacketNoPayload_V1 outPacket;
+		LivestreamNetwork::Packet_PING_V1 outPacket;
 		outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 		outPacket.hdr.packetCount = ++nPacketsSent;
 		outPacket.hdr.protocolVersion = packetProtocolVersion;
@@ -117,7 +117,7 @@ void ofApp::keyReleased(int key){
 	} else if ((char) key == 'd') {
 		// ********** GET_DISTANCE packet type ********** //
 		// Load the packet data
-		LivestreamNetwork::PacketNoPayload_V1 outPacket;
+		LivestreamNetwork::Packet_GET_DISTANCE_V1 outPacket;
 		outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 		outPacket.hdr.packetCount = ++nPacketsSent;
 		outPacket.hdr.protocolVersion = packetProtocolVersion;
@@ -140,7 +140,7 @@ void ofApp::keyReleased(int key){
 	} else if ((char) key == 's') {
 		// ********** MODE_SLAVE packet type ********** //
 		// Load the packet data
-		LivestreamNetwork::PacketNoPayload_V1 outPacket;
+		LivestreamNetwork::Packet_MODE_SLAVE_V1 outPacket;
 		outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 		outPacket.hdr.packetCount = ++nPacketsSent;
 		outPacket.hdr.protocolVersion = packetProtocolVersion;
@@ -156,7 +156,7 @@ void ofApp::keyReleased(int key){
 	} else if ((char) key == 'm') {
 		// ********** MODE_MASTER packet type ********** //
 		// Load the packet data
-		LivestreamNetwork::PacketNoPayload_V1 outPacket;
+		LivestreamNetwork::Packet_MODE_MASTER_V1 outPacket;
 		outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 		outPacket.hdr.packetCount = ++nPacketsSent;
 		outPacket.hdr.protocolVersion = packetProtocolVersion;
@@ -172,7 +172,7 @@ void ofApp::keyReleased(int key){
 	}  else if ((char) key == 'l') {
 		// ********** SET_LED packet type ********** //
 		// Load the packet data
-		LivestreamNetwork::PacketBool_V1 outPacket;
+		LivestreamNetwork::Packet_SET_LED_V1 outPacket;
 		outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 		outPacket.hdr.packetCount = ++nPacketsSent;
 		outPacket.hdr.protocolVersion = packetProtocolVersion;
@@ -180,7 +180,7 @@ void ofApp::keyReleased(int key){
 			sizeof(LivestreamNetwork::SET_LED) / sizeof(LivestreamNetwork::SET_LED[0]));
 
 		testLED = !testLED;
-		outPacket.b = testLED;
+		outPacket.state = testLED;
 
 		// Send the packet
 		udpSender.Send((char*) &outPacket, sizeof(outPacket));
@@ -191,10 +191,11 @@ void ofApp::keyReleased(int key){
 	} else if ((char) key == 'n') {
 		// ********** PLAY_NOTE packet type ********** //
 		// Load the packet data
-		LivestreamNetwork::PacketNoPayload_V1 outPacket;
+		LivestreamNetwork::Packet_PLAY_NOTE_V1 outPacket;
 		outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 		outPacket.hdr.packetCount = ++nPacketsSent;
 		outPacket.hdr.protocolVersion = packetProtocolVersion;
+		outPacket.pitch = 0;
 		strncpy(outPacket.hdr.typeTag, LivestreamNetwork::PLAY_NOTE, 
 			sizeof(LivestreamNetwork::PLAY_NOTE) / sizeof(LivestreamNetwork::PLAY_NOTE[0]));
 
@@ -206,7 +207,7 @@ void ofApp::keyReleased(int key){
 	} else if ((char) key == 't') {
 		// ********** GET_ALL_TEMPS packet type ********** //
 		// Load the packet data
-		LivestreamNetwork::PacketNoPayload_V1 outPacket;
+		LivestreamNetwork::Packet_GET_ALL_TEMPS_V1 outPacket;
 		outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 		outPacket.hdr.packetCount = ++nPacketsSent;
 		outPacket.hdr.protocolVersion = packetProtocolVersion;
@@ -221,7 +222,7 @@ void ofApp::keyReleased(int key){
 	} else if ((char) key == 'a') {
 		// ********** SET_MAESTRO_ADDRESS packet type ********** //
 		// Load the packet data
-		LivestreamNetwork::PacketIPAddress_V1 outPacket;
+		LivestreamNetwork::Packet_SET_MAESTRO_ADDRESS_V1 outPacket;
 		outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 		outPacket.hdr.packetCount = ++nPacketsSent;
 		outPacket.hdr.protocolVersion = packetProtocolVersion;
