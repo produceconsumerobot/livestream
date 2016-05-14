@@ -74,8 +74,8 @@ void ofApp::setup(){
 	
 	if (debugTest != NO_SOUND) {
 		// Sound output setup
-        //volSound.loadSound("/livestream/audio/Tp10.wav");
-		volSound.loadSound("sounds/Tp10.wav");
+        volSound.loadSound("/livestream/audio/Tp10.wav");
+		//volSound.loadSound("sounds/Tp10.wav");
 		volume = 0.0f;
 		volSound.setVolume(volume);
 		volSound.setMultiPlay(true);
@@ -340,7 +340,7 @@ void ofApp::draw() {
 					} else if(memcmp( header->typeTag, LivestreamNetwork::PLAY_NOTE, 
 						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
 						// ********** PLAY_NOTE packet type ********** //
-                        volSound.loadSound("/livestream/audio/Tp10.wav");
+                        //volSound.loadSound("/livestream/audio/Tp10.wav");
 						volSound.play();
 						volSound.setVolume(volume);
 						//ofSoundSetVolume(volume);
