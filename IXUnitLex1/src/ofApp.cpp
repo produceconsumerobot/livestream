@@ -197,7 +197,7 @@ void ofApp::draw() {
 			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
 			// ********** SET_MAESTRO_ADDRESS packet type ********** //
 			// Get the data
-			LivestreamNetwork::PacketIPAddress_V1* inPacket = (LivestreamNetwork::PacketIPAddress_V1 *) &udpMessage;
+			LivestreamNetwork::Packet_SET_MAESTRO_ADDRESS_V1* inPacket = (LivestreamNetwork::Packet_SET_MAESTRO_ADDRESS_V1 *) &udpMessage;
 			// Set the maestroIpAddress
 			maestroIpAddress = inPacket->ipAddress;
             udpSender.Close();
@@ -513,7 +513,7 @@ void ofApp::keyPressed(int key){
 		 pitchBend = false;
 	 } else if (key == 'p'){
 		 // Load the packet data
-        LivestreamNetwork::PacketNoPayload_V1 outPacket;
+        LivestreamNetwork::Packet_PONG_V1 outPacket;
         outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
         outPacket.hdr.packetCount = ++nPacketsSent;
         outPacket.hdr.protocolVersion = packetProtocolVersion;

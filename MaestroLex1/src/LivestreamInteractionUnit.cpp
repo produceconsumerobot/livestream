@@ -141,7 +141,7 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 		// Parse DISTANCE Packets
 		if (memcmp( header->typeTag, LivestreamNetwork::DISTANCE, 
 			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
-			LivestreamNetwork::PacketDistance_V1* inPacket = (LivestreamNetwork::PacketDistance_V1 *) udpMessage;
+			LivestreamNetwork::Packet_DISTANCE_V1* inPacket = (LivestreamNetwork::Packet_DISTANCE_V1 *) udpMessage;
 			ofLog(OF_LOG_VERBOSE) << "LD, " << inPacket->distance << ", LS, " << inPacket->signalStrength << endl;
 			
 			// Parse DISTANCE data
@@ -151,16 +151,16 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 
 			// Send volume update
 			// Load the packet data
-			LivestreamNetwork::PacketUInt8_V1 outPacket;
+			LivestreamNetwork::Packet_SET_VOLUME_V1 outPacket;
 			outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 			outPacket.hdr.packetCount = ++nPacketsSent;
 			outPacket.hdr.protocolVersion = packetProtocolVersion;
 			strncpy(outPacket.hdr.typeTag, LivestreamNetwork::SET_VOLUME, 
 				sizeof LivestreamNetwork::SET_VOLUME / sizeof LivestreamNetwork::SET_VOLUME[0]);
-			outPacket.u = (volume * 255.f);
+			outPacket.volume = (volume * 255.f);
 							
 			// Send the packet
-			udpSender.Send((char*) &outPacket, sizeof(LivestreamNetwork::PacketUInt8_V1));
+			udpSender.Send((char*) &outPacket, sizeof(LivestreamNetwork::Packet_SET_VOLUME_V1));
 			// Convert the typeTage char[2] to a string for logging
 			typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
 				sizeof(outPacket.hdr.typeTag[0]));
@@ -168,7 +168,7 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 
 		} else if (memcmp( header->typeTag, LivestreamNetwork::TEMPERATURE, 
 			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
-			LivestreamNetwork::PacketTemperature_V1* inPacket = (LivestreamNetwork::PacketTemperature_V1 *) udpMessage;
+			LivestreamNetwork::Packet_TEMPERATURE_V1* inPacket = (LivestreamNetwork::Packet_TEMPERATURE_V1 *) udpMessage;
 			ofLog(OF_LOG_VERBOSE) << "T" << inPacket->sensorDesignator << ", " << inPacket->temperature << endl;
 			setTemperature(inPacket->temperature);
 		}
