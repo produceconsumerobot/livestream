@@ -58,7 +58,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\LivestreamUtils\src;%(AdditionalIncludeDirectories);..\..\..\addons\ofxNetwork\libs;..\..\..\addons\ofxNetwork\src;src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\LivestreamUtils\src;%(AdditionalIncludeDirectories);..\..\..\addons\ofxNetwork\libs;..\..\..\addons\ofxNetwork\src;src;..\..\..\addons\ofxInputField\src;..\..\..\addons\ofxGui\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
@@ -75,7 +75,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\addons\ofxNetwork\libs;..\..\..\addons\ofxNetwork\src;src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\LivestreamUtils\src;%(AdditionalIncludeDirectories);..\..\..\addons\ofxNetwork\libs;..\..\..\addons\ofxNetwork\src;src;..\..\..\addons\ofxInputField\src;..\..\..\addons\ofxGui\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
@@ -90,6 +90,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxBaseGui.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxButton.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxGuiGroup.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxLabel.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxPanel.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSlider.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxInputField\src\ofxInputField.cpp" />
     <ClCompile Include="..\LivestreamUtils\src\LivestreamNetwork.cpp" />
     <ClCompile Include="src\LivestreamInteractionUnit.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -100,6 +109,16 @@
     <ClCompile Include="..\..\..\addons\ofxNetwork\src\ofxTCPServer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxButton.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxGui.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxGuiGroup.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxLabel.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxPanel.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.h" />
+    <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h" />
+    <ClInclude Include="..\..\..\addons\ofxInputField\src\ofxInputField.h" />
     <ClInclude Include="..\LivestreamUtils\src\LivestreamNetwork.h" />
     <ClInclude Include="..\LivestreamUtils\src\Range.h" />
     <ClInclude Include="src\LivestreamInteractionUnit.h" />

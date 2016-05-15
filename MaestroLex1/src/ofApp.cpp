@@ -25,16 +25,51 @@ void ofApp::setup(){
 	nPacketsSent = 0;
 	packetProtocolVersion = 1;
 
+
+
+	// Draw the run data to the screen
+	panelWidth = 200;
+	panelRowHeight = 300;
+	/*
+	globalSettingsPanel.setWidthElements(panelWidth);
+	globalSettingsPanel.setDefaultWidth(panelWidth);
+	globalSettingsPanel.setup("Global Settings", "globalSettings.xml", 0, 0);
+	//globalSettingsPanel.setWidthElements(200);
+	globalSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "/livestream/data/"));
+	globalSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/livestream/audio/"));
+	globalSettingsPanel.add(volumeMin.setup("volMin", 0, 0, 1));
+	globalSettingsPanel.add(volumeMax.setup("volMax", 1, 0, 1));
+	globalSettingsPanel.add(waterDataReadInterval.setup("dataReadInterval", 3000, 1, 60000));
+	globalSettingsPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 60, 1, 3000));
+	globalSettingsPanel.add(notePlayInterval.setup("notePlayInterval", 1000, 1, 10000));
+	globalSettingsPanel.add(signalStrengthMin.setup("signalStrengthMin", 20, 0, 255));
+	globalSettingsPanel.add(signalStrengthMax.setup("signalStrengthMax", 80, 0, 255));
+	globalSettingsPanel.add(minSignalWeight.setup("minSignalWeight", 0.05f, 0, 1));
+	globalSettingsPanel.add(noiseDistance.setup("noiseDistance", 20, 0, 255));
+	globalSettingsPanel.add(maxDistSamplesToSmooth.setup("maxDistSamplesToSmooth", 1, 0, 60));
+	// Load settings from file
+	globalSettingsPanel.loadFromFile("globalSettings.xml");
+
+	maestroPanel.setup("Maestro", "maestroSettings.xml", 0, 275);
+	maestroPanel.add(datetimeString.setup(string("current date")));
+	maestroPanel.add(lastStartupTime.setup(string("startup date")));
+	maestroPanel.add(currentTemp.setup(string("0.0C")));
+	maestroPanel.add(lowTemp.setup(string("0.0C")));
+	maestroPanel.add(highTemp.setup(string("0.0C")));
+	*/
+
 	nInterXUnits = 1;
 	interXUnit.resize(1);
-	interXUnit.at(0).ipAddress = "192.168.254.1";
-	interXUnit.at(0).udpSender.Create();
-	interXUnit.at(0).udpSender.SetEnableBroadcast(false);
-	interXUnit.at(0).udpSender.Connect(interXUnit.at(0).ipAddress.c_str(),11999);
-	interXUnit.at(0).udpSender.SetNonBlocking(true);
-	testLED = false;
-
+	interXUnit.at(0).setup(11);
+	//interXUnit.at(0).ixPanel.setPosition(panelWidth, 0);
+	//interXUnit.at(0).ipAddress = "192.168.254.1";
+	//interXUnit.at(0).udpSender.Create();
+	//interXUnit.at(0).udpSender.SetEnableBroadcast(false);
+	//interXUnit.at(0).udpSender.Connect(interXUnit.at(0).ipAddress.getParameter().toString().c_str(), 11999);
+	//interXUnit.at(0).udpSender.SetNonBlocking(true);
 	
+
+	testLED = false;
 }
 
 //--------------------------------------------------------------
@@ -53,8 +88,8 @@ void ofApp::update(){
 		ofLog(OF_LOG_VERBOSE) << "UDP MESSAGE << " << udpAddress << endl;
 
 		for (int j=0; j<interXUnit.size(); j++) {
-			if (interXUnit.at(j).ipAddress.compare(udpAddress) == 0) {
-				ofLog(OF_LOG_VERBOSE) << "Address Match << " << interXUnit.at(j).ipAddress << ", " << udpAddress << endl;
+			if (interXUnit.at(j).ipAddress.getParameter().toString().compare(udpAddress) == 0) {
+				ofLog(OF_LOG_VERBOSE) << "Address Match << " << interXUnit.at(j).ipAddress.getParameter().toString() << ", " << udpAddress << endl;
 				interXUnit.at(j).parseUdpPacket(udpMessage);
 			}
 		}
@@ -63,6 +98,7 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+	ofBackgroundGradient(ofColor::white, ofColor::gray);
 	
 	//ofSleepMillis(1000);
 
@@ -82,6 +118,8 @@ void ofApp::draw(){
 			keyReleased('l');
 			// Send the Maestro IP address
 			keyReleased('a');
+			// Get all temps
+			keyReleased('t');
 			interXUnit.at(j).heartbeatTime = ofGetElapsedTimeMillis();
 			cout << setprecision(3) 
 				<< "LR, " << ofGetFrameRate() 
@@ -89,8 +127,18 @@ void ofApp::draw(){
 				<< ", LS, " << interXUnit.at(j).distanceSignalStrength
 				<< endl;
 		}
+		interXUnit.at(j).ixPanel.draw();
 	}
 	
+	// Draw the run data to the screen
+
+
+	//globalSettingsPanel.draw();
+
+	//ofPushMatrix();
+	//ofTranslate(0, 100);
+	//maestroPanel.draw();
+	//ofPopMatrix();
 }
 
 //--------------------------------------------------------------

@@ -2,6 +2,8 @@
 
 #include "ofMain.h"
 #include "ofxNetwork.h"
+#include "ofxGui.h"
+#include "ofxInputField.h"
 #include "LivestreamInteractionUnit.h"
 
 class ofApp : public ofBaseApp{
@@ -36,6 +38,45 @@ class ofApp : public ofBaseApp{
 		vector<ofPoint> stroke;
 
 		bool testLED;
+
+		// Settings
+		//string waterDataAddress;
+		//string waterDataFilesLocation;
+		//string soundFilesLocation;
+		//Range volumeRange;
+		//int waterDataReadInterval;
+		//int distanceReadInterval;
+		//int notePlayInterval;
+		//Range signalStrengthRange;
+		//float minSignalWeight;
+		//int noiseDistance;
+		//int maxDistSamplesToSmooth;
+
+		// GUI
+		ofxPanel globalSettingsPanel;
+
+		ofxTextField waterDataFilesLocation;
+		ofxTextField soundFilesLocation;
+		ofxFloatField volumeMin;
+		ofxFloatField volumeMax;
+		ofxIntField waterDataReadInterval;
+		ofxIntField distanceReadInterval;
+		ofxIntField notePlayInterval;
+		ofxIntField signalStrengthMin;
+		ofxIntField signalStrengthMax;
+		ofxFloatField minSignalWeight;
+		ofxIntField noiseDistance;
+		ofxIntField maxDistSamplesToSmooth;
+
+		ofxPanel maestroPanel;
+		ofxLabel datetimeString;
+		ofxLabel lastStartupTime;
+		ofxLabel currentTemp;
+		ofxLabel lowTemp;
+		ofxLabel highTemp;
+
+		int panelWidth;
+		int panelRowHeight;
 
 };
 
