@@ -33,6 +33,8 @@ void ofApp::setup(){
 	interXUnit.at(0).udpSender.Connect(interXUnit.at(0).ipAddress.c_str(),11999);
 	interXUnit.at(0).udpSender.SetNonBlocking(true);
 	testLED = false;
+
+	
 }
 
 //--------------------------------------------------------------
@@ -76,8 +78,10 @@ void ofApp::draw(){
 			interXUnit.at(j).notePlayTime = ofGetElapsedTimeMillis();
 		}
 		if (ofGetElapsedTimeMillis() - interXUnit.at(j).heartbeatTime > interXUnit.at(j).heartbeatInterval) {
-			// Play a note
+			// blink the heartbeat LED
 			keyReleased('l');
+			// Send the Maestro IP address
+			keyReleased('a');
 			interXUnit.at(j).heartbeatTime = ofGetElapsedTimeMillis();
 			cout << setprecision(3) 
 				<< "LR, " << ofGetFrameRate() 
