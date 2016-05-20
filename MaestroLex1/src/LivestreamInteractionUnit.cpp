@@ -12,14 +12,14 @@ LivestreamInteractionUnit::LivestreamInteractionUnit() {
 void LivestreamInteractionUnit::setup(int _id, string _ipAddress) {
 //void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataName, string _sensorLocation) {
 	id = _id;
-	ipAddress = _ipAddress;
+	//ipAddress = _ipAddress;
 	ixPanel.setup("IXUnit" + to_string(_id),
 		"IXUnit" + to_string(_id) + ".xml", 0, 0);
 	ixPanel.setup("IXUnit", "IXUnit.xml", 0, 0);
 	//ixPanel.add(id.setup("ID", _id, -1, 255));
 	ixPanel.add(dataName.setup("dataName", "none"));
 	ixPanel.add(sensorLocation.setup("sensorLoc", "none"));
-	ixPanel.add(ipAddress.setup("IP", "none"));
+	ixPanel.add(ipAddress.setup("IP", _ipAddress));
 	ixPanel.add(guiSmoothedDistance.setup("SmoothedDistance", 0, 0, 50 * 30));
 	ixPanel.add(guiTemperature.setup("Temperature", -60, -60, 100));						// Celcius
 	ixPanel.add(guiLowTemperature.setup("LowTemperature", -60, -60, 100));					// Celcius

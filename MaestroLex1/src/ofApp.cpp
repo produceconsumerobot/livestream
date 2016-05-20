@@ -60,7 +60,7 @@ void ofApp::setup(){
 	globalSettingsPanel.loadFromFile("globalSettings.xml");
 	
 	interXUnit.resize(9);
-	interXUnit.at(0).setup(11, "192.168.1.102" + 11);
+	interXUnit.at(0).setup(11, "192.168.1.102");
 	interXUnit.at(0).ixPanel.setPosition(panelSpacing * 1, 0);
 
 
