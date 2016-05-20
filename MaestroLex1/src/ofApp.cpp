@@ -13,10 +13,10 @@ void ofApp::setup(){
     //create the socket and set to send to 127.0.0.1:11999
 	udpSender.Create();
 	udpSender.SetEnableBroadcast(true);
-	udpSender.Connect("192.168.254.255",11999);
+	udpSender.Connect("192.168.1.255",11999);
 	udpSender.SetNonBlocking(true);
 
-	maestroIpAddress = "192.168.254.3";
+	maestroIpAddress = "192.168.1.201";
 
 	udpReceiver.Create();
 	udpReceiver.Bind(11999);
@@ -28,13 +28,22 @@ void ofApp::setup(){
 
 
 	// Draw the run data to the screen
-	panelWidth = 200;
+	int panelSpacing = 200;
+	panelWidth = panelSpacing - 5;
 	panelRowHeight = 300;
-	/*
-	globalSettingsPanel.setWidthElements(panelWidth);
-	globalSettingsPanel.setDefaultWidth(panelWidth);
-	globalSettingsPanel.setup("Global Settings", "globalSettings.xml", 0, 0);
-	//globalSettingsPanel.setWidthElements(200);
+
+	ofxGuiSetFont("verdana.ttf", 6);
+	ofxGuiSetDefaultHeight(10);
+	ofxGuiSetDefaultWidth(panelWidth);
+
+	maestroPanel.setup("Maestro", "maestroSettings.xml", 0, 0);
+	maestroPanel.add(datetimeString.setup(string("current date")));
+	maestroPanel.add(lastStartupTime.setup(string("startup date")));
+	maestroPanel.add(currentTemp.setup(string("0.0C")));
+	maestroPanel.add(lowTemp.setup(string("0.0C")));
+	maestroPanel.add(highTemp.setup(string("0.0C")));
+	
+	globalSettingsPanel.setup("Default Settings", "defaultSettings.xml", 0, 100);
 	globalSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "/livestream/data/"));
 	globalSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/livestream/audio/"));
 	globalSettingsPanel.add(volumeMin.setup("volMin", 0, 0, 1));
@@ -49,25 +58,11 @@ void ofApp::setup(){
 	globalSettingsPanel.add(maxDistSamplesToSmooth.setup("maxDistSamplesToSmooth", 1, 0, 60));
 	// Load settings from file
 	globalSettingsPanel.loadFromFile("globalSettings.xml");
-
-	maestroPanel.setup("Maestro", "maestroSettings.xml", 0, 275);
-	maestroPanel.add(datetimeString.setup(string("current date")));
-	maestroPanel.add(lastStartupTime.setup(string("startup date")));
-	maestroPanel.add(currentTemp.setup(string("0.0C")));
-	maestroPanel.add(lowTemp.setup(string("0.0C")));
-	maestroPanel.add(highTemp.setup(string("0.0C")));
-	*/
-
-	nInterXUnits = 1;
-	interXUnit.resize(1);
-	interXUnit.at(0).setup(11);
-	//interXUnit.at(0).ixPanel.setPosition(panelWidth, 0);
-	//interXUnit.at(0).ipAddress = "192.168.254.1";
-	//interXUnit.at(0).udpSender.Create();
-	//interXUnit.at(0).udpSender.SetEnableBroadcast(false);
-	//interXUnit.at(0).udpSender.Connect(interXUnit.at(0).ipAddress.getParameter().toString().c_str(), 11999);
-	//interXUnit.at(0).udpSender.SetNonBlocking(true);
 	
+	interXUnit.resize(9);
+	interXUnit.at(0).setup(11, "192.168.1.102" + 11);
+	interXUnit.at(0).ixPanel.setPosition(panelSpacing * 1, 0);
+
 
 	testLED = false;
 }
@@ -102,6 +97,7 @@ void ofApp::draw(){
 	
 	//ofSleepMillis(1000);
 
+
 	for (int j=0; j<interXUnit.size(); j++) {
 		if (ofGetElapsedTimeMillis() - interXUnit.at(j).distanceReadTime > interXUnit.at(j).distanceReadInterval) {
 			// Read the distance
@@ -124,7 +120,7 @@ void ofApp::draw(){
 			cout << setprecision(3) 
 				<< "LR, " << ofGetFrameRate() 
 				<< ", LD, " << interXUnit.at(j).getSmoothedDistance()
-				<< ", LS, " << interXUnit.at(j).distanceSignalStrength
+				<< ", LS, " << interXUnit.at(j).guiSignalStrength
 				<< endl;
 		}
 		interXUnit.at(j).ixPanel.draw();
@@ -133,12 +129,9 @@ void ofApp::draw(){
 	// Draw the run data to the screen
 
 
-	//globalSettingsPanel.draw();
+	globalSettingsPanel.draw();
+	maestroPanel.draw();
 
-	//ofPushMatrix();
-	//ofTranslate(0, 100);
-	//maestroPanel.draw();
-	//ofPopMatrix();
 }
 
 //--------------------------------------------------------------

@@ -59,6 +59,8 @@ sudo chmod a+w /livestream/logs/
 sudo mkdir -p /livestream/audio/
 sudo chmod a+w /livestream/audio/
 
+# automount /livestream/audio/
+
 sudo mkdir -p /livestream
 
 
@@ -84,3 +86,5 @@ sudo cp -fa colormake.pl colormake colormake-short clmake clmake-short /usr/bin/
 # https://learn.adafruit.com/usb-audio-cards-with-a-raspberry-pi?view=all#cm-headphone-type
 printf 'pcm.!default  {\n type hw card 1\n}\nctl.!default {\n type hw card 1\n}\n' | sudo tee --append /etc/asound.conf
 speaker-test -c2
+
+

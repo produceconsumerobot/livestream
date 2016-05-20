@@ -9,54 +9,47 @@ LivestreamInteractionUnit::LivestreamInteractionUnit() {
 
 }
 
-void LivestreamInteractionUnit::setup(int _id) {
-	//ixPanel.setup("IXUnit" + to_string(_id),
-	//	"IXUnit" + to_string(_id) + ".xml", 0, 0);
+void LivestreamInteractionUnit::setup(int _id, string _ipAddress) {
+//void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataName, string _sensorLocation) {
+	id = _id;
+	ipAddress = _ipAddress;
+	ixPanel.setup("IXUnit" + to_string(_id),
+		"IXUnit" + to_string(_id) + ".xml", 0, 0);
 	ixPanel.setup("IXUnit", "IXUnit.xml", 0, 0);
-	//id = _id;
-	//ixPanel.add(id.setup(_id, -1, 255));
-	//ixPanel.add(dataName.setup("dataNombre", "none"));
-	//ixPanel.add(sensorLocation.setup("sensorLoc", "none"));
-	//ixPanel.add(ipAddress.setup("IP", "none"));
-	//ixPanel.add(volume.setup(0, 0, 1));
-	
-	//ixPanel.add(volumeMin.setup(0.f, 0, 1));
-	/*
-	ixPanel.add(volumeMax.setup(0.f, 0, 1));
-	ixPanel.add(waterDataMin.setup(0.f, -10000, 10000));
-	ixPanel.add(waterDataMax.setup(0.f, -10000, 10000));
-	ixPanel.add(noteMin.setup(1, 1, 32));
-	ixPanel.add(noteMax.setup(2, 1, 32));
-	ixPanel.add(waterDataReadInterval.setup(3000, 1, 60000));
-	ixPanel.add(notePlayInterval.setup(1000, 1, 5000));
-	ixPanel.add(distanceReadInterval.setup(1000 / 60, 1, 2000));
-	ixPanel.add(distanceReadInterval.setup(1000 / 60, 1, 2000));
-	ixPanel.add(distanceMin.setup(30, 0, 50 * 30));
-	ixPanel.add(distanceMax.setup(20 * 30, 0, 50 * 30));
-	ixPanel.add(distanceSignalStrength.setup(0, 0, 255));
-	ixPanel.add(signalStrengthMin.setup(20, 0, 255));
-	ixPanel.add(signalStrengthMax.setup(80, 0, 255));
-	ixPanel.add(minSignalWeight.setup(0.05f, 0.f, 1.f));
-	ixPanel.add(noiseDistance.setup(20, 0, 100));
-	ixPanel.add(maxDistSamplesToSmooth.setup(1, 0, 100));
-	ixPanel.add(heartbeatInterval.setup(1000, 0, 2000));
+	//ixPanel.add(id.setup("ID", _id, -1, 255));
+	ixPanel.add(dataName.setup("dataName", "none"));
+	ixPanel.add(sensorLocation.setup("sensorLoc", "none"));
+	ixPanel.add(ipAddress.setup("IP", "none"));
+	ixPanel.add(guiSmoothedDistance.setup("SmoothedDistance", 0, 0, 50 * 30));
+	ixPanel.add(guiTemperature.setup("Temperature", -60, -60, 100));						// Celcius
+	ixPanel.add(guiLowTemperature.setup("LowTemperature", -60, -60, 100));					// Celcius
+	ixPanel.add(guiHighTemperature.setup("HighTemperature", 0, -60, 100));					// Celcius
 
-	ixPanel.add(guiSmoothedDistance.setup(0, 0, 50));
-	ixPanel.add(guiTemperature.setup(-60, -60, 100));
-	ixPanel.add(guiLowTemperature.setup(-60, -60, 100));
-	*/
-	ixPanel.add(guiHighTemperature.setup(0, -60, 100));
+	ixPanel.add(volume.setup("volume", 0, 0, 1));
+	ixPanel.add(volumeMin.setup("volMin", 0.f, 0, 1));
+	ixPanel.add(volumeMax.setup("volMax", 0.f, 0, 1));
+	ixPanel.add(waterDataMin.setup("waterDataMin", 0.f, -10000, 10000));
+	ixPanel.add(waterDataMax.setup("waterDataMax", 0.f, -10000, 10000));
+	ixPanel.add(noteMin.setup("noteMin", 1, 1, 32));
+	ixPanel.add(noteMax.setup("noteMax", 2, 1, 32));
+	ixPanel.add(heartbeatInterval.setup("heartbeatInterval", 1000, 0, 2000));				// ms
+	ixPanel.add(waterDataReadInterval.setup("waterDataReadInterval", 3000, 1, 60000));		// ms
+	ixPanel.add(notePlayInterval.setup("notePlayInterval", 1000, 1, 5000));					// ms
+	ixPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 60, 1, 2000));	// ms
+	ixPanel.add(distanceMin.setup("distanceMin", 30, 0, 50 * 30));							// cm
+	ixPanel.add(distanceMax.setup("distanceMax", 20 * 30, 0, 50 * 30));						// cm
+	ixPanel.add(guiSignalStrength.setup("signalStrength", 0, 0, 255));
+	ixPanel.add(signalStrengthMin.setup("signalStrengthMin", 20, 0, 255));
+	ixPanel.add(signalStrengthMax.setup("signalStrengthMax", 80, 0, 255));
+	ixPanel.add(minSignalWeight.setup("minSignalWeight", 0.05f, 0.f, 1.f));
+	ixPanel.add(noiseDistance.setup("noiseDistance", 20, 0, 100));
+	ixPanel.add(maxDistSamplesToSmooth.setup("maxDistSamplesToSmooth", 1, 0, 100));
 	
-
 	heartbeatTime = ofGetElapsedTimeMillis();
 	eyeSafetyOn = false;
 	distSensorStatus = 0;
 	nPacketsSent = 0;
 	packetProtocolVersion = 1;
-
-
-
-
 
 	//id = -1;
 	//dataName = "none";
@@ -100,7 +93,10 @@ void LivestreamInteractionUnit::setup(int _id) {
 	nPacketsSent = 0;
 	packetProtocolVersion = 1;
 
-
+	udpSender.Create();
+	udpSender.SetEnableBroadcast(false);
+	udpSender.Connect(ipAddress.getParameter().toString().c_str(), 11999);
+	udpSender.SetNonBlocking(true);
 }
 
 // ---------------------------------------------------------------------------- //
@@ -110,7 +106,7 @@ void LivestreamInteractionUnit::setDistance(int distance, int signalStrength) {
 	// set the raw distance
 	rawDistance = distance;
 	// set the signal strength
-	distanceSignalStrength = signalStrength;
+	guiSignalStrength = signalStrength;
 
 	// increment up to max smoothing (deals with initial state)
 	if (distSamplesToSmooth < maxDistSamplesToSmooth ) distSamplesToSmooth++; 

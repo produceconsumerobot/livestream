@@ -18,35 +18,39 @@ class LivestreamInteractionUnit {
 
 public:
 	
-	int id;						// ID of this interaction unit
-	ofxTextField dataName;			// Name of the water data played by this unit
+	int id;								// ID of this interaction unit
+	ofxTextField dataName;				// Name of the water data played by this unit
 	ofxTextField sensorLocation;		// Location of the water data played by this unit
-	ofxTextField ipAddress;			// IP address of this unit
+	ofxTextField ipAddress;				// IP address of this unit
+	// startupTime
+	// lastHeartbeatTime
+	ofxFloatSlider guiSmoothedDistance;	// Smoothed distance weighted by the signal strength
+	ofxIntField guiSignalStrength;		// Signal strength of distance sensor
+	ofxFloatSlider guiTemperature;		// Most recent temperature measurement;
+	ofxFloatSlider guiLowTemperature;	// Lowest recorded temperature
+	ofxFloatSlider guiHighTemperature;	// Highest recorded temperature
+	ofxFloatSlider waterData;			// Current water data value
+	ofxIntField	note;					// Note to play
 	ofxFloatField volume;				// Note play volume
-	ofxFloatField volumeMin;
-	ofxFloatField volumeMax;
+	ofxFloatField distanceMin;
+	ofxFloatField distanceMax;
 	ofxFloatField waterDataMin;
 	ofxFloatField waterDataMax;
 	ofxIntField noteMin;
 	ofxIntField noteMax;
+	ofxFloatField volumeMin;
+	ofxFloatField volumeMax;
+	ofxIntField distanceReadInterval;
 	ofxIntField waterDataReadInterval;
 	ofxIntField notePlayInterval;
-	ofxIntField distanceReadInterval;
-	ofxFloatField distanceMin;
-	ofxFloatField distanceMax;
-	ofxIntField distanceSignalStrength;	// Signal strength of distance sensor
+	ofxIntField heartbeatInterval;		// Interval (ms) to pulse heartbeats
 	ofxFloatField signalStrengthMin;	// Min/Full signal strength used for weighting the distance measure
 	ofxFloatField signalStrengthMax;	// Min/Full signal strength used for weighting the distance measure
 	ofxFloatField minSignalWeight;		// Weight assigned to the min minimum signal strength
 	ofxIntField noiseDistance;			// Distance (cm) below which the measurement is considered noise
 	ofxIntField maxDistSamplesToSmooth;	// Number of distance samples to smooth
 	//bool heartbeat;				// Hearbeats to track if we're alive
-	ofxIntField heartbeatInterval;		// Interval (ms) to pulse heartbeats
 
-	ofxFloatSlider guiSmoothedDistance;		// Smoothed distance weighted by the signal strength
-	ofxFloatSlider guiTemperature;			// Most recent temperature measurement;
-	ofxFloatSlider guiLowTemperature;			// Lowest recorded temperature
-	ofxFloatSlider guiHighTemperature;		// Highest recorded temperature
 
 	bool eyeSafetyOn;			// Tracks whether eye safety is on
 	int distSensorStatus;		// Status of the distance sensor
@@ -84,7 +88,8 @@ public:
 	int getHighTemperature();
 
 	LivestreamInteractionUnit();
-	void setup(int _id);
+	void setup(int _id, string _ipAddress);
+	//void setup(int _id, string _ipAddress, string _dataName, string _sensorLocation);
 
 	// GUI
 	ofxPanel		ixPanel;
