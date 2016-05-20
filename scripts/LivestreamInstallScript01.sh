@@ -60,8 +60,12 @@ sudo mkdir -p /livestream/audio/
 sudo chmod a+w /livestream/audio/
 
 # automount /livestream/audio/
+# fstab
 
 sudo mkdir -p /livestream
+
+# copy /IXUnitLex1.service to /etc/systemd/system/IXUnitLex1.service
+# systemctl enable /etc/systemd/system/IXUnitLex1.service
 
 
 # install logmein hamachi
