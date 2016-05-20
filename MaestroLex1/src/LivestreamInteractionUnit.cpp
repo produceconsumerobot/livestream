@@ -5,20 +5,28 @@
 // Constructor
 // ---------------------------------------------------------------------------- //
 LivestreamInteractionUnit::LivestreamInteractionUnit() {
+}
 
+// ---------------------------------------------------------------------------- //
+// Destructor
+// ---------------------------------------------------------------------------- //
+LivestreamInteractionUnit::~LivestreamInteractionUnit() {
 
 }
 
-void LivestreamInteractionUnit::setup(int _id, string _ipAddress) {
-//void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataName, string _sensorLocation) {
+// ---------------------------------------------------------------------------- //
+// setup
+// ---------------------------------------------------------------------------- //
+//void LivestreamInteractionUnit::setup(int _id, string _ipAddress) {
+void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataName, string _sensorLocation) {
 	id = _id;
 	//ipAddress = _ipAddress;
 	ixPanel.setup("IXUnit" + to_string(_id),
 		"IXUnit" + to_string(_id) + ".xml", 0, 0);
 	ixPanel.setup("IXUnit", "IXUnit.xml", 0, 0);
 	//ixPanel.add(id.setup("ID", _id, -1, 255));
-	ixPanel.add(dataName.setup("dataName", "none"));
-	ixPanel.add(sensorLocation.setup("sensorLoc", "none"));
+	ixPanel.add(dataName.setup("dataName", _dataName));
+	ixPanel.add(sensorLocation.setup("sensorLoc", _sensorLocation));
 	ixPanel.add(ipAddress.setup("IP", _ipAddress));
 	ixPanel.add(guiSmoothedDistance.setup("SmoothedDistance", 0, 0, 50 * 30));
 	ixPanel.add(guiTemperature.setup("Temperature", -60, -60, 100));						// Celcius
@@ -92,6 +100,7 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress) {
 	distSensorStatus = 0;
 	nPacketsSent = 0;
 	packetProtocolVersion = 1;
+	waterDataFilesLocation = "/livestream/data/";
 
 	udpSender.Create();
 	udpSender.SetEnableBroadcast(false);
@@ -233,4 +242,23 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 			ofLog(OF_LOG_VERBOSE) << "T" << inPacket->sensorDesignator << ", " << inPacket->temperature << endl;
 			setTemperature(inPacket->temperature);
 		}
+}
+
+// ---------------------------------------------------------------------------- //
+void LivestreamInteractionUnit::playNote() {
+	LivestreamNetwork::Packet_PLAY_NOTE_V1 outPacket;
+	outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
+	outPacket.hdr.packetCount = ++nPacketsSent;
+	outPacket.hdr.protocolVersion = packetProtocolVersion;
+	string filename = dataName.getParameter().toString() + "_" + sensorLocation.getParameter().toString() + "_" + note.getParameter().toString();
+	string filePath = waterDataFilesLocation + filename;
+	strncpy(outPacket.filePath, filePath.c_str(), sizeof(outPacket.filePath));
+	strncpy(outPacket.hdr.typeTag, LivestreamNetwork::PLAY_NOTE,
+		sizeof(LivestreamNetwork::PLAY_NOTE) / sizeof(LivestreamNetwork::PLAY_NOTE[0]));
+
+	// Send the packet
+	udpSender.Send((char*)&outPacket, sizeof(outPacket));
+	// Convert the typeTage char[2] to a string for logging
+	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
+	ofLog(OF_LOG_VERBOSE) << typeTag << " (" << filePath << ")" << ">>" << ipAddress << endl;
 }

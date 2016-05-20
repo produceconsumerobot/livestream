@@ -30,19 +30,9 @@ public:
 	static const char STATUS[2];					// LU
 	//static const char GET_LOOP_RATE[2];			// GL [deprecated?]
 	//static const char LOOP_RATE[2];				// LR [deprecated?]
-	static const char LOAD_NOTE_FILE[2];			// NL
-	static const char CLEAR_NOTE_FILES[2];			// CN
-	static const char GET_NOTE_FILES_COUNT[2];		// NG
-	static const char NOTE_FILES_COUNT[2];			// NC
 	static const char PLAY_NOTE[2];					// NP
 	static const char GET_ALL_TEMPS[2];				// GT x
 	static const char TEMPERATURE[2];				// TN x
-
-	const char LivestreamNetwork::LOAD_NOTE_FILE[2]{ 'N', 'L' };
-	const char LivestreamNetwork::CLEAR_NOTE_FILES[2]{ 'C', 'N' };
-	const char LivestreamNetwork::GET_NOTE_FILES_COUNT[2]{ 'N', 'G' };
-	const char LivestreamNetwork::NOTE_FILES_COUNT[2]{ 'N', 'C' };
-	const char LivestreamNetwork::PLAY_NOTE[2] = { 'N', 'P' };
 
 	// ---------------------------------------------
 	// Packet Definitions
@@ -166,7 +156,7 @@ public:
 
 	struct Packet_PLAY_NOTE_V1 {
 		PacketHeader_V1 hdr;
-		uint8_t pitch;
+		char filePath[256];
 	};
 
 	struct Packet_GET_ALL_TEMPS_V1 {

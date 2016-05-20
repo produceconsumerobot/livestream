@@ -74,6 +74,7 @@ void ofApp::setup(){
 	
 	if (debugTest != NO_SOUND) {
 		// Sound output setup
+        // ToDo: change to data/tp10.wav
         volSound.loadSound("/livestream/audio/Tp10.wav");
 		//volSound.loadSound("sounds/Tp10.wav");
 		volume = 0.0f;
@@ -324,6 +325,9 @@ void ofApp::draw() {
 						
 						// Get the LED data
 						LivestreamNetwork::Packet_SET_LED_V1* inPacket = (LivestreamNetwork::Packet_SET_LED_V1 *) &udpMessage;
+                        
+                        ofLog(OF_LOG_VERBOSE) << ipAddress << " >> " << header->typeTag << " (" << inPacket->state << ")" << endl;  
+                        
 						// Set the LED outputs
 						if (inPacket->state) {
 							// Blink the LED
@@ -341,8 +345,16 @@ void ofApp::draw() {
 						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
 						// ********** PLAY_NOTE packet type ********** //
                         //volSound.loadSound("/livestream/audio/Tp10.wav");
+                        
+                        // Get the note file path
+						LivestreamNetwork::Packet_PLAY_NOTE_V1* inPacket = (LivestreamNetwork::Packet_PLAY_NOTE_V1 *) &udpMessage;
+					                       
+                        ofLog(OF_LOG_VERBOSE) << ipAddress << " >> " << header->typeTag << " (" << filePath << ")" << endl;                        
+                        
+                        // Set the Volume
                         volSound.setVolume(volume);
 						ofSoundSetVolume(volume);
+                        volSound.loadSound(str(inPacket->filePath));
 						volSound.play();
 						volSound.setVolume(volume);
 						ofSoundSetVolume(volume);

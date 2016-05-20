@@ -1,5 +1,6 @@
 
 #include "LivestreamNetwork.h"
+#include <string>
 
 const char LivestreamNetwork::MODE_SLAVE[2] =				{'M', 'S'};
 const char LivestreamNetwork::MODE_MASTER[2] =				{'M', 'M'};
@@ -21,10 +22,6 @@ const char LivestreamNetwork::GET_STATUS[2] =				{'G', 'U'};
 const char LivestreamNetwork::STATUS[2] =					{'L', 'U'};
 //const char LivestreamNetwork::GET_LOOP_RATE[2] =			{'G', 'L'};
 //const char LivestreamNetwork::LOOP_RATE[2] =				{'L', 'R'};
-const char LivestreamNetwork::LOAD_NOTE_FILE[2]				{'N', 'L'};
-const char LivestreamNetwork::CLEAR_NOTE_FILES[2]			{ 'C', 'N' };
-const char LivestreamNetwork::GET_NOTE_FILES_COUNT[2]		{ 'N', 'G' };
-const char LivestreamNetwork::NOTE_FILES_COUNT[2]			{ 'N', 'C' };
 const char LivestreamNetwork::PLAY_NOTE[2] =				{'N', 'P'};
 const char LivestreamNetwork::GET_ALL_TEMPS[2] =			{'G', 'T'};
 const char LivestreamNetwork::TEMPERATURE[2] =				{'T', 'N'};

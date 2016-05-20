@@ -25,8 +25,6 @@ void ofApp::setup(){
 	nPacketsSent = 0;
 	packetProtocolVersion = 1;
 
-
-
 	// Draw the run data to the screen
 	int panelSpacing = 200;
 	panelWidth = panelSpacing - 5;
@@ -60,7 +58,9 @@ void ofApp::setup(){
 	globalSettingsPanel.loadFromFile("globalSettings.xml");
 	
 	interXUnit.resize(9);
-	interXUnit.at(0).setup(11, "192.168.1.102");
+	interXUnit.at(0).setup(11, "192.168.1.102", "Coldspring", "Temp");
+	interXUnit.at(0).ixPanel.setPosition(panelSpacing * 1, 0);
+	interXUnit.at(0).setup(11, "192.168.1.103", "Coldspring", "Conductivity");
 	interXUnit.at(0).ixPanel.setPosition(panelSpacing * 1, 0);
 
 
@@ -106,7 +106,8 @@ void ofApp::draw(){
 		}
 		if (ofGetElapsedTimeMillis() - interXUnit.at(j).notePlayTime > interXUnit.at(j).notePlayInterval) {
 			// Play a note
-			keyReleased('n');
+			interXUnit.at(j).playNote();
+			//keyReleased('n');
 			interXUnit.at(j).notePlayTime = ofGetElapsedTimeMillis();
 		}
 		if (ofGetElapsedTimeMillis() - interXUnit.at(j).heartbeatTime > interXUnit.at(j).heartbeatInterval) {

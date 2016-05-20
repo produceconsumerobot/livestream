@@ -87,9 +87,13 @@ public:
 	int getLowTemperature();
 	int getHighTemperature();
 
-	LivestreamInteractionUnit();
-	void setup(int _id, string _ipAddress);
-	//void setup(int _id, string _ipAddress, string _dataName, string _sensorLocation);
+	string waterDataFilesLocation;
+
+	LivestreamInteractionUnit(); 
+	~LivestreamInteractionUnit();
+	//void setup(int _id, string _ipAddress);
+	void setup(int _id, string _ipAddress, string _dataName, string _sensorLocation);
+	void playNote();
 
 	// GUI
 	ofxPanel		ixPanel;
