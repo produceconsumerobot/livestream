@@ -79,5 +79,7 @@ class ofApp : public ofBaseApp{
 		int panelWidth;
 		int panelRowHeight;
 
+		bool udpSendTimersOn;
+
 };
 

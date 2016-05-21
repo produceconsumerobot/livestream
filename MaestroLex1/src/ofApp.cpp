@@ -67,6 +67,7 @@ void ofApp::setup(){
 
 
 	testLED = false;
+	udpSendTimersOn = false;
 }
 
 //--------------------------------------------------------------
@@ -106,36 +107,38 @@ void ofApp::draw(){
 	
 	//ofSleepMillis(1000);
 
-
-	for (int j=0; j<interXUnit.size(); j++) {
-		if (ofGetElapsedTimeMillis() - interXUnit.at(j).distanceReadTime > interXUnit.at(j).distanceReadInterval) {
-			// Read the distance
-			keyReleased('d');
-			interXUnit.at(j).distanceReadTime = ofGetElapsedTimeMillis();
+	if (udpSendTimersOn)
+	{
+		for (int j = 0; j<interXUnit.size(); j++) {
+			if (ofGetElapsedTimeMillis() - interXUnit.at(j).distanceReadTime > interXUnit.at(j).distanceReadInterval) {
+				// Read the distance
+				keyReleased('d');
+				interXUnit.at(j).distanceReadTime = ofGetElapsedTimeMillis();
+			}
+			if (ofGetElapsedTimeMillis() - interXUnit.at(j).notePlayTime > interXUnit.at(j).notePlayInterval) {
+				// Play a note
+				interXUnit.at(j).playNote();
+				//keyReleased('n');
+				interXUnit.at(j).notePlayTime = ofGetElapsedTimeMillis();
+			}
+			if (ofGetElapsedTimeMillis() - interXUnit.at(j).heartbeatTime > interXUnit.at(j).heartbeatInterval) {
+				// Ping the IXUnit
+				keyReleased('p');
+				// blink the heartbeat LED
+				keyReleased('l');
+				// Send the Maestro IP address
+				keyReleased('a');
+				// Get all temps
+				keyReleased('t');
+				interXUnit.at(j).heartbeatTime = ofGetElapsedTimeMillis();
+				cout << setprecision(3)
+					<< "LR, " << ofGetFrameRate()
+					<< ", LD, " << interXUnit.at(j).getSmoothedDistance()
+					<< ", LS, " << interXUnit.at(j).guiSignalStrength
+					<< endl;
+			}
+			interXUnit.at(j).ixPanel.draw();
 		}
-		if (ofGetElapsedTimeMillis() - interXUnit.at(j).notePlayTime > interXUnit.at(j).notePlayInterval) {
-			// Play a note
-			interXUnit.at(j).playNote();
-			//keyReleased('n');
-			interXUnit.at(j).notePlayTime = ofGetElapsedTimeMillis();
-		}
-		if (ofGetElapsedTimeMillis() - interXUnit.at(j).heartbeatTime > interXUnit.at(j).heartbeatInterval) {
-			// Ping the IXUnit
-			keyReleased('p');
-			// blink the heartbeat LED
-			keyReleased('l');
-			// Send the Maestro IP address
-			keyReleased('a');
-			// Get all temps
-			keyReleased('t');
-			interXUnit.at(j).heartbeatTime = ofGetElapsedTimeMillis();
-			cout << setprecision(3) 
-				<< "LR, " << ofGetFrameRate() 
-				<< ", LD, " << interXUnit.at(j).getSmoothedDistance()
-				<< ", LS, " << interXUnit.at(j).guiSignalStrength
-				<< endl;
-		}
-		interXUnit.at(j).ixPanel.draw();
 	}
 	
 	// Draw the run data to the screen
@@ -293,6 +296,10 @@ void ofApp::keyReleased(int key){
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 		ofLog(OF_LOG_VERBOSE) << typeTag << " (" << maestroIpAddress.getParameter().toString() << ") >> " << "broadcast" << endl;
 	}
+	else if (key == 32) {
+		udpSendTimersOn = !udpSendTimersOn;
+	}
+
 
 }
 
