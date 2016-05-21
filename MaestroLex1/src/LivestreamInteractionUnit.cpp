@@ -117,13 +117,13 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 // ---------------------------------------------------------------------------- //
 // setDistance
 // ---------------------------------------------------------------------------- //
-void LivestreamInteractionUnit::setDistance(int distance, int signalStrength) {
+void LivestreamInteractionUnit::setDistance(int distance, float signalStrength) {
 	// set the raw distance
 	rawDistance = distance;
 	// set the signal strength
 	guiSignalStrength = signalStrength;
 
-	if (distance != -1 && signalStrength != -1)
+	if (distance != -1 && signalStrength >= 0)
 	{
 
 		// increment up to max smoothing (deals with initial state)
@@ -234,10 +234,10 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 		{
 			LivestreamNetwork::Packet_DISTANCE_V1* inPacket = (LivestreamNetwork::Packet_DISTANCE_V1 *) udpMessage;
 			ofLog(OF_LOG_VERBOSE) << ipAddress.getParameter().toString() << " >> " << typeTag 
-				<< "LD, " << inPacket->distance << ", LS, " << inPacket->signalStrength << endl;
+				<< " LD, " << inPacket->distance << ", LS, " << inPacket->signalStrength << endl;
 			
 			// Parse DISTANCE data
-			setDistance(inPacket->distance, inPacket->signalStrength);
+			setDistance(inPacket->distance, (float) inPacket->signalStrength / 255.f);
 			// Calculate the new volume level
 			calculateVolume();
 

@@ -27,7 +27,7 @@ public:
 	ofxTextField lastPong;				// Last received pong
 	ofxIntSlider rawDistance;	// Smoothed distance weighted by the signal strength
 	ofxFloatSlider guiSmoothedDistance;	// Smoothed distance weighted by the signal strength
-	ofxIntField guiSignalStrength;		// Signal strength of distance sensor
+	ofxFloatField guiSignalStrength;		// Signal strength of distance sensor
 	ofxFloatSlider guiTemperature;		// Most recent temperature measurement;
 	ofxFloatSlider guiLowTemperature;	// Lowest recorded temperature
 	ofxFloatSlider guiHighTemperature;	// Highest recorded temperature
@@ -76,7 +76,7 @@ public:
 	
 	ofxUDPManager udpSender;
 
-	void setDistance(int distance, int signalStrength);
+	void setDistance(int distance, float signalStrength);
 	float calculateVolume();
 	void setTemperature(int temp);
 
