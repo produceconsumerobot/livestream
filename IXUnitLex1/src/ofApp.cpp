@@ -203,7 +203,7 @@ void ofApp::draw() {
 			maestroIpAddress = inPacket->ipAddress;
             udpSender.Close();
             udpSender.Create();
-            udpSender.SetEnableBroadcast(true);
+            udpSender.SetEnableBroadcast(false);
             udpSender.Connect(maestroIpAddress.c_str(),11999);
             udpSender.SetNonBlocking(true);
 		} else {
