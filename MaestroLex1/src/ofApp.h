@@ -28,7 +28,7 @@ class ofApp : public ofBaseApp{
 		unsigned long long nPacketsSent;
 		int packetProtocolVersion;
 
-		string maestroIpAddress;
+		//string maestroIpAddress;
 
 		vector<LivestreamInteractionUnit> interXUnit;
 		int nInterXUnits;
@@ -69,6 +69,7 @@ class ofApp : public ofBaseApp{
 		ofxIntField maxDistSamplesToSmooth;
 
 		ofxPanel maestroPanel;
+		ofxTextField maestroIpAddress;
 		ofxLabel datetimeString;
 		ofxLabel lastStartupTime;
 		ofxLabel currentTemp;

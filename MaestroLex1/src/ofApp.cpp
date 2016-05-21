@@ -5,6 +5,11 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+	string baseIpAddress = "192.168.0.";
+	string broadcastIpAddress = baseIpAddress + "255";
+	maestroIpAddress = baseIpAddress + "102";
+	string ixUnitIpAddress = baseIpAddress + "100";
+
 	// we don't want to be running to fast
 	ofSetVerticalSync(false);
 	//ofSetFrameRate(60);
@@ -13,10 +18,8 @@ void ofApp::setup(){
     //create the socket and set to send to 127.0.0.1:11999
 	udpSender.Create();
 	udpSender.SetEnableBroadcast(true);
-	udpSender.Connect("192.168.1.255",11999);
+	udpSender.Connect(broadcastIpAddress.c_str(),11999);
 	udpSender.SetNonBlocking(true);
-
-	maestroIpAddress = "192.168.1.201";
 
 	udpReceiver.Create();
 	udpReceiver.Bind(11999);
@@ -35,6 +38,7 @@ void ofApp::setup(){
 	ofxGuiSetDefaultWidth(panelWidth);
 
 	maestroPanel.setup("Maestro", "maestroSettings.xml", 0, 0);
+	maestroPanel.add(maestroIpAddress.setup("IP", maestroIpAddress));
 	maestroPanel.add(datetimeString.setup(string("current date")));
 	maestroPanel.add(lastStartupTime.setup(string("startup date")));
 	maestroPanel.add(currentTemp.setup(string("0.0C")));
@@ -57,10 +61,8 @@ void ofApp::setup(){
 	// Load settings from file
 	globalSettingsPanel.loadFromFile("globalSettings.xml");
 	
-	interXUnit.resize(9);
-	interXUnit.at(0).setup(11, "192.168.1.102", "Coldspring", "Temp");
-	interXUnit.at(0).ixPanel.setPosition(panelSpacing * 1, 0);
-	interXUnit.at(0).setup(11, "192.168.1.103", "Coldspring", "Conductivity");
+	interXUnit.resize(1);
+	interXUnit.at(0).setup(11, ixUnitIpAddress, "Coldspring", "Conductivity");
 	interXUnit.at(0).ixPanel.setPosition(panelSpacing * 1, 0);
 
 
@@ -79,12 +81,19 @@ void ofApp::update(){
 		int port;
 		// Get the sender's address
 		udpReceiver.GetRemoteAddr(udpAddress, port);
-		//string address = udpAddress;
-		ofLog(OF_LOG_VERBOSE) << "UDP MESSAGE << " << udpAddress << endl;
+		
+		// Convert the UDP message to read its type tag from the header section
+		LivestreamNetwork::PacketHeader_V1* header =
+			(LivestreamNetwork::PacketHeader_V1 *) udpMessage;
+		string typeTag(header->typeTag, header->typeTag + sizeof(header->typeTag) / sizeof(header->typeTag[0]));
+
+		if (maestroIpAddress.getParameter().toString().compare(udpAddress) != 0) {
+			ofLog(OF_LOG_VERBOSE) << udpAddress << " >> " << typeTag << endl;
+		}
 
 		for (int j=0; j<interXUnit.size(); j++) {
 			if (interXUnit.at(j).ipAddress.getParameter().toString().compare(udpAddress) == 0) {
-				ofLog(OF_LOG_VERBOSE) << "Address Match << " << interXUnit.at(j).ipAddress.getParameter().toString() << ", " << udpAddress << endl;
+				ofLog(OF_LOG_VERBOSE) << udpAddress << " >> Address Match (" << interXUnit.at(j).ipAddress.getParameter().toString() << ")" << endl;
 				interXUnit.at(j).parseUdpPacket(udpMessage);
 			}
 		}
@@ -111,6 +120,8 @@ void ofApp::draw(){
 			interXUnit.at(j).notePlayTime = ofGetElapsedTimeMillis();
 		}
 		if (ofGetElapsedTimeMillis() - interXUnit.at(j).heartbeatTime > interXUnit.at(j).heartbeatInterval) {
+			// Ping the IXUnit
+			keyReleased('p');
 			// blink the heartbeat LED
 			keyReleased('l');
 			// Send the Maestro IP address
@@ -158,7 +169,7 @@ void ofApp::keyReleased(int key){
 		udpSender.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-		ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "broadcast" << endl;	
+		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;	
 
 	} else if ((char) key == 'd') {
 		// ********** GET_DISTANCE packet type ********** //
@@ -174,7 +185,7 @@ void ofApp::keyReleased(int key){
 		udpSender.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-		ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "broadcast" << endl;	
+		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;	
 			/*
 			ofLog(OF_LOG_VERBOSE) 
 				<< "nPacketsSent, " << outPacket.hdr.packetCount
@@ -197,7 +208,7 @@ void ofApp::keyReleased(int key){
 		udpSender.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-		ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "broadcast" << endl;	
+		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;	
 
 	} else if ((char) key == 'm') {
 		// ********** MODE_MASTER packet type ********** //
@@ -213,7 +224,7 @@ void ofApp::keyReleased(int key){
 		udpSender.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-		ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "broadcast" << endl;
+		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;
 
 	}  else if ((char) key == 'l') {
 		// ********** SET_LED packet type ********** //
@@ -232,7 +243,7 @@ void ofApp::keyReleased(int key){
 		udpSender.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-		ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "broadcast" << endl;	
+		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;	
 
 	} else if ((char) key == 'n') {
 		// ********** PLAY_NOTE packet type ********** //
@@ -241,7 +252,7 @@ void ofApp::keyReleased(int key){
 		outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 		outPacket.hdr.packetCount = ++nPacketsSent;
 		outPacket.hdr.protocolVersion = packetProtocolVersion;
-		outPacket.pitch = 0;
+		//outPacket.pitch = 0;
 		strncpy(outPacket.hdr.typeTag, LivestreamNetwork::PLAY_NOTE, 
 			sizeof(LivestreamNetwork::PLAY_NOTE) / sizeof(LivestreamNetwork::PLAY_NOTE[0]));
 
@@ -249,7 +260,7 @@ void ofApp::keyReleased(int key){
 		udpSender.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-		ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "broadcast" << endl;	
+		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;	
 	} else if ((char) key == 't') {
 		// ********** GET_ALL_TEMPS packet type ********** //
 		// Load the packet data
@@ -264,7 +275,7 @@ void ofApp::keyReleased(int key){
 		udpSender.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-		ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "broadcast" << endl;	
+		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;	
 	} else if ((char) key == 'a') {
 		// ********** SET_MAESTRO_ADDRESS packet type ********** //
 		// Load the packet data
@@ -274,13 +285,13 @@ void ofApp::keyReleased(int key){
 		outPacket.hdr.protocolVersion = packetProtocolVersion;
 		strncpy(outPacket.hdr.typeTag, LivestreamNetwork::SET_MAESTRO_ADDRESS, 
 			sizeof(LivestreamNetwork::SET_MAESTRO_ADDRESS) / sizeof(LivestreamNetwork::SET_MAESTRO_ADDRESS[0]));
-		strcpy(outPacket.ipAddress, maestroIpAddress.c_str());
+		strcpy(outPacket.ipAddress, maestroIpAddress.getParameter().toString().c_str());
 
 		// Send the packet
 		udpSender.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-		ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << "broadcast" << endl;	
+		ofLog(OF_LOG_VERBOSE) << typeTag << " (" << maestroIpAddress.getParameter().toString() << ") >> " << "broadcast" << endl;
 	}
 
 }

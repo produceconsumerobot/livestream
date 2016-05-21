@@ -35,7 +35,7 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 
 	ixPanel.add(volume.setup("volume", 0, 0, 1));
 	ixPanel.add(volumeMin.setup("volMin", 0.f, 0, 1));
-	ixPanel.add(volumeMax.setup("volMax", 0.f, 0, 1));
+	ixPanel.add(volumeMax.setup("volMax", 1.f, 0, 1));
 	ixPanel.add(waterDataMin.setup("waterDataMin", 0.f, -10000, 10000));
 	ixPanel.add(waterDataMax.setup("waterDataMax", 0.f, -10000, 10000));
 	ixPanel.add(noteMin.setup("noteMin", 1, 1, 32));
@@ -206,7 +206,7 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 			(LivestreamNetwork::PacketHeader_V1 *) udpMessage;
 		// Convert the typeTage char[2] to a string for logging
 		string typeTag(header->typeTag, header->typeTag + sizeof(header->typeTag) / sizeof(header->typeTag[0]));
-		ofLog(OF_LOG_VERBOSE) << typeTag << "<<" << ipAddress.getParameter().toString() << endl;
+		ofLog(OF_LOG_VERBOSE) << ipAddress.getParameter().toString() << " >> " << typeTag << endl;
 
 		// Parse DISTANCE Packets
 		if (memcmp( header->typeTag, LivestreamNetwork::DISTANCE, 
@@ -250,8 +250,9 @@ void LivestreamInteractionUnit::playNote() {
 	outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 	outPacket.hdr.packetCount = ++nPacketsSent;
 	outPacket.hdr.protocolVersion = packetProtocolVersion;
-	string filename = dataName.getParameter().toString() + "_" + sensorLocation.getParameter().toString() + "_" + note.getParameter().toString();
-	string filePath = waterDataFilesLocation + filename;
+	string filePath = "audio/Coldspring_Conductivity_01.mp3";
+	//string filename = dataName.getParameter().toString() + "_" + sensorLocation.getParameter().toString() + "_" + note.getParameter().toString();
+	//string filePath = waterDataFilesLocation + filename;
 	strncpy(outPacket.filePath, filePath.c_str(), sizeof(outPacket.filePath));
 	strncpy(outPacket.hdr.typeTag, LivestreamNetwork::PLAY_NOTE,
 		sizeof(LivestreamNetwork::PLAY_NOTE) / sizeof(LivestreamNetwork::PLAY_NOTE[0]));
@@ -260,5 +261,5 @@ void LivestreamInteractionUnit::playNote() {
 	udpSender.Send((char*)&outPacket, sizeof(outPacket));
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-	ofLog(OF_LOG_VERBOSE) << typeTag << " (" << filePath << ")" << ">>" << ipAddress << endl;
+	ofLog(OF_LOG_VERBOSE) << typeTag << " (" << filePath << ")" << " >> " << ipAddress.getParameter().toString() << endl;
 }
