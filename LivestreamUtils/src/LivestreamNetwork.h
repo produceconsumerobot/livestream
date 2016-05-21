@@ -30,7 +30,7 @@ public:
 	static const char STATUS[2];					// LU
 	//static const char GET_LOOP_RATE[2];			// GL [deprecated?]
 	//static const char LOOP_RATE[2];				// LR [deprecated?]
-	static const char PLAY_NOTE[2];					// NP
+	static const char PLAY_NOTE[2];					// PN
 	static const char GET_ALL_TEMPS[2];				// GT x
 	static const char TEMPERATURE[2];				// TN x
 

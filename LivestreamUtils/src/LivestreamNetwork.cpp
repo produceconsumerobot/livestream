@@ -22,6 +22,6 @@ const char LivestreamNetwork::GET_STATUS[2] =				{'G', 'U'};
 const char LivestreamNetwork::STATUS[2] =					{'L', 'U'};
 //const char LivestreamNetwork::GET_LOOP_RATE[2] =			{'G', 'L'};
 //const char LivestreamNetwork::LOOP_RATE[2] =				{'L', 'R'};
-const char LivestreamNetwork::PLAY_NOTE[2] =				{'N', 'P'};
+const char LivestreamNetwork::PLAY_NOTE[2] =				{'P', 'N'};
 const char LivestreamNetwork::GET_ALL_TEMPS[2] =			{'G', 'T'};
 const char LivestreamNetwork::TEMPERATURE[2] =				{'T', 'N'};
