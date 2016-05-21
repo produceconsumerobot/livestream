@@ -93,9 +93,9 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 										//noiseDistance = 20;					// cm
 	distSamplesToSmooth = 0;			// Start at zero and increment to maxDistSamplesToSmooth
 										//maxDistSamplesToSmooth = 1;		
-	temperature = -1;
-	lowTemperature = -1;
-	highTemperature = -1;
+	temperature = -100;
+	lowTemperature = -100;
+	highTemperature = -100;
 	//heartbeat = 1;
 	heartbeatInterval = 1000;			// ms
 	heartbeatTime = ofGetElapsedTimeMillis();
@@ -176,11 +176,11 @@ void LivestreamInteractionUnit::setTemperature(int temp) {
 	temperature = temp;
 	guiTemperature = temperature;
 
-	if (lowTemperature == -1)
+	if (lowTemperature == -100)
 	{
 		lowTemperature = temperature;
 	}
-	if (highTemperature == -1)
+	if (highTemperature == -100)
 	{
 		highTemperature = temperature;
 	}

@@ -131,14 +131,12 @@ void ofApp::draw(){
 				// Get all temps
 				keyReleased('t');
 				interXUnit.at(j).heartbeatTime = ofGetElapsedTimeMillis();
-				cout << setprecision(3)
-					<< "LR, " << ofGetFrameRate()
-					<< ", LD, " << interXUnit.at(j).getSmoothedDistance()
-					<< ", LS, " << interXUnit.at(j).guiSignalStrength
-					<< endl;
 			}
-			interXUnit.at(j).ixPanel.draw();
 		}
+	}
+
+	for (int j = 0; j < interXUnit.size(); j++) {
+		interXUnit.at(j).ixPanel.draw();
 	}
 	
 	// Draw the run data to the screen
