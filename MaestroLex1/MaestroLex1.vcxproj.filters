@@ -52,6 +52,9 @@
     <ClCompile Include="..\..\..\addons\ofxInputField\src\ofxInputField.cpp">
       <Filter>addons\ofxInputField\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\LivestreamUtils\src\logger.cpp">
+      <Filter>LivestreamUtils\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -148,6 +151,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\addons\ofxInputField\src\ofxInputField.h">
       <Filter>addons\ofxInputField\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LivestreamUtils\src\logger.h">
+      <Filter>LivestreamUtils\src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

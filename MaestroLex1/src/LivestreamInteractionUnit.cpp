@@ -1,5 +1,6 @@
 
 #include "LivestreamInteractionUnit.h"
+#include "logger.h"
 
 // ---------------------------------------------------------------------------- //
 // Constructor
@@ -28,6 +29,7 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 	ixPanel.add(dataName.setup("dataName", _dataName));
 	ixPanel.add(sensorLocation.setup("sensorLoc", _sensorLocation));
 	ixPanel.add(ipAddress.setup("IP", _ipAddress));
+	ixPanel.add(lastPong.setup("lastPong", "NA"));
 	ixPanel.add(guiSmoothedDistance.setup("SmoothedDistance", 0, 0, 50 * 30));
 	ixPanel.add(guiTemperature.setup("Temperature", -60, -60, 100));						// Celcius
 	ixPanel.add(guiLowTemperature.setup("LowTemperature", -60, -60, 100));					// Celcius
@@ -210,7 +212,8 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 
 		// Parse DISTANCE Packets
 		if (memcmp( header->typeTag, LivestreamNetwork::DISTANCE, 
-			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
+			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) 
+		{
 			LivestreamNetwork::Packet_DISTANCE_V1* inPacket = (LivestreamNetwork::Packet_DISTANCE_V1 *) udpMessage;
 			ofLog(OF_LOG_VERBOSE) << "LD, " << inPacket->distance << ", LS, " << inPacket->signalStrength << endl;
 			
@@ -237,10 +240,15 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 			ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << ipAddress.getParameter().toString() << endl;	
 
 		} else if (memcmp( header->typeTag, LivestreamNetwork::TEMPERATURE, 
-			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
+			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) 
+		{
 			LivestreamNetwork::Packet_TEMPERATURE_V1* inPacket = (LivestreamNetwork::Packet_TEMPERATURE_V1 *) udpMessage;
 			ofLog(OF_LOG_VERBOSE) << "T" << inPacket->sensorDesignator << ", " << inPacket->temperature << endl;
 			setTemperature(inPacket->temperature);
+		} else if (memcmp(header->typeTag, LivestreamNetwork::PONG,
+			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) 
+		{
+			lastPong = LoggerThread::dateTimeString();
 		}
 }
 

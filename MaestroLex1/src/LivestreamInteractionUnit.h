@@ -24,6 +24,7 @@ public:
 	ofxTextField ipAddress;				// IP address of this unit
 	// startupTime
 	// lastHeartbeatTime
+	ofxTextField lastPong;				// Last received pong
 	ofxFloatSlider guiSmoothedDistance;	// Smoothed distance weighted by the signal strength
 	ofxIntField guiSignalStrength;		// Signal strength of distance sensor
 	ofxFloatSlider guiTemperature;		// Most recent temperature measurement;
