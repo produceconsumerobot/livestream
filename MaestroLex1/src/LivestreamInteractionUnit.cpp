@@ -45,7 +45,7 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 	ixPanel.add(notePlayInterval.setup("notePlayInterval", 1000, 1, 5000));					// ms
 	ixPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 60, 1, 2000));	// ms
 	ixPanel.add(distanceMin.setup("distanceMin", 30, 0, 50 * 30));							// cm
-	ixPanel.add(distanceMax.setup("distanceMax", 20 * 30, 0, 50 * 30));						// cm
+	ixPanel.add(distanceMax.setup("distanceMax", 2 * 30, 0, 50 * 30));						// cm
 	ixPanel.add(guiSignalStrength.setup("signalStrength", 0, 0, 255));
 	ixPanel.add(signalStrengthMin.setup("signalStrengthMin", 20, 0, 255));
 	ixPanel.add(signalStrengthMax.setup("signalStrengthMax", 80, 0, 255));
