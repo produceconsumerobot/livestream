@@ -25,6 +25,7 @@ public:
 	// startupTime
 	// lastHeartbeatTime
 	ofxTextField lastPong;				// Last received pong
+	ofxIntSlider rawDistance;	// Smoothed distance weighted by the signal strength
 	ofxFloatSlider guiSmoothedDistance;	// Smoothed distance weighted by the signal strength
 	ofxIntField guiSignalStrength;		// Signal strength of distance sensor
 	ofxFloatSlider guiTemperature;		// Most recent temperature measurement;
@@ -101,7 +102,7 @@ public:
 
 private:
 	int distSamplesToSmooth;	// 
-	int rawDistance;			// Most recent distance measurement
+	//int rawDistance;			// Most recent distance measurement
 	int smoothedDistance;		// Smoothed distance weighted by the signal strength
 	int temperature;			// Most recent temperature measurement;
 	int lowTemperature;			// Lowest recorded temperature

@@ -30,7 +30,8 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 	ixPanel.add(sensorLocation.setup("sensorLoc", _sensorLocation));
 	ixPanel.add(ipAddress.setup("IP", _ipAddress));
 	ixPanel.add(lastPong.setup("lastPong", "NA"));
-	ixPanel.add(guiSmoothedDistance.setup("SmoothedDistance", 0, 0, 50 * 30));
+	ixPanel.add(rawDistance.setup("rawDistance", 0, -1, 50 * 30));
+	ixPanel.add(guiSmoothedDistance.setup("SmoothedDistance", 0, -1, 50 * 30));
 	ixPanel.add(guiTemperature.setup("Temperature", -60, -60, 100));						// Celcius
 	ixPanel.add(guiLowTemperature.setup("LowTemperature", -60, -60, 100));					// Celcius
 	ixPanel.add(guiHighTemperature.setup("HighTemperature", 0, -60, 100));					// Celcius
@@ -119,26 +120,31 @@ void LivestreamInteractionUnit::setDistance(int distance, int signalStrength) {
 	// set the signal strength
 	guiSignalStrength = signalStrength;
 
-	// increment up to max smoothing (deals with initial state)
-	if (distSamplesToSmooth < maxDistSamplesToSmooth ) distSamplesToSmooth++; 
-	// Calculate the weight of new value
-	float newWeight = ((float)1)/((float) distSamplesToSmooth); 
+	if (distance != -1 && signalStrength != -1)
+	{
 
-	if (rawDistance < noiseDistance) {
-		// Handle strange case where lidar reports 1cm when should be infinity
-		distance = distanceMax*2;
+		// increment up to max smoothing (deals with initial state)
+		if (distSamplesToSmooth < maxDistSamplesToSmooth) distSamplesToSmooth++;
+		// Calculate the weight of new value
+		float newWeight = ((float)1) / ((float)distSamplesToSmooth);
 
-		// We're within the noise distance
-		// Ignore signal strength and go toward newVal quickly
-		newWeight = newWeight * (1.f - signalStrengthMin);
-	} else {
-		// Weight by the signal strength
-		newWeight = newWeight * ofMap(signalStrength, signalStrengthMin, signalStrengthMax, minSignalWeight, 1.f, true);
+		if (rawDistance < noiseDistance) {
+			// Handle strange case where lidar reports 1cm when should be infinity
+			distance = distanceMax * 2;
+
+			// We're within the noise distance
+			// Ignore signal strength and go toward newVal quickly
+			newWeight = newWeight * (1.f - signalStrengthMin);
+		}
+		else {
+			// Weight by the signal strength
+			newWeight = newWeight * ofMap(signalStrength, signalStrengthMin, signalStrengthMax, minSignalWeight, 1.f, true);
+		}
+
+		// Calculate the smoothed PWM value
+		smoothedDistance = ((float)rawDistance)*newWeight + smoothedDistance*(1 - newWeight);
+		guiSmoothedDistance = smoothedDistance;
 	}
-
-	// Calculate the smoothed PWM value
-	smoothedDistance = ((float) rawDistance)*newWeight + smoothedDistance*(1-newWeight);
-	guiSmoothedDistance = smoothedDistance;
 }
 // ---------------------------------------------------------------------------- //
 // calculateVolume
@@ -169,6 +175,15 @@ int LivestreamInteractionUnit::getVolume() {
 void LivestreamInteractionUnit::setTemperature(int temp) {
 	temperature = temp;
 	guiTemperature = temperature;
+
+	if (lowTemperature == -1)
+	{
+		lowTemperature = temperature;
+	}
+	if (highTemperature == -1)
+	{
+		highTemperature = temperature;
+	}
 
 	lowTemperature = min(temperature, lowTemperature);
 	guiLowTemperature = lowTemperature;

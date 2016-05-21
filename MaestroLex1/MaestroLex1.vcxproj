@@ -100,6 +100,7 @@
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp" />
     <ClCompile Include="..\..\..\addons\ofxInputField\src\ofxInputField.cpp" />
     <ClCompile Include="..\LivestreamUtils\src\LivestreamNetwork.cpp" />
+    <ClCompile Include="..\LivestreamUtils\src\logger.cpp" />
     <ClCompile Include="src\LivestreamInteractionUnit.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h" />
     <ClInclude Include="..\..\..\addons\ofxInputField\src\ofxInputField.h" />
     <ClInclude Include="..\LivestreamUtils\src\LivestreamNetwork.h" />
+    <ClInclude Include="..\LivestreamUtils\src\logger.h" />
     <ClInclude Include="..\LivestreamUtils\src\Range.h" />
     <ClInclude Include="src\LivestreamInteractionUnit.h" />
     <ClInclude Include="src\LivestreamSettings.h" />
