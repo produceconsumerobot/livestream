@@ -226,14 +226,15 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 			(LivestreamNetwork::PacketHeader_V1 *) udpMessage;
 		// Convert the typeTage char[2] to a string for logging
 		string typeTag(header->typeTag, header->typeTag + sizeof(header->typeTag) / sizeof(header->typeTag[0]));
-		ofLog(OF_LOG_VERBOSE) << ipAddress.getParameter().toString() << " >> " << typeTag << endl;
+		//ofLog(OF_LOG_VERBOSE) << ipAddress.getParameter().toString() << " >> " << typeTag << endl;
 
 		// Parse DISTANCE Packets
 		if (memcmp( header->typeTag, LivestreamNetwork::DISTANCE, 
 			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) 
 		{
 			LivestreamNetwork::Packet_DISTANCE_V1* inPacket = (LivestreamNetwork::Packet_DISTANCE_V1 *) udpMessage;
-			ofLog(OF_LOG_VERBOSE) << "LD, " << inPacket->distance << ", LS, " << inPacket->signalStrength << endl;
+			ofLog(OF_LOG_VERBOSE) << ipAddress.getParameter().toString() << " >> " << typeTag 
+				<< "LD, " << inPacket->distance << ", LS, " << inPacket->signalStrength << endl;
 			
 			// Parse DISTANCE data
 			setDistance(inPacket->distance, inPacket->signalStrength);
@@ -261,12 +262,14 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) 
 		{
 			LivestreamNetwork::Packet_TEMPERATURE_V1* inPacket = (LivestreamNetwork::Packet_TEMPERATURE_V1 *) udpMessage;
-			ofLog(OF_LOG_VERBOSE) << "T" << inPacket->sensorDesignator << ", " << inPacket->temperature << endl;
+			ofLog(OF_LOG_VERBOSE) << ipAddress.getParameter().toString() << " >> " << typeTag 
+				<< inPacket->sensorDesignator << ", " << inPacket->temperature << endl;
 			setTemperature(inPacket->temperature);
 		} else if (memcmp(header->typeTag, LivestreamNetwork::PONG,
 			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) 
 		{
 			lastPong = LoggerThread::dateTimeString();
+			ofLog(OF_LOG_VERBOSE) << ipAddress.getParameter().toString() << " >> " << typeTag << endl;
 		}
 }
 

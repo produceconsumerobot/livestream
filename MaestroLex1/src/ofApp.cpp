@@ -5,10 +5,10 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	string baseIpAddress = "192.168.0.";
+	string baseIpAddress = "192.168.1.";
 	string broadcastIpAddress = baseIpAddress + "255";
-	maestroIpAddress = baseIpAddress + "102";
-	string ixUnitIpAddress = baseIpAddress + "100";
+	maestroIpAddress = baseIpAddress + "201";
+	string ixUnitIpAddress = baseIpAddress + "211";
 
 	// we don't want to be running to fast
 	ofSetVerticalSync(false);
@@ -67,7 +67,7 @@ void ofApp::setup(){
 
 
 	testLED = false;
-	udpSendTimersOn = false;
+	udpSendTimersOn = true;
 }
 
 //--------------------------------------------------------------
