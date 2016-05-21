@@ -88,6 +88,7 @@ public:
 	int getTemperature();
 	int getLowTemperature();
 	int getHighTemperature();
+	void ipAddressChanged(string & _ipAddress);
 
 	string waterDataFilesLocation;
 

@@ -22,6 +22,8 @@ LivestreamInteractionUnit::~LivestreamInteractionUnit() {
 void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataName, string _sensorLocation) {
 	id = _id;
 	//ipAddress = _ipAddress;
+	ipAddress.addListener(this, &LivestreamInteractionUnit::ipAddressChanged);
+
 	ixPanel.setup("IXUnit" + to_string(_id),
 		"IXUnit" + to_string(_id) + ".xml", 0, 0);
 	ixPanel.setup("IXUnit", "IXUnit.xml", 0, 0);
@@ -105,6 +107,7 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 	packetProtocolVersion = 1;
 	waterDataFilesLocation = "/livestream/data/";
 
+	// Setup the UDP 
 	udpSender.Create();
 	udpSender.SetEnableBroadcast(false);
 	udpSender.Connect(ipAddress.getParameter().toString().c_str(), 11999);
@@ -285,4 +288,15 @@ void LivestreamInteractionUnit::playNote() {
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 	ofLog(OF_LOG_VERBOSE) << typeTag << " (" << filePath << ")" << " >> " << ipAddress.getParameter().toString() << endl;
+}
+
+//--------------------------------------------------------------
+void LivestreamInteractionUnit::ipAddressChanged(string &_ipAddress) {
+	ipAddress = _ipAddress;
+
+	udpSender.Close();
+	udpSender.Create();
+	udpSender.SetEnableBroadcast(false);
+	udpSender.Connect(ipAddress.getParameter().toString().c_str(), 11999);
+	udpSender.SetNonBlocking(true);
 }
