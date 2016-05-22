@@ -108,8 +108,7 @@ public:
 	// GUI
 	ofxPanel		ixPanel;
 
-	uint64_t nPacketsSent;
-	uint16_t packetProtocolVersion;
+
 
 private:
 	int distSamplesToSmooth;	// 
