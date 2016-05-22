@@ -11,7 +11,7 @@ void ofApp::setup(){
     //create the socket and set to send to 127.0.0.1:11999
 	udpSender.Create();
 	udpSender.SetEnableBroadcast(true);
-	udpSender.Connect("10.0.0.255",11999);
+	udpSender.Connect("192.168.1.255",11999);
 	//udpSender.Bind(11999);
 	udpSender.SetNonBlocking(true);
 
@@ -28,8 +28,10 @@ void ofApp::update(){
 	string message=udpMessage;
 	TestPacket* packet = (TestPacket*) &udpMessage;
 	if(message!=""){
-		char address[20];
-		udpReceiver.GetRemoteAddr(address);
+		//char address[20];
+		string address;
+		int port;
+		udpReceiver.GetRemoteAddr(address, port);
 		string udpAddress = address;
 		string tempOut(packet->temp1, sizeof(packet->temp1));
 		cout << "From " << udpAddress << ": " << tempOut << endl;

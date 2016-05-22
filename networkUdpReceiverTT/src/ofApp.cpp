@@ -38,7 +38,7 @@ void ofApp::update(){
 		udpReceiver.GetRemoteAddr(address);
 		string udpAddress = address;
 		//cout << "From " << udpAddress << ": " << message << endl;
-		TestPacket* inPacket = (TestPacket*) &udpMessage;
+		TestPacket* packet = (TestPacket*) &udpMessage;
 		string tempOut(packet->temp1, sizeof(packet->temp1));
 		cout << "From " << udpAddress << ": " << tempOut << endl;
 		//cout << "From " << udpAddress << ": " << (char) inPacket->temp1[0] << (char) inPacket->temp1[1] << endl;
