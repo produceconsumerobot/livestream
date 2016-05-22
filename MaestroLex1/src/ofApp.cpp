@@ -29,7 +29,7 @@ void ofApp::setup(){
 	packetProtocolVersion = 1;
 
 	// Draw the run data to the screen
-	int panelSpacing = 200;
+	int panelSpacing = 195;
 	panelWidth = panelSpacing - 5;
 	panelRowHeight = 300;
 
