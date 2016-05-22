@@ -78,7 +78,7 @@ void ofApp::setup(){
 	ixID = 16;
 	interXUnit.at(4).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
 	interXUnit.at(4).ixPanel.setPosition(panelSpacing * 0, panelRowHeight);
-	ixID = 12;
+	ixID = 21;
 	interXUnit.at(5).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
 	interXUnit.at(5).ixPanel.setPosition(panelSpacing * 1, panelRowHeight);
 	ixID = 22;
