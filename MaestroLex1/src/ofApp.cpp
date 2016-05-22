@@ -61,9 +61,34 @@ void ofApp::setup(){
 	// Load settings from file
 	globalSettingsPanel.loadFromFile("globalSettings.xml");
 	
-	interXUnit.resize(1);
-	interXUnit.at(0).setup(11, ixUnitIpAddress, "Coldspring", "Conductivity");
+	interXUnit.resize(9);
+	int ixID = 13;
+	interXUnit.at(0).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
 	interXUnit.at(0).ixPanel.setPosition(panelSpacing * 1, 0);
+	int ixID = 17;
+	interXUnit.at(1).setup(ixID, baseIpAddress + "2" + to_string(ixID), "McSpring", "Temp");
+	interXUnit.at(1).ixPanel.setPosition(panelSpacing * 2, 0);
+	int ixID = 11;
+	interXUnit.at(2).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Lost", "Flow");
+	interXUnit.at(2).ixPanel.setPosition(panelSpacing * 3, 0);
+	int ixID = 14;
+	interXUnit.at(3).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
+	interXUnit.at(3).ixPanel.setPosition(panelSpacing * 4, 0);
+	int ixID = 16;
+	interXUnit.at(4).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
+	interXUnit.at(4).ixPanel.setPosition(panelSpacing * 0, panelRowHeight);
+	int ixID = 12;
+	interXUnit.at(5).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
+	interXUnit.at(5).ixPanel.setPosition(panelSpacing * 1, panelRowHeight);
+	int ixID = 22;
+	interXUnit.at(6).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
+	interXUnit.at(6).ixPanel.setPosition(panelSpacing * 2, panelRowHeight);
+	int ixID = 19;
+	interXUnit.at(7).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
+	interXUnit.at(7).ixPanel.setPosition(panelSpacing * 3, panelRowHeight);
+	int ixID = 18;
+	interXUnit.at(8).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
+	interXUnit.at(8).ixPanel.setPosition(panelSpacing * 4, panelRowHeight);
 
 
 	testLED = false;
