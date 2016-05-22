@@ -56,8 +56,10 @@ public:
 
 	bool eyeSafetyOn;			// Tracks whether eye safety is on
 	int distSensorStatus;		// Status of the distance sensor
-	unsigned long long nPacketsSent;
-	int packetProtocolVersion;
+	uint64_t nPacketsSent;
+	uint16_t packetProtocolVersion;
+
+	bool ledState;
 
 
 	//Range volumeRange;			// Min/Max note play volume		
@@ -97,9 +99,17 @@ public:
 	//void setup(int _id, string _ipAddress);
 	void setup(int _id, string _ipAddress, string _dataName, string _sensorLocation);
 	void playNote();
+	void ping();
+	void getDistance();
+	void setLed();
+	void getAllTemps();
+	void setMaestroAddress();
 
 	// GUI
 	ofxPanel		ixPanel;
+
+	uint64_t nPacketsSent;
+	uint16_t packetProtocolVersion;
 
 private:
 	int distSamplesToSmooth;	// 

@@ -138,7 +138,7 @@ void ofApp::draw(){
 		for (int j = 0; j<interXUnit.size(); j++) {
 			if (ofGetElapsedTimeMillis() - interXUnit.at(j).distanceReadTime > interXUnit.at(j).distanceReadInterval) {
 				// Read the distance
-				keyReleased('d');
+				interXUnit.at(j).getDistance();
 				interXUnit.at(j).distanceReadTime = ofGetElapsedTimeMillis();
 			}
 			if (ofGetElapsedTimeMillis() - interXUnit.at(j).notePlayTime > interXUnit.at(j).notePlayInterval) {
@@ -148,14 +148,16 @@ void ofApp::draw(){
 				interXUnit.at(j).notePlayTime = ofGetElapsedTimeMillis();
 			}
 			if (ofGetElapsedTimeMillis() - interXUnit.at(j).heartbeatTime > interXUnit.at(j).heartbeatInterval) {
+				
 				// Ping the IXUnit
-				keyReleased('p');
+				interXUnit.at(j).ping();
 				// blink the heartbeat LED
-				keyReleased('l');
+				interXUnit.at(j).setLed();
 				// Send the Maestro IP address
-				keyReleased('a');
+				interXUnit.at(j).setMaestroAddress();
 				// Get all temps
-				keyReleased('t');
+				interXUnit.at(j).getAllTemps();
+
 				interXUnit.at(j).heartbeatTime = ofGetElapsedTimeMillis();
 			}
 		}

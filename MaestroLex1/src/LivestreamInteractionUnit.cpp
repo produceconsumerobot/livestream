@@ -48,7 +48,7 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 	ixPanel.add(heartbeatInterval.setup("heartbeatInterval", 1000, 0, 2000));				// ms
 	ixPanel.add(waterDataReadInterval.setup("waterDataReadInterval", 3000, 1, 60000));		// ms
 	ixPanel.add(notePlayInterval.setup("notePlayInterval", 1000, 1, 5000));					// ms
-	ixPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 10, 1, 2000));	// ms
+	ixPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 5, 1, 2000));	// ms
 	ixPanel.add(distanceMin.setup("distanceMin", 30, 0, 50 * 30));							// cm
 	ixPanel.add(distanceMax.setup("distanceMax", 20 * 30, 0, 50 * 30));						// cm
 	ixPanel.add(guiSignalStrength.setup("signalStrength", 0, 0, 1.f));
@@ -106,6 +106,8 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 	nPacketsSent = 0;
 	packetProtocolVersion = 1;
 	waterDataFilesLocation = "/livestream/data/";
+
+	ledState = false;
 
 	// Setup the UDP 
 	udpSender.Create();
@@ -287,6 +289,103 @@ void LivestreamInteractionUnit::playNote() {
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 	ofLog(OF_LOG_VERBOSE) << typeTag << " (" << filePath << ")" << " >> " << ipAddress.getParameter().toString() << endl;
+}
+
+void LivestreamInteractionUnit::ping() {
+	LivestreamNetwork::Packet_PING_V1 outPacket;
+	outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
+	outPacket.hdr.packetCount = ++nPacketsSent;
+	outPacket.hdr.protocolVersion = packetProtocolVersion;
+	strncpy(outPacket.hdr.typeTag, LivestreamNetwork::PING,
+		sizeof(LivestreamNetwork::PING) / sizeof(LivestreamNetwork::PING[0]));
+
+	// Send the packet
+	udpSender.Send((char*)&outPacket, sizeof(outPacket));
+	// Convert the typeTage char[2] to a string for logging
+	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
+	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;
+}
+
+
+void LivestreamInteractionUnit::getDistance() {
+	// ********** GET_DISTANCE packet type ********** //
+	// Load the packet data
+	LivestreamNetwork::Packet_GET_DISTANCE_V1 outPacket;
+	outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
+	outPacket.hdr.packetCount = ++nPacketsSent;
+	outPacket.hdr.protocolVersion = packetProtocolVersion;
+	strncpy(outPacket.hdr.typeTag, LivestreamNetwork::GET_DISTANCE,
+		sizeof(LivestreamNetwork::GET_DISTANCE) / sizeof(LivestreamNetwork::GET_DISTANCE[0]));
+
+	// Send the packet
+	udpSender.Send((char*)&outPacket, sizeof(outPacket));
+	// Convert the typeTage char[2] to a string for logging
+	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
+	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;
+	
+	//ofLog(OF_LOG_VERBOSE)
+	//<< "nPacketsSent, " << outPacket.hdr.packetCount
+	//<< ", timeStamp, " << outPacket.hdr.timeStamp
+	//<< ", ver, " << outPacket.hdr.protocolVersion
+	//	<< endl;
+	
+
+}
+
+void LivestreamInteractionUnit::setLed() {
+	// ********** SET_LED packet type ********** //
+	// Load the packet data
+	LivestreamNetwork::Packet_SET_LED_V1 outPacket;
+	outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
+	outPacket.hdr.packetCount = ++nPacketsSent;
+	outPacket.hdr.protocolVersion = packetProtocolVersion;
+	strncpy(outPacket.hdr.typeTag, LivestreamNetwork::SET_LED,
+		sizeof(LivestreamNetwork::SET_LED) / sizeof(LivestreamNetwork::SET_LED[0]));
+
+	ledState = !ledState;
+	outPacket.state = ledState;
+
+	// Send the packet
+	udpSender.Send((char*)&outPacket, sizeof(outPacket));
+	// Convert the typeTage char[2] to a string for logging
+	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
+	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;
+
+}
+
+void LivestreamInteractionUnit::getAllTemps() {
+	// ********** GET_ALL_TEMPS packet type ********** //
+	// Load the packet data
+	LivestreamNetwork::Packet_GET_ALL_TEMPS_V1 outPacket;
+	outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
+	outPacket.hdr.packetCount = ++nPacketsSent;
+	outPacket.hdr.protocolVersion = packetProtocolVersion;
+	strncpy(outPacket.hdr.typeTag, LivestreamNetwork::GET_ALL_TEMPS,
+		sizeof(LivestreamNetwork::GET_ALL_TEMPS) / sizeof(LivestreamNetwork::GET_ALL_TEMPS[0]));
+
+	// Send the packet
+	udpSender.Send((char*)&outPacket, sizeof(outPacket));
+	// Convert the typeTage char[2] to a string for logging
+	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
+	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;
+}
+
+void LivestreamInteractionUnit::setMaestroAddress() {
+	// ********** SET_MAESTRO_ADDRESS packet type ********** //
+	// Load the packet data
+	LivestreamNetwork::Packet_SET_MAESTRO_ADDRESS_V1 outPacket;
+	outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
+	outPacket.hdr.packetCount = ++nPacketsSent;
+	outPacket.hdr.protocolVersion = packetProtocolVersion;
+	strncpy(outPacket.hdr.typeTag, LivestreamNetwork::SET_MAESTRO_ADDRESS,
+		sizeof(LivestreamNetwork::SET_MAESTRO_ADDRESS) / sizeof(LivestreamNetwork::SET_MAESTRO_ADDRESS[0]));
+	strcpy(outPacket.ipAddress, maestroIpAddress.getParameter().toString().c_str());
+
+	// Send the packet
+	udpSender.Send((char*)&outPacket, sizeof(outPacket));
+	// Convert the typeTage char[2] to a string for logging
+	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
+	ofLog(OF_LOG_VERBOSE) << typeTag << " (" << maestroIpAddress.getParameter().toString() << ") >> " << "broadcast" << endl;
 }
 
 //--------------------------------------------------------------
