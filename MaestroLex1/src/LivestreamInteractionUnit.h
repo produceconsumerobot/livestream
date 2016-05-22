@@ -103,7 +103,7 @@ public:
 	void getDistance();
 	void setLed();
 	void getAllTemps();
-	void setMaestroAddress();
+	void setMaestroAddress(string maestroIpAddress);
 
 	// GUI
 	ofxPanel		ixPanel;

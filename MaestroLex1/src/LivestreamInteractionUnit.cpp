@@ -370,7 +370,7 @@ void LivestreamInteractionUnit::getAllTemps() {
 	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;
 }
 
-void LivestreamInteractionUnit::setMaestroAddress() {
+void LivestreamInteractionUnit::setMaestroAddress(string maestroIpAddress) {
 	// ********** SET_MAESTRO_ADDRESS packet type ********** //
 	// Load the packet data
 	LivestreamNetwork::Packet_SET_MAESTRO_ADDRESS_V1 outPacket;
@@ -379,13 +379,13 @@ void LivestreamInteractionUnit::setMaestroAddress() {
 	outPacket.hdr.protocolVersion = packetProtocolVersion;
 	strncpy(outPacket.hdr.typeTag, LivestreamNetwork::SET_MAESTRO_ADDRESS,
 		sizeof(LivestreamNetwork::SET_MAESTRO_ADDRESS) / sizeof(LivestreamNetwork::SET_MAESTRO_ADDRESS[0]));
-	strcpy(outPacket.ipAddress, maestroIpAddress.getParameter().toString().c_str());
+	strcpy(outPacket.ipAddress, maestroIpAddress.c_str());
 
 	// Send the packet
 	udpSender.Send((char*)&outPacket, sizeof(outPacket));
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-	ofLog(OF_LOG_VERBOSE) << typeTag << " (" << maestroIpAddress.getParameter().toString() << ") >> " << "broadcast" << endl;
+	ofLog(OF_LOG_VERBOSE) << typeTag << " (" << maestroIpAddress << ") >> " << "broadcast" << endl;
 }
 
 //--------------------------------------------------------------
