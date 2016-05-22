@@ -154,7 +154,7 @@ void ofApp::draw(){
 				// blink the heartbeat LED
 				interXUnit.at(j).setLed();
 				// Send the Maestro IP address
-				interXUnit.at(j).setMaestroAddress();
+				interXUnit.at(j).setMaestroAddress(maestroIpAddress);
 				// Get all temps
 				interXUnit.at(j).getAllTemps();
 
