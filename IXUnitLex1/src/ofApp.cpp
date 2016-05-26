@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <cstdio>
+#include <string>
 #include "ofApp.h"
 #include "LivestreamNetwork.h"
 
@@ -34,7 +35,7 @@ void ofApp::setup(){
 	udpReceiver.Bind(11999);
 	udpReceiver.SetNonBlocking(true);
 
-	// create the receiver socket and bind to the maestro address 11999
+	// create the receiver socket and bind to the maestro ipAddress 11999
 	maestroIpAddress = "192.168.254.0";
 	udpSender.Create();
     udpSender.SetEnableBroadcast(false);
@@ -193,7 +194,7 @@ void ofApp::draw() {
                     // Send the packet
                     udpSender.Send((char*) &outPacket, sizeof(outPacket));
                     // Convert the typeTage char[2] to a string for logging
-                    typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
+                    string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
                         sizeof(outPacket.hdr.typeTag[0]));
                     ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << maestroIpAddress << ", " << rawDist << ", " << signalStrength << endl;
                 }
@@ -209,19 +210,19 @@ void ofApp::draw() {
 	if(message!=""){
 		// We got a message!
 		//char udpAddress[20];
-		string address;
+		string ipAddress;
 		int udpPort;
-		// Get the sender's address
+		// Get the sender's ipAddress
 		//udpReceiver.GetRemoteAddr(udpAddress, &udpPort);
-		udpReceiver.GetRemoteAddr(address, udpPort);
-		//string address = udpAddress;
+		udpReceiver.GetRemoteAddr(ipAddress, udpPort);
+		//string ipAddress = udpAddress;
 		
 		// Convert the UDP message to read its type tag from the header section
 		LivestreamNetwork::PacketHeader_V1* header = 
 			(LivestreamNetwork::PacketHeader_V1 *) &udpMessage;
 		// Convert the typeTage char[2] to a string for logging
 		string typeTag(header->typeTag, header->typeTag + sizeof header->typeTag / sizeof header->typeTag[0]);
-		ofLog(OF_LOG_VERBOSE) << typeTag << "<<" << address << endl;			
+		ofLog(OF_LOG_VERBOSE) << typeTag << "<<" << ipAddress << endl;			
 		
 		if(memcmp( header->typeTag, LivestreamNetwork::SET_MAESTRO_ADDRESS, 
 			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
@@ -236,7 +237,7 @@ void ofApp::draw() {
             udpSender.Connect(maestroIpAddress.c_str(),11999);
             udpSender.SetNonBlocking(true);
 		} else {
-			if (address.compare(maestroIpAddress) == 0) {
+			if (ipAddress.compare(maestroIpAddress) == 0) {
 				// Only look at messages from maestroIpAddress
 				
 				if (!slaveMode) {
@@ -362,7 +363,7 @@ void ofApp::draw() {
                         // Get the note file path
 						LivestreamNetwork::Packet_PLAY_NOTE_V1* inPacket = (LivestreamNetwork::Packet_PLAY_NOTE_V1 *) &udpMessage;
 					                       
-                        ofLog(OF_LOG_VERBOSE) << ipAddress << " >> " << header->typeTag << " (" << filePath << ")" << endl;                        
+                        ofLog(OF_LOG_VERBOSE) << ipAddress << " >> " << header->typeTag << " (" << inPacket->filePath << ")" << endl;                        
                         
                         // Set the Volume
                         volSound.setVolume(volume);
@@ -373,7 +374,7 @@ void ofApp::draw() {
 						ofSoundSetVolume(volume);
 					}
 				}
-			} //address.compare(maestroIpAddress) == 0
+			} //ipAddress.compare(maestroIpAddress) == 0
 		} // !SET_MAESTRO_ADDRESS
 	} // message!=""
     
