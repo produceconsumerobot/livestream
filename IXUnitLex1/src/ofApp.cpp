@@ -59,13 +59,13 @@ void ofApp::setup(){
 	
 	if (debugTest != NO_GPIO) {
 		// Setup GPIOs
-		blinkLED  = new GPIO("7");
+		blinkLED  = new GPIO("15");
 		blinkLED->export_gpio();
 		blinkLED->setdir_gpio("out");
 		blinkLED->setval_gpio("0");
 		blinkLEDoutState = false;
 		
-		netLED  = new GPIO("15");
+		netLED  = new GPIO("16");
 		netLED->export_gpio();
 		netLED->setdir_gpio("out");
 		netLED->setval_gpio("0");
@@ -86,8 +86,8 @@ void ofApp::setup(){
 	// Init LidarLite
 	int lidarConfig = 0; // 2=low sensitivity, low noise
 	if (debugTest != NO_LIDAR) {
-		myLidarLite = LidarLite();
-		myLidarLite.logLevel = LidarLite::INFO;
+		myLidarLite = ThreadedLidarLite();
+		myLidarLite.logLevel = ThreadedLidarLite::INFO;
 		myLidarLite.begin(0);
 		myLidarLite.configure(lidarConfig);
 		// Exit if the lidar lite didn't initialize properly
@@ -118,27 +118,25 @@ void ofApp::setup(){
 	
 
 	// Write initialization to the log
-	string logFileName = "/logs/livestream/livestream_" + hostname + ".log";
+    string aligner;
+    if (ofGetMonth() < 10) aligner = aligner + "0";
+	string logFileName = "/livestream/logs/livestream_" + hostname + "_" + aligner + ofGetMonth() + ".log";
+    string logString = getDateTimeString() + ",INITILIZATION";
+    if (debugTest != NO_LIDAR) {
+		logString = logString + ", LH, " + myLidarLite.hardwareVersion();
+		logString = logString + " , LV, " + myLidarLite.softwareVersion();
+		logString = logString + ", LC, " + lidarConfig;
+	}
+     
 	ofstream mFile;
 	mFile.open(logFileName.c_str(), ios::out | ios::app);
-	mFile << getDateTimeString() << ",INITILIZATION";
-	if (debugTest != NO_LIDAR) {
-		mFile	<< ", LH, " << myLidarLite.hardwareVersion();
-		mFile	<< " , LV, " << myLidarLite.softwareVersion();
-		mFile	<< ", LC, " << lidarConfig;
-	}
-	//mFile << ", TN, " << nSensors; 
-	mFile << endl;
+	mFile << logString << endl;
 	mFile.close();
 	
-	cout << getDateTimeString() << ",INITILIZATION " << hostname;
-	if (debugTest != NO_LIDAR) {
-		cout << " , LH, " << myLidarLite.hardwareVersion(); 
-		cout << " , LV, " << myLidarLite.softwareVersion();
-		cout << ", LC, " << lidarConfig;
-	}
-	//cout << ", TN, " << nSensors;
-	cout << endl;
+	cout << logString << endl;
+            
+    // Start the LidarLite thread
+    myLidarLite.start();
     
     // Setup blink timer
     blinkInterval = 1000000;
@@ -170,6 +168,37 @@ void ofApp::draw() {
             }
         }            
         blinkTimer = ofGetSystemTimeMicros();
+    }
+    
+    if (slaveMode) {
+        if (debugTest != NO_LIDAR) {
+            if (myLidarLite.isOutputNew()) {
+                // There's new distance data available!
+                int rawDist = -1;
+                int signalStrength = -1;
+                
+                // Read the distance and signalStrength
+                bool success = myLidarLite.getOutput(rawDist, signalStrength);
+                if (success) {
+                    // Load the packet data
+                    LivestreamNetwork::Packet_DISTANCE_V1 outPacket;
+                    outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
+                    outPacket.hdr.packetCount = ++nPacketsSent;
+                    outPacket.hdr.protocolVersion = packetProtocolVersion;
+                    strncpy(outPacket.hdr.typeTag, LivestreamNetwork::DISTANCE, 
+                        sizeof LivestreamNetwork::DISTANCE / sizeof LivestreamNetwork::DISTANCE[0]);
+                    outPacket.distance = rawDist;
+                    outPacket.signalStrength = signalStrength;
+                        
+                    // Send the packet
+                    udpSender.Send((char*) &outPacket, sizeof(outPacket));
+                    // Convert the typeTage char[2] to a string for logging
+                    typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
+                        sizeof(outPacket.hdr.typeTag[0]));
+                    ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << maestroIpAddress << ", " << rawDist << ", " << signalStrength << endl;
+                }
+            }
+        }
     }
 	
 	// Check incoming UDP messages
@@ -227,27 +256,11 @@ void ofApp::draw() {
 						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
 						// ********** GET_DISTANCE packet type ********** //
 						
-						// Read data from the LidarLite
-						int rawDist = myLidarLite.distance();
-						int signalStrength = myLidarLite.signalStrength();
-						
-						// Load the packet data
-						LivestreamNetwork::Packet_DISTANCE_V1 outPacket;
-						outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
-						outPacket.hdr.packetCount = ++nPacketsSent;
-						outPacket.hdr.protocolVersion = packetProtocolVersion;
-						strncpy(outPacket.hdr.typeTag, LivestreamNetwork::DISTANCE, 
-							sizeof LivestreamNetwork::DISTANCE / sizeof LivestreamNetwork::DISTANCE[0]);
-						outPacket.distance = rawDist;
-						outPacket.signalStrength = signalStrength;
-							
-						// Send the packet
-						udpSender.Send((char*) &outPacket, sizeof(outPacket));
-						// Convert the typeTage char[2] to a string for logging
-						typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / 
-							sizeof(outPacket.hdr.typeTag[0]));
-						ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << maestroIpAddress << ", " << rawDist << ", " << signalStrength << endl;		
-						
+                        // Initiate a distance read in another thread
+                        int success = myLidarLite.startDistanceRead();
+                        if (!success) {
+                            cout << "FAIL: myLidarLite.startRead();" << endl;
+                        } 						
 					} else if(memcmp( header->typeTag, LivestreamNetwork::PING, 
 						sizeof header->typeTag / sizeof header->typeTag[0]) == 0) {
 						// ********** PING packet type ********** //
@@ -590,4 +603,5 @@ void ofApp::exit(){
 		blinkLED->setval_gpio("0");
 		netLED->setval_gpio("0");
 	}
+    myLidarLite.stop();
 }

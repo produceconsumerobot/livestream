@@ -3,7 +3,7 @@
 #include "ofMain.h"
 #include "ofxNetwork.h"
 #include "ofxGPIO.h"
-#include "LidarLite.hpp"
+#include "ThreadedLidarLite.h"
 //#include "DS18B20.h"
 
 
@@ -77,7 +77,7 @@ class ofApp : public ofBaseApp{
 		GPIO* blinkLED;
 		GPIO* netLED;
 		
-		LidarLite myLidarLite;
+		ThreadedLidarLite myLidarLite;
 		
 		int loopInterval;
 		
