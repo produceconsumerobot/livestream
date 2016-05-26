@@ -368,7 +368,7 @@ void ofApp::draw() {
                         // Set the Volume
                         volSound.setVolume(volume);
 						ofSoundSetVolume(volume);
-                        string filePath(inPacket->filePath)
+                        string filePath(inPacket->filePath);
                         volSound.loadSound(filePath);
 						volSound.play();
 						volSound.setVolume(volume);
