@@ -87,7 +87,7 @@ void ofApp::setup(){
 	// Init LidarLite
 	int lidarConfig = 0; // 2=low sensitivity, low noise
 	if (debugTest != NO_LIDAR) {
-		myLidarLite = ThreadedLidarLite();
+		//myLidarLite = ThreadedLidarLite();
 		myLidarLite.logLevel = ThreadedLidarLite::INFO;
 		myLidarLite.begin(0);
 		myLidarLite.configure(lidarConfig);
