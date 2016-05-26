@@ -122,19 +122,19 @@ void ofApp::setup(){
     string aligner;
     if (ofGetMonth() < 10) aligner = aligner + "0";
 	string logFileName = "/livestream/logs/livestream_" + hostname + "_" + aligner + ofGetMonth() + ".log";
-    string logString = getDateTimeString() + ",INITILIZATION";
+    ostringstream  logStringStream = getDateTimeString() << ",INITILIZATION";
     if (debugTest != NO_LIDAR) {
-		logString = logString + ", LH, " + myLidarLite.hardwareVersion();
-		logString = logString + " , LV, " + myLidarLite.softwareVersion();
-		logString = logString + ", LC, " + lidarConfig;
+		logStringStream = logStringStream << ", LH, " + myLidarLite.hardwareVersion();
+		logStringStream = logStringStream << " , LV, " + myLidarLite.softwareVersion();
+		logStringStream = logStringStream << ", LC, " + lidarConfig;
 	}
      
 	ofstream mFile;
 	mFile.open(logFileName.c_str(), ios::out | ios::app);
-	mFile << logString << endl;
+	mFile << logStringStream << endl;
 	mFile.close();
 	
-	cout << logString << endl;
+	cout << logStringStream << endl;
             
     // Start the LidarLite thread
     myLidarLite.start();
