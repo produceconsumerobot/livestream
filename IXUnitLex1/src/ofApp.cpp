@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <cstdio>
-#include <string>
+//#include <string>
 #include "ofApp.h"
 #include "LivestreamNetwork.h"
 
@@ -368,7 +368,8 @@ void ofApp::draw() {
                         // Set the Volume
                         volSound.setVolume(volume);
 						ofSoundSetVolume(volume);
-                        volSound.loadSound(toString(inPacket->filePath));
+                        string filePath(inPacket->filePath)
+                        volSound.loadSound(filePath);
 						volSound.play();
 						volSound.setVolume(volume);
 						ofSoundSetVolume(volume);
