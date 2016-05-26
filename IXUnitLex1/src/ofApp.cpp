@@ -76,8 +76,8 @@ void ofApp::setup(){
 	if (debugTest != NO_SOUND) {
 		// Sound output setup
         // ToDo: change to data/tp10.wav
-        volSound.loadSound("/livestream/audio/Tp10.wav");
-		//volSound.loadSound("sounds/Tp10.wav");
+        //volSound.loadSound("/livestream/audio/Tp10.wav");
+		volSound.loadSound("sounds/Tp10.wav");
 		volume = 0.0f;
 		volSound.setVolume(volume);
 		volSound.setMultiPlay(true);
