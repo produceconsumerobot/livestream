@@ -60,13 +60,15 @@ void ofApp::setup(){
 	
 	if (debugTest != NO_GPIO) {
 		// Setup GPIOs
-		blinkLED  = new GPIO("15");
+		blinkLED  = new GPIO("16");
+        blinkLED->setup("16");
 		blinkLED->export_gpio();
 		blinkLED->setdir_gpio("out");
 		blinkLED->setval_gpio("0");
 		blinkLEDoutState = false;
 		
-		netLED  = new GPIO("16");
+		netLED  = new GPIO("15");
+        netLED->setup("15");
 		netLED->export_gpio();
 		netLED->setdir_gpio("out");
 		netLED->setval_gpio("0");
@@ -119,16 +121,16 @@ void ofApp::setup(){
 	
 
 	// Write initialization to the log
-    string aligner;
+    string aligner = "";
     if (ofGetMonth() < 10) aligner = aligner + "0";
 	//string logFileName = "/livestream/logs/livestream_" + hostname + "_" + aligner + ofToString(ofGetMonth()) + ".log";
     string logFileName = "/logs/livestream/livestream_" + hostname + "_" + aligner + ofToString(ofGetMonth()) + ".log";
     ostringstream  logStringStream;
     logStringStream << getDateTimeString() << ",INITILIZATION";
     if (debugTest != NO_LIDAR) {
-		logStringStream << ", LH, " + myLidarLite.hardwareVersion();
-		logStringStream << " , LV, " + myLidarLite.softwareVersion();
-		logStringStream << ", LC, " + lidarConfig;
+		logStringStream << ", LH, " << myLidarLite.hardwareVersion();
+		logStringStream << " , LV, " << myLidarLite.softwareVersion();
+		logStringStream << ", LC, " << lidarConfig;
 	}
      
 	ofstream mFile;
@@ -605,7 +607,13 @@ void ofApp::exit(){
 	ofSoundShutdown();
 	if (debugTest != NO_GPIO) {
 		blinkLED->setval_gpio("0");
+        blinkLED->.unexport_gpio();
+        free(blinkLED);
+        blinkLED = NULL;
 		netLED->setval_gpio("0");
+        netLED->.unexport_gpio();
+        free(netLED);
+        netLED = NULL;
 	}
     myLidarLite.stop();
 }
