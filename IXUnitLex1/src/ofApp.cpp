@@ -122,7 +122,8 @@ void ofApp::setup(){
     string aligner;
     if (ofGetMonth() < 10) aligner = aligner + "0";
 	string logFileName = "/livestream/logs/livestream_" + hostname + "_" + aligner + ofGetMonth() + ".log";
-    ostringstream  logStringStream = getDateTimeString() << ",INITILIZATION";
+    ostringstream  logStringStream;
+    logStringStream << getDateTimeString() << ",INITILIZATION";
     if (debugTest != NO_LIDAR) {
 		logStringStream << ", LH, " + myLidarLite.hardwareVersion();
 		logStringStream << " , LV, " + myLidarLite.softwareVersion();
