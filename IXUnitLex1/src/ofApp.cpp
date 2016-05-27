@@ -386,17 +386,17 @@ void ofApp::draw() {
                         currentSoundPlayer = (currentSoundPlayer + 1) % nSoundPlayers;
                         
                         // Play the note
-                        //string filePath(inPacket->filePath);
-						soundPlayers.at(0).play();
-						soundPlayers.at(0).setVolume(volume);
-						ofSoundSetVolume(volume);
-                        
-                        //string filePath(inPacket->filePath);
-                        //soundPlayers.at(currentSoundPlayer).load(filePath);
-                        //soundPlayers.at(currentSoundPlayer).setMultiPlay(true);
-						//soundPlayers.at(currentSoundPlayer).play();
-						//soundPlayers.at(currentSoundPlayer).setVolume(volume);
+                        // Debugging
+						//soundPlayers.at(0).play();
+						//soundPlayers.at(0).setVolume(volume);
 						//ofSoundSetVolume(volume);
+                        
+                        string filePath(inPacket->filePath);
+                        soundPlayers.at(currentSoundPlayer).load(filePath);
+                        soundPlayers.at(currentSoundPlayer).setMultiPlay(true);
+						soundPlayers.at(currentSoundPlayer).play();
+						soundPlayers.at(currentSoundPlayer).setVolume(volume);
+						ofSoundSetVolume(volume);
 					}
 				}
 			} //ipAddress.compare(maestroIpAddress) == 0
