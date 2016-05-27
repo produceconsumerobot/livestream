@@ -18,10 +18,10 @@ void ofApp::setup(){
 	ofSetLogLevel(OF_LOG_ERROR);
 
     //create the socket and set to send to 127.0.0.1:11999
-	udpSender.Create();
-	udpSender.SetEnableBroadcast(true);
-	udpSender.Connect(broadcastIpAddress.c_str(),11999);
-	udpSender.SetNonBlocking(true);
+	udpBroadcaster.Create();
+	udpBroadcaster.SetEnableBroadcast(true);
+	udpBroadcaster.Connect(broadcastIpAddress.c_str(),11999);
+	udpBroadcaster.SetNonBlocking(true);
 
 	udpReceiver.Create();
 	udpReceiver.Bind(11999);
@@ -46,6 +46,7 @@ void ofApp::setup(){
 	maestroPanel.add(currentTemp.setup(string("0.0C")));
 	maestroPanel.add(lowTemp.setup(string("0.0C")));
 	maestroPanel.add(highTemp.setup(string("0.0C")));
+	maestroPanel.add(frameRate.setup("frameRate", 0, 0, 1000));
 	
 	defaultSettingsPanel.setup("Default Settings", "defaultSettings.xml", 0, 100);
 	defaultSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "/livestream/data/")); // Jacobson Park
@@ -221,6 +222,7 @@ void ofApp::draw(){
 	defaultSettingsPanel.draw();
 	maestroPanel.draw();
 
+	frameRate = ofGetFrameRate();
 }
 
 //--------------------------------------------------------------
@@ -243,7 +245,7 @@ void ofApp::keyReleased(int key){
 			sizeof(LivestreamNetwork::PING) / sizeof(LivestreamNetwork::PING[0]));
 
 		// Send the packet
-		udpSender.Send((char*) &outPacket, sizeof(outPacket));
+		udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;	
@@ -259,7 +261,7 @@ void ofApp::keyReleased(int key){
 			sizeof(LivestreamNetwork::GET_DISTANCE) / sizeof(LivestreamNetwork::GET_DISTANCE[0]));
 
 		// Send the packet
-		udpSender.Send((char*) &outPacket, sizeof(outPacket));
+		udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;	
@@ -282,7 +284,7 @@ void ofApp::keyReleased(int key){
 			sizeof(LivestreamNetwork::MODE_SLAVE) / sizeof(LivestreamNetwork::MODE_SLAVE[0]));
 
 		// Send the packet
-		udpSender.Send((char*) &outPacket, sizeof(outPacket));
+		udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;	
@@ -298,7 +300,7 @@ void ofApp::keyReleased(int key){
 			sizeof(LivestreamNetwork::MODE_MASTER) / sizeof(LivestreamNetwork::MODE_MASTER[0]));
 
 		// Send the packet
-		udpSender.Send((char*) &outPacket, sizeof(outPacket));
+		udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;
@@ -317,7 +319,7 @@ void ofApp::keyReleased(int key){
 		outPacket.state = testLED;
 
 		// Send the packet
-		udpSender.Send((char*) &outPacket, sizeof(outPacket));
+		udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;	
@@ -334,7 +336,7 @@ void ofApp::keyReleased(int key){
 			sizeof(LivestreamNetwork::PLAY_NOTE) / sizeof(LivestreamNetwork::PLAY_NOTE[0]));
 
 		// Send the packet
-		udpSender.Send((char*) &outPacket, sizeof(outPacket));
+		udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;	
@@ -349,7 +351,7 @@ void ofApp::keyReleased(int key){
 			sizeof(LivestreamNetwork::GET_ALL_TEMPS) / sizeof(LivestreamNetwork::GET_ALL_TEMPS[0]));
 
 		// Send the packet
-		udpSender.Send((char*) &outPacket, sizeof(outPacket));
+		udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 		ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;	
@@ -365,7 +367,7 @@ void ofApp::keyReleased(int key){
 		strcpy(outPacket.ipAddress, maestroIpAddress.getParameter().toString().c_str());
 
 		// Send the packet
-		udpSender.Send((char*) &outPacket, sizeof(outPacket));
+		udpBroadcaster.Send((char*) &outPacket, sizeof(outPacket));
 		// Convert the typeTage char[2] to a string for logging
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 		ofLog(OF_LOG_VERBOSE) << typeTag << " (" << maestroIpAddress.getParameter().toString() << ") >> " << "broadcast" << endl;

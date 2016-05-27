@@ -23,7 +23,7 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);		
 
-		ofxUDPManager udpSender;
+		ofxUDPManager udpBroadcaster;
 		ofxUDPManager udpReceiver;
 		unsigned long long nPacketsSent;
 		int packetProtocolVersion;
@@ -76,6 +76,7 @@ class ofApp : public ofBaseApp{
 		ofxLabel currentTemp;
 		ofxLabel lowTemp;
 		ofxLabel highTemp;
+		ofxFloatField frameRate;
 
 		int panelWidth;
 		int panelRowHeight;

@@ -315,7 +315,7 @@ void LivestreamInteractionUnit::ping() {
 	udpSender.Send((char*)&outPacket, sizeof(outPacket));
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;
+	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << ipAddress.getParameter().toString() << endl;
 }
 
 
@@ -333,7 +333,7 @@ void LivestreamInteractionUnit::getDistance() {
 	udpSender.Send((char*)&outPacket, sizeof(outPacket));
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;
+	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << ipAddress.getParameter().toString() << endl;
 	
 	//ofLog(OF_LOG_VERBOSE)
 	//<< "nPacketsSent, " << outPacket.hdr.packetCount
@@ -359,7 +359,7 @@ void LivestreamInteractionUnit::setLed() {
 	udpSender.Send((char*)&outPacket, sizeof(outPacket));
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;
+	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << ipAddress.getParameter().toString() << endl;
 
 }
 
@@ -377,7 +377,7 @@ void LivestreamInteractionUnit::getAllTemps() {
 	udpSender.Send((char*)&outPacket, sizeof(outPacket));
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << "broadcast" << endl;
+	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << ipAddress.getParameter().toString() << endl;
 }
 
 void LivestreamInteractionUnit::setMaestroAddress(string maestroIpAddress) {
@@ -395,7 +395,7 @@ void LivestreamInteractionUnit::setMaestroAddress(string maestroIpAddress) {
 	udpSender.Send((char*)&outPacket, sizeof(outPacket));
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
-	ofLog(OF_LOG_VERBOSE) << typeTag << " (" << maestroIpAddress << ") >> " << "broadcast" << endl;
+	ofLog(OF_LOG_VERBOSE) << typeTag << " (" << maestroIpAddress << ") >> " << ipAddress.getParameter().toString() << endl;
 }
 
 //--------------------------------------------------------------
