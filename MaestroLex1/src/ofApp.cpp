@@ -15,7 +15,7 @@ void ofApp::setup(){
 	// we don't want to be running to fast
 	ofSetVerticalSync(false);
 	//ofSetFrameRate(60);
-	ofSetLogLevel(OF_LOG_VERBOSE);
+	ofSetLogLevel(OF_LOG_ERROR);
 
     //create the socket and set to send to 127.0.0.1:11999
 	udpSender.Create();
@@ -33,7 +33,7 @@ void ofApp::setup(){
 	// Draw the run data to the screen
 	int panelSpacing = 190;
 	panelWidth = panelSpacing - 5;
-	panelRowHeight = 375;
+	panelRowHeight = 350;
 
 	ofxGuiSetFont("verdana.ttf", 6);
 	ofxGuiSetDefaultHeight(10);
@@ -171,10 +171,10 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+	ofSleepMillis(5);
+
 	ofBackgroundGradient(ofColor::white, ofColor::gray);
 	
-	//ofSleepMillis(1000);
-
 	if (udpSendTimersOn)
 	{
 		for (int j = 0; j<interXUnit.size(); j++) {
