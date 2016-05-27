@@ -6,11 +6,11 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	//string baseIpAddress = "192.168.1.";
-	string baseIpAddress = "192.168.0.";
+	string baseIpAddress = "192.168.1.";		// Jacobson Park
+	maestroIpAddress = baseIpAddress + "201"; // Jacobson Park
+	//string baseIpAddress = "192.168.0.";		// Sean's network
+	//maestroIpAddress = baseIpAddress + "103";	// Sean's computer
 	string broadcastIpAddress = baseIpAddress + "255";
-	//maestroIpAddress = baseIpAddress + "201";
-	maestroIpAddress = baseIpAddress + "103";
 
 	// we don't want to be running to fast
 	ofSetVerticalSync(false);
@@ -54,11 +54,11 @@ void ofApp::setup(){
 	defaultSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/home/pi/openFrameworks/apps/livestream/IXUnitLex1/bin/data/audio/"));
 	defaultSettingsPanel.add(volumeMin.setup("volMin", 0, 0, 1));
 	defaultSettingsPanel.add(volumeMax.setup("volMax", 1, 0, 1));
-	defaultSettingsPanel.add(waterDataReadInterval.setup("dataReadInterval", 3000, 1, 60000));
-	defaultSettingsPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 60, 1, 3000));
+	defaultSettingsPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 5, 1, 3000));
+	defaultSettingsPanel.add(waterDataReadInterval.setup("waterDataReadInterval", 1000, 1, 60000));
 	defaultSettingsPanel.add(notePlayInterval.setup("notePlayInterval", 1000, 1, 10000));
-	defaultSettingsPanel.add(signalStrengthMin.setup("signalStrengthMin", 20, 0, 255));
-	defaultSettingsPanel.add(signalStrengthMax.setup("signalStrengthMax", 80, 0, 255));
+	defaultSettingsPanel.add(signalStrengthMin.setup("signalStrengthMin", 20.f / 255.f, 0, 1.f));
+	defaultSettingsPanel.add(signalStrengthMax.setup("signalStrengthMax", 80.f / 255.f, 0, 1.f));
 	defaultSettingsPanel.add(minSignalWeight.setup("minSignalWeight", 0.05f, 0, 1));
 	defaultSettingsPanel.add(noiseDistance.setup("noiseDistance", 20, 0, 255));
 	defaultSettingsPanel.add(maxDistSamplesToSmooth.setup("maxDistSamplesToSmooth", 1, 0, 60));

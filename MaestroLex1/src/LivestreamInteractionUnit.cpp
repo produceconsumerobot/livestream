@@ -42,7 +42,7 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 	ixPanel.add(note.setup("note", 1, 1, 32));
 
 	ixPanel.add(volume.setup("volume", 0.f, 0.f, 1.f));
-	ixPanel.add(distanceMin.setup("distanceMin", 30, 0, 50 * 30));							// cm
+	ixPanel.add(distanceMin.setup("distanceMin", 40, 0, 50 * 30));							// cm
 	ixPanel.add(distanceMax.setup("distanceMax", 20 * 30, 0, 50 * 30));						// cm
 	ixPanel.add(waterDataMin.setup("waterDataMin", 0.f, -10000.f, 10000.f));
 	ixPanel.add(waterDataMax.setup("waterDataMax", 0.f, -10000.f, 10000.f));
@@ -51,7 +51,7 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 	ixPanel.add(volumeMin.setup("volMin", 0.f, 0.f, 1.f));
 	ixPanel.add(volumeMax.setup("volMax", 1.f, 0.f, 1.f));
 	ixPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 5, 1, 2000));	// ms
-	ixPanel.add(waterDataReadInterval.setup("waterDataReadInterval", 3000, 1, 60000));		// ms
+	ixPanel.add(waterDataReadInterval.setup("waterDataReadInterval", 1000, 1, 60000));		// ms
 	ixPanel.add(notePlayInterval.setup("notePlayInterval", 1000, 1, 5000));					// ms
 	ixPanel.add(heartbeatInterval.setup("heartbeatInterval", 1000, 0, 2000));				// ms
 	ixPanel.add(guiSignalStrength.setup("signalStrength", 0, 0, 1.f));

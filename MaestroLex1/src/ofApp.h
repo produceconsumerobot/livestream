@@ -62,8 +62,8 @@ class ofApp : public ofBaseApp{
 		ofxIntField waterDataReadInterval;
 		ofxIntField distanceReadInterval;
 		ofxIntField notePlayInterval;
-		ofxIntField signalStrengthMin;
-		ofxIntField signalStrengthMax;
+		ofxFloatField signalStrengthMin;
+		ofxFloatField signalStrengthMax;
 		ofxFloatField minSignalWeight;
 		ofxIntField noiseDistance;
 		ofxIntField maxDistSamplesToSmooth;
