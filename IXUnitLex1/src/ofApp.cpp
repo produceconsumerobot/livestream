@@ -617,11 +617,11 @@ void ofApp::exit(){
 	ofSoundShutdown();
 	if (debugTest != NO_GPIO) {
 		blinkLED->setval_gpio("0");
-        blinkLED->.unexport_gpio();
+        blinkLED->unexport_gpio();
         free(blinkLED);
         blinkLED = NULL;
 		netLED->setval_gpio("0");
-        netLED->.unexport_gpio();
+        netLED->unexport_gpio();
         free(netLED);
         netLED = NULL;
 	}
