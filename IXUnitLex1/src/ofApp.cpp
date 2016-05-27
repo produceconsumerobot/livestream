@@ -371,7 +371,7 @@ void ofApp::draw() {
                         // Get the note file path
 						LivestreamNetwork::Packet_PLAY_NOTE_V1* inPacket = (LivestreamNetwork::Packet_PLAY_NOTE_V1 *) &udpMessage;
 					                       
-                        ofLog(OF_LOG_VERBOSE) << ipAddress << " >> " << header->typeTag << " (" << inPacket->filePath << ")" << endl;                        
+                        ofLog(OF_LOG_VERBOSE) << ipAddress << " >> " << ofToString(header->typeTag) << " (" << inPacket->filePath << ")" << endl;                        
                         
                         // Increment the sound player to support note sustain
                         currentSoundPlayer = (currentSoundPlayer + 1) % nSoundPlayers;
