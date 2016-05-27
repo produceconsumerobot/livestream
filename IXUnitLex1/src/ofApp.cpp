@@ -60,7 +60,7 @@ void ofApp::setup(){
 	
 	if (debugTest != NO_GPIO) {
 		// Setup GPIOs
-		//blinkLED  = new GPIO("16");
+		//blinkLED = new GPIO("16");
         //blinkLED->setup("16");
 		//blinkLED->export_gpio();
 		//blinkLED->setdir_gpio("out");
@@ -70,7 +70,7 @@ void ofApp::setup(){
         system(string("gpio write " + blinkLED + " 0").c_str());		
         blinkLEDoutState = false;
 		
-		//netLED  = new GPIO("15");
+		//netLED = new GPIO("15");
 		//netLED->export_gpio();
 		//netLED->setdir_gpio("out");
 		//netLED->setval_gpio("0");
@@ -78,10 +78,6 @@ void ofApp::setup(){
         system(string("gpio mode " + netLED + " out").c_str());
         system(string("gpio write " + netLED + " 0").c_str());
 		netLEDoutState = false;
-        
-        
-        
-
 	}
 	
     nSoundPlayers = 10;

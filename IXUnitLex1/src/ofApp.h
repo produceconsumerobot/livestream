@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxNetwork.h"
-#include "ofxGPIO.h"
+//#include "ofxGPIO.h"
 #include "ThreadedLidarLite.h"
 //#include "DS18B20.h"
 
@@ -35,13 +35,7 @@ class ofApp : public ofBaseApp{
 		unsigned long long blinkTimer;
 		unsigned long long logTimer;
         unsigned long long blinkInterval;
-		//bool gpioOutLedState;
-		//bool gpioBlinkLedState;
-		//string gpioPwmInState;
-		
-		//GPIO* gpioOutLed;
-		//GPIO* gpioBlinkLed;
-		//GPIO* gpioPwmIn;
+
 		
 		// PWM smoothing
 		int nSamplesToSmooth;
@@ -80,11 +74,9 @@ class ofApp : public ofBaseApp{
 		
 		//GPIO* blinkLED;
 		//GPIO* netLED;
-        
         string blinkLED;
         string netLED;
         
-		
 		ThreadedLidarLite myLidarLite;
 		
 		int loopInterval;
