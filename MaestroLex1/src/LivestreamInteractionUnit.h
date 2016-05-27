@@ -32,8 +32,8 @@ public:
 	ofxFloatSlider guiLowTemperature;	// Lowest recorded temperature
 	ofxFloatSlider guiHighTemperature;	// Highest recorded temperature
 	ofxFloatSlider waterData;			// Current water data value
-	ofxIntField	note;					// Note to play
-	ofxFloatField volume;				// Note play volume
+	ofxIntSlider	note;					// Note to play
+	ofxFloatSlider volume;				// Note play volume
 	ofxFloatField distanceMin;
 	ofxFloatField distanceMax;
 	ofxFloatField waterDataMin;
