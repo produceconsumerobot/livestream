@@ -75,14 +75,18 @@ void ofApp::setup(){
 		netLEDoutState = false;
 	}
 	
+    nSoundPlayers = 10;
+    currentSoundPlayer = 0;
+    soundPlayers.resize(nSoundPlayers);
 	if (debugTest != NO_SOUND) {
+      
 		// Sound output setup
         // ToDo: change to data/tp10.wav
         //volSound.loadSound("/livestream/audio/Tp10.wav");
-		volSound.loadSound("sounds/Tp10.wav");
+		soundPlayers.at(currentSoundPlayer).load("sounds/Tp10.wav");
 		volume = 0.0f;
-		volSound.setVolume(volume);
-		volSound.setMultiPlay(true);
+		soundPlayers.at(currentSoundPlayer).setVolume(volume);
+		soundPlayers.at(currentSoundPlayer).setMultiPlay(true);
 		ofSoundSetVolume(volume);
 	}
 
@@ -291,7 +295,7 @@ void ofApp::draw() {
 						LivestreamNetwork::Packet_SET_VOLUME_V1* inPacket = (LivestreamNetwork::Packet_SET_VOLUME_V1 *) &udpMessage;
 						// Set the Volume
 						volume = (float) inPacket->volume / 255.f;
-						volSound.setVolume(volume);
+						soundPlayers.at(currentSoundPlayer).setVolume(volume);
 						ofSoundSetVolume(volume);
 						ofLog(OF_LOG_VERBOSE) << "SV, " << (int) inPacket->volume << endl;			
 						
@@ -369,13 +373,15 @@ void ofApp::draw() {
 					                       
                         ofLog(OF_LOG_VERBOSE) << ipAddress << " >> " << header->typeTag << " (" << inPacket->filePath << ")" << endl;                        
                         
-                        // Set the Volume
-                        volSound.setVolume(volume);
-						ofSoundSetVolume(volume);
+                        // Increment the sound player to support note sustain
+                        currentSoundPlayer = (currentSoundPlayer + 1) % nSoundPlayers;
+                        
+                        // Play the note
                         string filePath(inPacket->filePath);
-                        volSound.loadSound(filePath);
-						volSound.play();
-						volSound.setVolume(volume);
+                        soundPlayers.at(currentSoundPlayer).load(filePath);
+                        soundPlayers.at(currentSoundPlayer).setMultiPlay(true);
+						soundPlayers.at(currentSoundPlayer).play();
+						soundPlayers.at(currentSoundPlayer).setVolume(volume);
 						ofSoundSetVolume(volume);
 					}
 				}
@@ -429,7 +435,7 @@ void ofApp::draw() {
 		
 		if (ofGetSystemTimeMicros() - blinkTimer >= blinkInterval) {
 			if (debugTest != NO_SOUND) {
-				volSound.play();
+				currentSoundPlayer.play();
 			}
 			
 			if (debugTest != NO_GPIO) {
@@ -461,7 +467,7 @@ void ofApp::draw() {
 			blinkTimer = ofGetSystemTimeMicros();
 		}
 		if (debugTest != NO_SOUND) {
-			volSound.setVolume(soundVolume);
+			currentSoundPlayer.setVolume(soundVolume);
 			//ofSoundSetVolume(soundVolume);
 		}
 		
@@ -603,7 +609,11 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 //--------------------------------------------------------------
 void ofApp::exit(){ 
 	cout << "EXIT" << endl;
-	volSound.unloadSound();
+    for (int j=1; j<nSoundPlayers; j++) {
+        if (soundPlayers.at(j).isLoaded()) {
+            soundPlayers.at(j).unload();
+        }
+    }
 	ofSoundShutdown();
 	if (debugTest != NO_GPIO) {
 		blinkLED->setval_gpio("0");
