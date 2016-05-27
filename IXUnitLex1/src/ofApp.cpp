@@ -133,8 +133,8 @@ void ofApp::setup(){
 	// Write initialization to the log
     string aligner = "";
     if (ofGetMonth() < 10) aligner = aligner + "0";
-	string logFileName = "/livestream/logs/livestream_" + hostname + "_" + aligner + ofToString(ofGetMonth()) + ".log";
-    //string logFileName = "/logs/livestream/livestream_" + hostname + "_" + aligner + ofToString(ofGetMonth()) + ".log";
+	//string logFileName = "/livestream/logs/livestream_" + hostname + "_" + aligner + ofToString(ofGetMonth()) + ".log";
+    string logFileName = "/logs/livestream/livestream_" + hostname + "_" + aligner + ofToString(ofGetMonth()) + ".log";
     ostringstream  logStringStream;
     logStringStream << getDateTimeString() << ",INITILIZATION";
     if (debugTest != NO_LIDAR) {
