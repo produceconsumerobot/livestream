@@ -66,7 +66,7 @@ void ofApp::setup(){
 		//blinkLED->setdir_gpio("out");
 		//blinkLED->setval_gpio("0");
         blinkLED = "16";
-        string out;
+        int out;
         out = system(string("gpio mode " + blinkLED + " out").c_str());
         out = system(string("gpio write " + blinkLED + " 0").c_str());		
         blinkLEDoutState = false;
@@ -175,10 +175,10 @@ void ofApp::draw() {
         if (debugTest != NO_GPIO) {
             // Blink the LED
             if (blinkLEDoutState) {
-                string out = system(string("gpio write " + blinkLED + " 0").c_str());
+                int out = system(string("gpio write " + blinkLED + " 0").c_str());
                 blinkLEDoutState = false;
             } else {
-                string out = system(string("gpio write " + blinkLED + " 1").c_str());
+                int out = system(string("gpio write " + blinkLED + " 1").c_str());
                 blinkLEDoutState = true;
             }
         }            
@@ -363,13 +363,13 @@ void ofApp::draw() {
 							//blinkLED->setval_gpio("1");
 							//blinkLEDoutState = true;
 							//netLED->setval_gpio("1");
-                            string out = system(string("gpio write " + netLED + " 1").c_str());
+                            int out = system(string("gpio write " + netLED + " 1").c_str());
 							netLEDoutState = true;
 						} else {							
 							//blinkLED->setval_gpio("0");
 							//blinkLEDoutState = false;
 							//netLED->setval_gpio("0");
-                            string out = system(string("gpio write " + netLED + " 0").c_str());
+                            int out = system(string("gpio write " + netLED + " 0").c_str());
 							netLEDoutState = false;
 						}
 					} else if(memcmp( header->typeTag, LivestreamNetwork::PLAY_NOTE, 
@@ -630,7 +630,7 @@ void ofApp::exit(){
     }
 	ofSoundShutdown();
 	if (debugTest != NO_GPIO) {
-        string out;
+        int out;
         out = system(string("gpio write " + blinkLED + " 0").c_str());
         out = system(string("gpio write " + netLED + " 0").c_str());
 		//blinkLED->setval_gpio("0");
