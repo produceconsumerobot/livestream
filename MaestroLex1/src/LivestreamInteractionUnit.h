@@ -86,24 +86,28 @@ public:
 
 	int getSmoothedDistance();
 	int getVolume();
-	int getRawDistance();
 	int getTemperature();
 	int getLowTemperature();
 	int getHighTemperature();
 	void ipAddressChanged(string & _ipAddress);
 
-	string waterDataFilesLocation;
+	string waterDataDir;
+	fstream * waterDataFile;
 
 	LivestreamInteractionUnit(); 
 	~LivestreamInteractionUnit();
 	//void setup(int _id, string _ipAddress);
-	void setup(int _id, string _ipAddress, string _dataName, string _sensorLocation);
-	void playNote();
+	void setup(int _id, string _ipAddress, string _dataName, string _sensorLocation, string _waterDataDir);
+	void playNote(string dirPath);
 	void ping();
 	void getDistance();
 	void setLed();
 	void getAllTemps();
 	void setMaestroAddress(string maestroIpAddress);
+	int readWaterData();		// Returns 0 if successful
+	int calculateNote();		// Returns note number
+	int openWaterDataFile();			// Returns 0 if successful
+	int closeWaterDataFile();		// Returns 0 if successful
 
 	// GUI
 	ofxPanel		ixPanel;

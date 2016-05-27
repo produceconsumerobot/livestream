@@ -1,14 +1,16 @@
 #include "ofApp.h"
+#include "logger.h"
 //#include "LivestreamNetwork.h"
 
 #define RECONNECT_TIME 400
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	string baseIpAddress = "192.168.1.";
+	//string baseIpAddress = "192.168.1.";
+	string baseIpAddress = "192.168.0.";
 	string broadcastIpAddress = baseIpAddress + "255";
-	maestroIpAddress = baseIpAddress + "201";
-	//string ixUnitIpAddress = baseIpAddress + "211";
+	//maestroIpAddress = baseIpAddress + "201";
+	maestroIpAddress = baseIpAddress + "103";
 
 	// we don't want to be running to fast
 	ofSetVerticalSync(false);
@@ -31,7 +33,7 @@ void ofApp::setup(){
 	// Draw the run data to the screen
 	int panelSpacing = 190;
 	panelWidth = panelSpacing - 5;
-	panelRowHeight = 300;
+	panelRowHeight = 375;
 
 	ofxGuiSetFont("verdana.ttf", 6);
 	ofxGuiSetDefaultHeight(10);
@@ -39,57 +41,97 @@ void ofApp::setup(){
 
 	maestroPanel.setup("Maestro", "maestroSettings.xml", 0, 0);
 	maestroPanel.add(maestroIpAddress.setup("IP", maestroIpAddress));
-	maestroPanel.add(datetimeString.setup(string("current date")));
-	maestroPanel.add(lastStartupTime.setup(string("startup date")));
+	maestroPanel.add(currentDateTime.setup("current date", LoggerThread::dateTimeString()));
+	maestroPanel.add(lastStartupDateTime.setup("startup date", LoggerThread::dateTimeString()));
 	maestroPanel.add(currentTemp.setup(string("0.0C")));
 	maestroPanel.add(lowTemp.setup(string("0.0C")));
 	maestroPanel.add(highTemp.setup(string("0.0C")));
 	
-	globalSettingsPanel.setup("Default Settings", "defaultSettings.xml", 0, 100);
-	globalSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "/livestream/data/"));
-	globalSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/livestream/audio/"));
-	globalSettingsPanel.add(volumeMin.setup("volMin", 0, 0, 1));
-	globalSettingsPanel.add(volumeMax.setup("volMax", 1, 0, 1));
-	globalSettingsPanel.add(waterDataReadInterval.setup("dataReadInterval", 3000, 1, 60000));
-	globalSettingsPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 60, 1, 3000));
-	globalSettingsPanel.add(notePlayInterval.setup("notePlayInterval", 1000, 1, 10000));
-	globalSettingsPanel.add(signalStrengthMin.setup("signalStrengthMin", 20, 0, 255));
-	globalSettingsPanel.add(signalStrengthMax.setup("signalStrengthMax", 80, 0, 255));
-	globalSettingsPanel.add(minSignalWeight.setup("minSignalWeight", 0.05f, 0, 1));
-	globalSettingsPanel.add(noiseDistance.setup("noiseDistance", 20, 0, 255));
-	globalSettingsPanel.add(maxDistSamplesToSmooth.setup("maxDistSamplesToSmooth", 1, 0, 60));
+	defaultSettingsPanel.setup("Default Settings", "defaultSettings.xml", 0, 100);
+	//defaultSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "/livestream/data/"));
+	defaultSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "C:\\pub\\LocalDev\\Sean\\of_v0.9.3_vs_release\\of_v0.9.3_vs_release\\apps\\livestream\\MaestroLex1\\bin\\data\\data\\"));
+	//defaultSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/livestream/audio/"));
+	defaultSettingsPanel.add(soundFilesLocation.setup("soundLoc", "audio/"));
+	defaultSettingsPanel.add(volumeMin.setup("volMin", 0, 0, 1));
+	defaultSettingsPanel.add(volumeMax.setup("volMax", 1, 0, 1));
+	defaultSettingsPanel.add(waterDataReadInterval.setup("dataReadInterval", 3000, 1, 60000));
+	defaultSettingsPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 60, 1, 3000));
+	defaultSettingsPanel.add(notePlayInterval.setup("notePlayInterval", 1000, 1, 10000));
+	defaultSettingsPanel.add(signalStrengthMin.setup("signalStrengthMin", 20, 0, 255));
+	defaultSettingsPanel.add(signalStrengthMax.setup("signalStrengthMax", 80, 0, 255));
+	defaultSettingsPanel.add(minSignalWeight.setup("minSignalWeight", 0.05f, 0, 1));
+	defaultSettingsPanel.add(noiseDistance.setup("noiseDistance", 20, 0, 255));
+	defaultSettingsPanel.add(maxDistSamplesToSmooth.setup("maxDistSamplesToSmooth", 1, 0, 60));
+	defaultSettingsPanel.add(soundOn.setup("soundOn", true));
 	// Load settings from file
-	globalSettingsPanel.loadFromFile("globalSettings.xml");
+	defaultSettingsPanel.loadFromFile("defaultSettings.xml");
 	
 	interXUnit.resize(9);
 	int ixID;
+	int i;
 	ixID = 13;
-	interXUnit.at(0).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
+	i = 0;
+	interXUnit.at(0).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity", waterDataFilesLocation.getParameter().toString());
+	interXUnit.at(i).waterDataMin = 318;
+	interXUnit.at(i).waterDataMax = 900;
+	interXUnit.at(i).noteMax = 13;
 	interXUnit.at(0).ixPanel.setPosition(panelSpacing * 1, 0);
 	ixID = 17;
-	interXUnit.at(1).setup(ixID, baseIpAddress + "2" + to_string(ixID), "McSpring", "Temp");
-	interXUnit.at(1).ixPanel.setPosition(panelSpacing * 2, 0);
+	i = 1;
+	interXUnit.at(i).setup(ixID, baseIpAddress + "2" + to_string(ixID), "McSpring", "Temp", waterDataFilesLocation.getParameter().toString());
+	interXUnit.at(i).waterDataMin = 12;
+	interXUnit.at(i).waterDataMax = 20;
+	interXUnit.at(i).noteMax = 17;
+	interXUnit.at(i).ixPanel.setPosition(panelSpacing * 2, 0);
 	ixID = 11;
-	interXUnit.at(2).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Lost", "Flow");
-	interXUnit.at(2).ixPanel.setPosition(panelSpacing * 3, 0);
+	i = 2;
+	interXUnit.at(i).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Lost", "Flow", waterDataFilesLocation.getParameter().toString());
+	interXUnit.at(i).waterDataMin = 4;
+	interXUnit.at(i).waterDataMax = 42;
+	interXUnit.at(i).noteMax = 13;
+	interXUnit.at(i).ixPanel.setPosition(panelSpacing * 3, 0);
 	ixID = 14;
-	interXUnit.at(3).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
-	interXUnit.at(3).ixPanel.setPosition(panelSpacing * 4, 0);
+	i = 3;
+	interXUnit.at(i).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Lost", "Temp", waterDataFilesLocation.getParameter().toString());
+	interXUnit.at(i).waterDataMin = 13.1;
+	interXUnit.at(i).waterDataMax = 20.1;
+	interXUnit.at(i).noteMax = 17;
+	interXUnit.at(i).ixPanel.setPosition(panelSpacing * 4, 0);
 	ixID = 16;
-	interXUnit.at(4).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
-	interXUnit.at(4).ixPanel.setPosition(panelSpacing * 0, panelRowHeight);
+	i = 4;
+	interXUnit.at(i).setup(ixID, baseIpAddress + "2" + to_string(ixID), "McSpring", "Conductivity", waterDataFilesLocation.getParameter().toString());
+	interXUnit.at(i).waterDataMin = 19;
+	interXUnit.at(i).waterDataMax = 1714;
+	interXUnit.at(i).noteMax = 13;
+	interXUnit.at(i).ixPanel.setPosition(panelSpacing * 0, panelRowHeight);
 	ixID = 21;
-	interXUnit.at(5).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
-	interXUnit.at(5).ixPanel.setPosition(panelSpacing * 1, panelRowHeight);
+	i = 5;
+	interXUnit.at(i).setup(ixID, baseIpAddress + "2" + to_string(ixID), "McSpring", "Flow", waterDataFilesLocation.getParameter().toString());
+	interXUnit.at(i).waterDataMin = 0.1;
+	interXUnit.at(i).waterDataMax = 50;
+	interXUnit.at(i).noteMax = 13;
+	interXUnit.at(i).ixPanel.setPosition(panelSpacing * 1, panelRowHeight);
 	ixID = 22;
-	interXUnit.at(6).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
-	interXUnit.at(6).ixPanel.setPosition(panelSpacing * 2, panelRowHeight);
+	i = 6;
+	interXUnit.at(i).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Flow", waterDataFilesLocation.getParameter().toString());
+	interXUnit.at(i).waterDataMin = 0.02;
+	interXUnit.at(i).waterDataMax = 25;
+	interXUnit.at(i).noteMax = 13;
+	interXUnit.at(i).ixPanel.setPosition(panelSpacing * 2, panelRowHeight);
 	ixID = 19;
-	interXUnit.at(7).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
-	interXUnit.at(7).ixPanel.setPosition(panelSpacing * 3, panelRowHeight);
+	i = 7;
+	interXUnit.at(i).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Temp", waterDataFilesLocation.getParameter().toString());
+	interXUnit.at(i).waterDataMin = 9.5;
+	interXUnit.at(i).waterDataMax = 11.6;
+	interXUnit.at(i).noteMax = 17;
+	interXUnit.at(i).ixPanel.setPosition(panelSpacing * 3, panelRowHeight);
 	ixID = 18;
-	interXUnit.at(8).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Coldspring", "Conductivity");
-	interXUnit.at(8).ixPanel.setPosition(panelSpacing * 4, panelRowHeight);
+	i = 8;
+	interXUnit.at(i).setup(ixID, baseIpAddress + "2" + to_string(ixID), "Lost", "Conductivity", waterDataFilesLocation.getParameter().toString());
+	interXUnit.at(i).waterDataMin = 13.6;
+	interXUnit.at(i).waterDataMax = 684;
+	interXUnit.at(i).noteMax = 13;
+	interXUnit.at(i).ixPanel.setPosition(panelSpacing * 4, panelRowHeight);
 
 
 	testLED = false;
@@ -141,14 +183,20 @@ void ofApp::draw(){
 				interXUnit.at(j).getDistance();
 				interXUnit.at(j).distanceReadTime = ofGetElapsedTimeMillis();
 			}
+			if (ofGetElapsedTimeMillis() - interXUnit.at(j).waterDataReadTime > interXUnit.at(j).waterDataReadInterval) {
+				// Read the water data
+				interXUnit.at(j).readWaterData();
+				interXUnit.at(j).waterDataReadTime = ofGetElapsedTimeMillis();
+			}
 			if (ofGetElapsedTimeMillis() - interXUnit.at(j).notePlayTime > interXUnit.at(j).notePlayInterval) {
 				// Play a note
-				interXUnit.at(j).playNote();
+				if (soundOn) {
+					interXUnit.at(j).playNote(soundFilesLocation.getParameter().toString());
+				}
 				//keyReleased('n');
 				interXUnit.at(j).notePlayTime = ofGetElapsedTimeMillis();
 			}
 			if (ofGetElapsedTimeMillis() - interXUnit.at(j).heartbeatTime > interXUnit.at(j).heartbeatInterval) {
-				
 				// Ping the IXUnit
 				interXUnit.at(j).ping();
 				// blink the heartbeat LED
@@ -169,8 +217,8 @@ void ofApp::draw(){
 	
 	// Draw the run data to the screen
 
-
-	globalSettingsPanel.draw();
+	currentDateTime = LoggerThread::dateTimeString();
+	defaultSettingsPanel.draw();
 	maestroPanel.draw();
 
 }
@@ -322,7 +370,7 @@ void ofApp::keyReleased(int key){
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 		ofLog(OF_LOG_VERBOSE) << typeTag << " (" << maestroIpAddress.getParameter().toString() << ") >> " << "broadcast" << endl;
 	}
-	else if (key == 32) {
+	else if ((char) key == '!') {
 		udpSendTimersOn = !udpSendTimersOn;
 	}
 

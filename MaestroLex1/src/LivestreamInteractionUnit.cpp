@@ -12,21 +12,22 @@ LivestreamInteractionUnit::LivestreamInteractionUnit() {
 // Destructor
 // ---------------------------------------------------------------------------- //
 LivestreamInteractionUnit::~LivestreamInteractionUnit() {
+	closeWaterDataFile();
 
+	//ofRemoveListener(ipAddress, this, &LivestreamInteractionUnit::ipAddressChanged);
 }
 
 // ---------------------------------------------------------------------------- //
 // setup
 // ---------------------------------------------------------------------------- //
 //void LivestreamInteractionUnit::setup(int _id, string _ipAddress) {
-void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataName, string _sensorLocation) {
+void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataName, string _sensorLocation, string _waterDataDir) {
 	id = _id;
 	//ipAddress = _ipAddress;
 	ipAddress.addListener(this, &LivestreamInteractionUnit::ipAddressChanged);
 
-	ixPanel.setup("IXUnit" + to_string(_id),
-		"IXUnit" + to_string(_id) + ".xml", 0, 0);
-	ixPanel.setup("IXUnit", "IXUnit.xml", 0, 0);
+	ixPanel.setup("IXUnit" + ofToString(_id),
+		"IXUnit" + ofToString(_id) + ".xml", 0, 0);
 	//ixPanel.add(id.setup("ID", _id, -1, 255));
 	ixPanel.add(dataName.setup("dataName", _dataName));
 	ixPanel.add(sensorLocation.setup("sensorLoc", _sensorLocation));
@@ -37,20 +38,22 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 	ixPanel.add(guiTemperature.setup("Temperature", -60, -60, 100));						// Celcius
 	ixPanel.add(guiLowTemperature.setup("LowTemperature", -60, -60, 100));					// Celcius
 	ixPanel.add(guiHighTemperature.setup("HighTemperature", 0, -60, 100));					// Celcius
+	ixPanel.add(waterData.setup("waterData", -10000, -10000, 10000));
+	ixPanel.add(note.setup("note", 1, 1, 32));
 
-	ixPanel.add(volume.setup("volume", 0, 0, 1));
-	ixPanel.add(volumeMin.setup("volMin", 0.f, 0, 1));
-	ixPanel.add(volumeMax.setup("volMax", 1.f, 0, 1));
-	ixPanel.add(waterDataMin.setup("waterDataMin", 0.f, -10000, 10000));
-	ixPanel.add(waterDataMax.setup("waterDataMax", 0.f, -10000, 10000));
-	ixPanel.add(noteMin.setup("noteMin", 1, 1, 32));
-	ixPanel.add(noteMax.setup("noteMax", 2, 1, 32));
-	ixPanel.add(heartbeatInterval.setup("heartbeatInterval", 1000, 0, 2000));				// ms
-	ixPanel.add(waterDataReadInterval.setup("waterDataReadInterval", 3000, 1, 60000));		// ms
-	ixPanel.add(notePlayInterval.setup("notePlayInterval", 1000, 1, 5000));					// ms
-	ixPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 5, 1, 2000));	// ms
+	ixPanel.add(volume.setup("volume", 0.f, 0.f, 1.f));
 	ixPanel.add(distanceMin.setup("distanceMin", 30, 0, 50 * 30));							// cm
 	ixPanel.add(distanceMax.setup("distanceMax", 20 * 30, 0, 50 * 30));						// cm
+	ixPanel.add(waterDataMin.setup("waterDataMin", 0.f, -10000.f, 10000.f));
+	ixPanel.add(waterDataMax.setup("waterDataMax", 0.f, -10000.f, 10000.f));
+	ixPanel.add(noteMin.setup("noteMin", 1, 1, 32));
+	ixPanel.add(noteMax.setup("noteMax", 13, 1, 32));
+	ixPanel.add(volumeMin.setup("volMin", 0.f, 0.f, 1.f));
+	ixPanel.add(volumeMax.setup("volMax", 1.f, 0.f, 1.f));
+	ixPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 5, 1, 2000));	// ms
+	ixPanel.add(waterDataReadInterval.setup("waterDataReadInterval", 3000, 1, 60000));		// ms
+	ixPanel.add(notePlayInterval.setup("notePlayInterval", 1000, 1, 5000));					// ms
+	ixPanel.add(heartbeatInterval.setup("heartbeatInterval", 1000, 0, 2000));				// ms
 	ixPanel.add(guiSignalStrength.setup("signalStrength", 0, 0, 1.f));
 	ixPanel.add(signalStrengthMin.setup("signalStrengthMin", 20.f/255.f, 0, 1.f));
 	ixPanel.add(signalStrengthMax.setup("signalStrengthMax", 80.f/255.f, 0, 1.f));
@@ -105,7 +108,9 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 	distSensorStatus = 0;
 	nPacketsSent = 0;
 	packetProtocolVersion = 1;
-	waterDataFilesLocation = "/livestream/data/";
+	waterDataDir = _waterDataDir;
+	openWaterDataFile();
+	//waterDataDir = "/livestream/data/";
 
 	ledState = false;
 
@@ -272,14 +277,21 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 }
 
 // ---------------------------------------------------------------------------- //
-void LivestreamInteractionUnit::playNote() {
+void LivestreamInteractionUnit::playNote(string dirPath) {
+	note = calculateNote();
+
 	LivestreamNetwork::Packet_PLAY_NOTE_V1 outPacket;
 	outPacket.hdr.timeStamp = ofGetElapsedTimeMillis();
 	outPacket.hdr.packetCount = ++nPacketsSent;
 	outPacket.hdr.protocolVersion = packetProtocolVersion;
-	string filePath = "audio/Coldspring_Conductivity_01.mp3";
-	//string filename = dataName.getParameter().toString() + "_" + sensorLocation.getParameter().toString() + "_" + note.getParameter().toString();
-	//string filePath = waterDataFilesLocation + filename;
+	//string filePath = "audio/Coldspring_Conductivity_01.mp3";
+	//string dirPath = dirPath;
+
+	string aligner = "";
+	if (note < 10) aligner = aligner + "0";
+	string filename = dataName.getParameter().toString() + "_" + sensorLocation.getParameter().toString() 
+		+ "_" + aligner + note.getParameter().toString() + ".mp3";
+	string filePath = dirPath + filename;
 	strncpy(outPacket.filePath, filePath.c_str(), sizeof(outPacket.filePath));
 	strncpy(outPacket.hdr.typeTag, LivestreamNetwork::PLAY_NOTE,
 		sizeof(LivestreamNetwork::PLAY_NOTE) / sizeof(LivestreamNetwork::PLAY_NOTE[0]));
@@ -328,8 +340,6 @@ void LivestreamInteractionUnit::getDistance() {
 	//<< ", timeStamp, " << outPacket.hdr.timeStamp
 	//<< ", ver, " << outPacket.hdr.protocolVersion
 	//	<< endl;
-	
-
 }
 
 void LivestreamInteractionUnit::setLed() {
@@ -397,4 +407,58 @@ void LivestreamInteractionUnit::ipAddressChanged(string &_ipAddress) {
 	udpSender.SetEnableBroadcast(false);
 	udpSender.Connect(ipAddress.getParameter().toString().c_str(), 11999);
 	udpSender.SetNonBlocking(true);
+}
+
+int LivestreamInteractionUnit::readWaterData() {
+	if (waterDataFile != NULL && waterDataFile->is_open()) {
+		if (waterDataFile->eof()) {
+			waterDataFile->clear();
+			waterDataFile->seekg(0, ios::beg);
+		}
+		float f;
+		(*waterDataFile) >> f;
+		waterData = f;
+		//cout << dataName.getParameter().toString() + "_" + sensorLocation.getParameter().toString() + ".csv" << " : " << f;
+		//string f;
+		//getline(*waterDataFile, f);
+		//waterDataFile->getline(f, 256);
+		//ofFilePath ofp;
+		//cout << ofp.getCurrentExeDir() << endl;
+		//cout << ofp.getCurrentExePath() << endl;
+		//cout << ofToDataPath("", true) << endl;
+
+
+		return 0;
+	}
+	else {
+		return -1;
+	}
+}
+
+int LivestreamInteractionUnit::calculateNote() {
+	return ofMap(waterData, waterDataMin, waterDataMax, noteMin, noteMax, true);
+}
+
+int LivestreamInteractionUnit::openWaterDataFile() {
+	string filename = dataName.getParameter().toString() + "_" + sensorLocation.getParameter().toString() + ".csv";
+	waterDataFile = new fstream(waterDataDir + filename);
+	string filePath = waterDataDir + filename;
+	waterDataFile->open(filePath.c_str(), std::ios::in);
+	if (waterDataFile->is_open()) {
+		waterDataFile->clear();
+		waterDataFile->seekg(0, ios::beg);
+		return 0;
+	}
+	else {
+		free(waterDataFile);
+		waterDataFile = NULL;
+		return -1;
+	}
+}
+
+int LivestreamInteractionUnit::closeWaterDataFile() {
+	waterDataFile->close();
+	free(waterDataFile);
+	waterDataFile = NULL;
+	return 0;
 }

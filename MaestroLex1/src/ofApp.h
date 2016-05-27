@@ -53,7 +53,7 @@ class ofApp : public ofBaseApp{
 		//int maxDistSamplesToSmooth;
 
 		// GUI
-		ofxPanel globalSettingsPanel;
+		ofxPanel defaultSettingsPanel;
 
 		ofxTextField waterDataFilesLocation;
 		ofxTextField soundFilesLocation;
@@ -67,11 +67,12 @@ class ofApp : public ofBaseApp{
 		ofxFloatField minSignalWeight;
 		ofxIntField noiseDistance;
 		ofxIntField maxDistSamplesToSmooth;
+		ofxToggle soundOn;
 
 		ofxPanel maestroPanel;
 		ofxTextField maestroIpAddress;
-		ofxLabel datetimeString;
-		ofxLabel lastStartupTime;
+		ofxLabel currentDateTime;
+		ofxLabel lastStartupDateTime;
 		ofxLabel currentTemp;
 		ofxLabel lowTemp;
 		ofxLabel highTemp;
