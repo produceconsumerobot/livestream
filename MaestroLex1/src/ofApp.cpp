@@ -141,30 +141,33 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-	char udpMessage[100000];
-	udpReceiver.Receive(udpMessage,100000);
-	string message=udpMessage;
-	if(message!=""){
-		// We got a message!
-		//char udpAddress[20];
-		string udpAddress;
-		int port;
-		// Get the sender's address
-		udpReceiver.GetRemoteAddr(udpAddress, port);
-		
-		// Convert the UDP message to read its type tag from the header section
-		LivestreamNetwork::PacketHeader_V1* header =
-			(LivestreamNetwork::PacketHeader_V1 *) udpMessage;
-		string typeTag(header->typeTag, header->typeTag + sizeof(header->typeTag) / sizeof(header->typeTag[0]));
+	string message = "yomama";
+	while (message != "") {
+		char udpMessage[100000];
+		udpReceiver.Receive(udpMessage,100000);
+		message=udpMessage;
+		if (message != "") {
+			// We got a message!
+			//char udpAddress[20];
+			string udpAddress;
+			int port;
+			// Get the sender's address
+			udpReceiver.GetRemoteAddr(udpAddress, port);
 
-		if (maestroIpAddress.getParameter().toString().compare(udpAddress) != 0) {
-			ofLog(OF_LOG_VERBOSE) << udpAddress << " >> " << typeTag << endl;
-		}
+			// Convert the UDP message to read its type tag from the header section
+			LivestreamNetwork::PacketHeader_V1* header =
+				(LivestreamNetwork::PacketHeader_V1 *) udpMessage;
+			string typeTag(header->typeTag, header->typeTag + sizeof(header->typeTag) / sizeof(header->typeTag[0]));
 
-		for (int j=0; j<interXUnit.size(); j++) {
-			if (interXUnit.at(j).ipAddress.getParameter().toString().compare(udpAddress) == 0) {
-				ofLog(OF_LOG_VERBOSE) << udpAddress << " >> Address Match (" << interXUnit.at(j).ipAddress.getParameter().toString() << ")" << endl;
-				interXUnit.at(j).parseUdpPacket(udpMessage);
+			if (maestroIpAddress.getParameter().toString().compare(udpAddress) != 0) {
+				ofLog(OF_LOG_VERBOSE) << udpAddress << " >> " << typeTag << endl;
+			}
+
+			for (int j = 0; j < interXUnit.size(); j++) {
+				if (interXUnit.at(j).ipAddress.getParameter().toString().compare(udpAddress) == 0) {
+					ofLog(OF_LOG_VERBOSE) << udpAddress << " >> Address Match (" << interXUnit.at(j).ipAddress.getParameter().toString() << ")" << endl;
+					interXUnit.at(j).parseUdpPacket(udpMessage);
+				}
 			}
 		}
 	} //message!=""
