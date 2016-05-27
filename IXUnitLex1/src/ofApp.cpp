@@ -66,7 +66,7 @@ void ofApp::setup(){
 		//blinkLED->setdir_gpio("out");
 		//blinkLED->setval_gpio("0");
         blinkLED = "16";
-        system(string("gpio mode " + blinkLED + " out").c_str());
+        string out = system(string("gpio mode " + blinkLED + " out").c_str());
         system(string("gpio write " + blinkLED + " 0").c_str());		
         blinkLEDoutState = false;
 		
@@ -132,8 +132,8 @@ void ofApp::setup(){
 	// Write initialization to the log
     string aligner = "";
     if (ofGetMonth() < 10) aligner = aligner + "0";
-	//string logFileName = "/livestream/logs/livestream_" + hostname + "_" + aligner + ofToString(ofGetMonth()) + ".log";
-    string logFileName = "/logs/livestream/livestream_" + hostname + "_" + aligner + ofToString(ofGetMonth()) + ".log";
+	string logFileName = "/livestream/logs/livestream_" + hostname + "_" + aligner + ofToString(ofGetMonth()) + ".log";
+    //string logFileName = "/logs/livestream/livestream_" + hostname + "_" + aligner + ofToString(ofGetMonth()) + ".log";
     ostringstream  logStringStream;
     logStringStream << getDateTimeString() << ",INITILIZATION";
     if (debugTest != NO_LIDAR) {
