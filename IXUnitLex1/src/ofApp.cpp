@@ -66,8 +66,8 @@ void ofApp::setup(){
 		//blinkLED->setdir_gpio("out");
 		//blinkLED->setval_gpio("0");
         blinkLED = "16";
-        string out = system(string("gpio mode " + blinkLED + " out").c_str());
-        system(string("gpio write " + blinkLED + " 0").c_str());		
+        string out = string out = system(string("gpio mode " + blinkLED + " out").c_str());
+        string out = system(string("gpio write " + blinkLED + " 0").c_str());		
         blinkLEDoutState = false;
 		
 		//netLED = new GPIO("15");
@@ -75,8 +75,8 @@ void ofApp::setup(){
 		//netLED->setdir_gpio("out");
 		//netLED->setval_gpio("0");
         netLED = "15";
-        system(string("gpio mode " + netLED + " out").c_str());
-        system(string("gpio write " + netLED + " 0").c_str());
+        string out = system(string("gpio mode " + netLED + " out").c_str());
+        string out = system(string("gpio write " + netLED + " 0").c_str());
 		netLEDoutState = false;
 	}
 	
@@ -174,10 +174,10 @@ void ofApp::draw() {
         if (debugTest != NO_GPIO) {
             // Blink the LED
             if (blinkLEDoutState) {
-                system(string("gpio write " + blinkLED + " 0").c_str());
+                string out = system(string("gpio write " + blinkLED + " 0").c_str());
                 blinkLEDoutState = false;
             } else {
-                system(string("gpio write " + blinkLED + " 1").c_str());
+                string out = system(string("gpio write " + blinkLED + " 1").c_str());
                 blinkLEDoutState = true;
             }
         }            
@@ -362,13 +362,13 @@ void ofApp::draw() {
 							//blinkLED->setval_gpio("1");
 							//blinkLEDoutState = true;
 							//netLED->setval_gpio("1");
-                            system(string("gpio write " + netLED + " 1").c_str());
+                            string out = system(string("gpio write " + netLED + " 1").c_str());
 							netLEDoutState = true;
 						} else {							
 							//blinkLED->setval_gpio("0");
 							//blinkLEDoutState = false;
 							//netLED->setval_gpio("0");
-                            system(string("gpio write " + netLED + " 0").c_str());
+                            string out = system(string("gpio write " + netLED + " 0").c_str());
 							netLEDoutState = false;
 						}
 					} else if(memcmp( header->typeTag, LivestreamNetwork::PLAY_NOTE, 
@@ -629,8 +629,8 @@ void ofApp::exit(){
     }
 	ofSoundShutdown();
 	if (debugTest != NO_GPIO) {
-        system(string("gpio write " + blinkLED + " 0").c_str());
-        system(string("gpio write " + netLED + " 0").c_str());
+        string out = system(string("gpio write " + blinkLED + " 0").c_str());
+        string out = system(string("gpio write " + netLED + " 0").c_str());
 		//blinkLED->setval_gpio("0");
         //blinkLED->unexport_gpio();
         //free(blinkLED);
