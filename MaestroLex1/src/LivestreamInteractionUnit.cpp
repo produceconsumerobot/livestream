@@ -137,7 +137,7 @@ void LivestreamInteractionUnit::setDistance(int distance, float signalStrength) 
 
 	if (rawDistance < noiseDistance) {
 		// Handle strange case where lidar reports 1cm when should be infinity
-		distance = distanceMax * 2;
+		rawDistance = distanceMax * 2;
 
 		// We're within the noise distance
 		// Ignore signal strength and go toward newVal quickly
