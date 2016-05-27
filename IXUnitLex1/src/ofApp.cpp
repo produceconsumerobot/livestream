@@ -61,14 +61,14 @@ void ofApp::setup(){
 	if (debugTest != NO_GPIO) {
 		// Setup GPIOs
 		blinkLED  = new GPIO("16");
-        blinkLED->setup("16");
+        //blinkLED->setup("16");
 		blinkLED->export_gpio();
 		blinkLED->setdir_gpio("out");
 		blinkLED->setval_gpio("0");
 		blinkLEDoutState = false;
 		
 		netLED  = new GPIO("15");
-        netLED->setup("15");
+        //netLED->setup("15");
 		netLED->export_gpio();
 		netLED->setdir_gpio("out");
 		netLED->setval_gpio("0");
@@ -435,7 +435,7 @@ void ofApp::draw() {
 		
 		if (ofGetSystemTimeMicros() - blinkTimer >= blinkInterval) {
 			if (debugTest != NO_SOUND) {
-				currentSoundPlayer.play();
+				soundPlayers.at(currentSoundPlayer).play();
 			}
 			
 			if (debugTest != NO_GPIO) {
@@ -467,7 +467,7 @@ void ofApp::draw() {
 			blinkTimer = ofGetSystemTimeMicros();
 		}
 		if (debugTest != NO_SOUND) {
-			currentSoundPlayer.setVolume(soundVolume);
+			soundPlayers.at(currentSoundPlayer).setVolume(soundVolume);
 			//ofSoundSetVolume(soundVolume);
 		}
 		

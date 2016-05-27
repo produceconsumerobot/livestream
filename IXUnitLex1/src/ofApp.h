@@ -53,7 +53,7 @@ class ofApp : public ofBaseApp{
 		float minSigWeight;
 		
 		// Sound output
-		//ofSoundPlayer  pitchSound;
+		ofSoundPlayer  pitchSound;
 		//ofSoundPlayer  volSound;
         
         vector<ofSoundPlayer> soundPlayers;     // Multiple sound players used to support sustain of previously played notes
