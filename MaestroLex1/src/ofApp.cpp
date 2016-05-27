@@ -48,10 +48,10 @@ void ofApp::setup(){
 	maestroPanel.add(highTemp.setup(string("0.0C")));
 	
 	defaultSettingsPanel.setup("Default Settings", "defaultSettings.xml", 0, 100);
-	//defaultSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "/livestream/data/"));
-	defaultSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "C:\\pub\\LocalDev\\Sean\\of_v0.9.3_vs_release\\of_v0.9.3_vs_release\\apps\\livestream\\MaestroLex1\\bin\\data\\data\\"));
-	//defaultSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/livestream/audio/"));
-	defaultSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/home/pi/openFrameworks/apps/livestream/IXUnitLex1/bin/data/audio/"));
+	defaultSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "/livestream/data/")); // Jacobson Park
+	defaultSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/livestream/audio/")); // Jacobson Park
+	//defaultSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "C:\\pub\\LocalDev\\Sean\\of_v0.9.3_vs_release\\of_v0.9.3_vs_release\\apps\\livestream\\MaestroLex1\\bin\\data\\data\\")); // Sean's network
+	//defaultSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/home/pi/openFrameworks/apps/livestream/IXUnitLex1/bin/data/audio/")); // Sean's network
 	defaultSettingsPanel.add(volumeMin.setup("volMin", 0, 0, 1));
 	defaultSettingsPanel.add(volumeMax.setup("volMax", 1, 0, 1));
 	defaultSettingsPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 5, 1, 3000));
