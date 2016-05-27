@@ -60,20 +60,28 @@ void ofApp::setup(){
 	
 	if (debugTest != NO_GPIO) {
 		// Setup GPIOs
-		blinkLED  = new GPIO("16");
+		//blinkLED  = new GPIO("16");
         //blinkLED->setup("16");
-		blinkLED->export_gpio();
-		blinkLED->setdir_gpio("out");
-		blinkLED->setval_gpio("0");
-		blinkLEDoutState = false;
+		//blinkLED->export_gpio();
+		//blinkLED->setdir_gpio("out");
+		//blinkLED->setval_gpio("0");
+        blinkLED = "16";
+        system("gpio mode " + blinkLED + " out");
+        system("gpio write " + blinkLED + " 0");		
+        blinkLEDoutState = false;
 		
 		//netLED  = new GPIO("15");
 		//netLED->export_gpio();
 		//netLED->setdir_gpio("out");
 		//netLED->setval_gpio("0");
-		//netLEDoutState = false;
-        system("gpio mode 15 out");
-        system("gpio write 15 0");
+        netLED = "15";
+        system("gpio mode " + netLED + " out");
+        system("gpio write " + netLED + " 0");
+		netLEDoutState = false;
+        
+        
+        
+
 	}
 	
     nSoundPlayers = 10;
@@ -84,7 +92,7 @@ void ofApp::setup(){
 		// Sound output setup
         // ToDo: change to data/tp10.wav
         //volSound.loadSound("/livestream/audio/Tp10.wav");
-		soundPlayers.at(currentSoundPlayer).load("sounds/Tp10.wav");
+		soundPlayers.at(currentSoundPlayer).loadSound("sounds/Tp10.wav");
 		volume = 0.0f;
 		soundPlayers.at(currentSoundPlayer).setVolume(volume);
 		soundPlayers.at(currentSoundPlayer).setMultiPlay(true);
@@ -170,10 +178,10 @@ void ofApp::draw() {
         if (debugTest != NO_GPIO) {
             // Blink the LED
             if (blinkLEDoutState) {
-                blinkLED->setval_gpio("0");
+                system("gpio write " + blinkLED + " 0");
                 blinkLEDoutState = false;
             } else {
-                blinkLED->setval_gpio("1");
+                system("gpio write " + blinkLED + " 1");
                 blinkLEDoutState = true;
             }
         }            
@@ -358,13 +366,13 @@ void ofApp::draw() {
 							//blinkLED->setval_gpio("1");
 							//blinkLEDoutState = true;
 							//netLED->setval_gpio("1");
-                            system("gpio write 15 1");
+                            system("gpio write " + netLED + " 1");
 							netLEDoutState = true;
 						} else {							
 							//blinkLED->setval_gpio("0");
 							//blinkLEDoutState = false;
 							//netLED->setval_gpio("0");
-                            system("gpio write 15 0");
+                            system("gpio write " + netLED + " 0");
 							netLEDoutState = false;
 						}
 					} else if(memcmp( header->typeTag, LivestreamNetwork::PLAY_NOTE, 
@@ -620,19 +628,21 @@ void ofApp::exit(){
 	cout << "EXIT" << endl;
     for (int j=1; j<nSoundPlayers; j++) {
         if (soundPlayers.at(j).isLoaded()) {
-            soundPlayers.at(j).unload();
+            soundPlayers.at(j).unloadSound();
         }
     }
 	ofSoundShutdown();
 	if (debugTest != NO_GPIO) {
-		blinkLED->setval_gpio("0");
-        blinkLED->unexport_gpio();
-        free(blinkLED);
-        blinkLED = NULL;
-		netLED->setval_gpio("0");
-        netLED->unexport_gpio();
-        free(netLED);
-        netLED = NULL;
+        system("gpio write " + blinkLED + " 0");
+        system("gpio write " + netLED + " 0");
+		//blinkLED->setval_gpio("0");
+        //blinkLED->unexport_gpio();
+        //free(blinkLED);
+        //blinkLED = NULL;
+		//netLED->setval_gpio("0");
+        //netLED->unexport_gpio();
+        //free(netLED);
+        //netLED = NULL;
 	}
     myLidarLite.stop();
 }

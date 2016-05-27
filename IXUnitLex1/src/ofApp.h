@@ -78,8 +78,12 @@ class ofApp : public ofBaseApp{
 		bool blinkLEDoutState;
 		bool netLEDoutState;
 		
-		GPIO* blinkLED;
-		GPIO* netLED;
+		//GPIO* blinkLED;
+		//GPIO* netLED;
+        
+        string blinkLED;
+        string netLED;
+        
 		
 		ThreadedLidarLite myLidarLite;
 		
