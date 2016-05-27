@@ -66,8 +66,8 @@ void ofApp::setup(){
 		//blinkLED->setdir_gpio("out");
 		//blinkLED->setval_gpio("0");
         blinkLED = "16";
-        system("gpio mode " + blinkLED + " out");
-        system("gpio write " + blinkLED + " 0");		
+        system(string("gpio mode " + blinkLED + " out").c_str());
+        system(string("gpio write " + blinkLED + " 0").c_str());		
         blinkLEDoutState = false;
 		
 		//netLED  = new GPIO("15");
