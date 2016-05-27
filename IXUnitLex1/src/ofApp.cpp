@@ -144,10 +144,10 @@ void ofApp::setup(){
      
 	ofstream mFile;
 	mFile.open(logFileName.c_str(), ios::out | ios::app);
-	mFile << logStringStream << endl;
+	mFile << logStringStream.str() << endl;
 	mFile.close();
 	
-	cout << logStringStream << endl;
+	cout << logStringStream.str() << endl;
             
     // Start the LidarLite thread
     myLidarLite.start();
