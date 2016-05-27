@@ -171,7 +171,7 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	ofSleepMillis(5);
+	//ofSleepMillis(5);
 
 	ofBackgroundGradient(ofColor::white, ofColor::gray);
 	
