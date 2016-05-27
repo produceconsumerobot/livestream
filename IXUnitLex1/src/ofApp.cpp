@@ -348,7 +348,8 @@ void ofApp::draw() {
 						// Get the LED data
 						LivestreamNetwork::Packet_SET_LED_V1* inPacket = (LivestreamNetwork::Packet_SET_LED_V1 *) &udpMessage;
                         
-                        ofLog(OF_LOG_VERBOSE) << ipAddress << " >> " << ofToString(header->typeTag) << " (" << inPacket->state << ")" << endl;  
+                        string typeTag(header->typeTag);
+                        ofLog(OF_LOG_VERBOSE) << ipAddress << " >> " << typeTag << " (" << inPacket->state << ")" << endl;  
                         
 						// Set the LED outputs
 						if (inPacket->state) {
