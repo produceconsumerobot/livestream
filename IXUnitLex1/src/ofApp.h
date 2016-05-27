@@ -93,7 +93,4 @@ class ofApp : public ofBaseApp{
 		static const int NO_TEMP = 2;
 		static const int NO_GPIO = 3;
 		static const int NO_SOUND = 4;
-        
-        static const int RED_LED = 16;
-        static const int GREEN_LED = 15;
 };

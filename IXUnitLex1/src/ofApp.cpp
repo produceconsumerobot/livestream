@@ -629,8 +629,9 @@ void ofApp::exit(){
     }
 	ofSoundShutdown();
 	if (debugTest != NO_GPIO) {
-        string out = system(string("gpio write " + blinkLED + " 0").c_str());
-        string out = system(string("gpio write " + netLED + " 0").c_str());
+        string out;
+        out = system(string("gpio write " + blinkLED + " 0").c_str());
+        out = system(string("gpio write " + netLED + " 0").c_str());
 		//blinkLED->setval_gpio("0");
         //blinkLED->unexport_gpio();
         //free(blinkLED);
