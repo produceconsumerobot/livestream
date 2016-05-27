@@ -67,12 +67,13 @@ void ofApp::setup(){
 		blinkLED->setval_gpio("0");
 		blinkLEDoutState = false;
 		
-		netLED  = new GPIO("15");
-        //netLED->setup("15");
-		netLED->export_gpio();
-		netLED->setdir_gpio("out");
-		netLED->setval_gpio("0");
-		netLEDoutState = false;
+		//netLED  = new GPIO("15");
+		//netLED->export_gpio();
+		//netLED->setdir_gpio("out");
+		//netLED->setval_gpio("0");
+		//netLEDoutState = false;
+        system("gpio mode 15 out");
+        system("gpio write 15 0");
 	}
 	
     nSoundPlayers = 10;
@@ -356,12 +357,14 @@ void ofApp::draw() {
 							// Blink the LED
 							//blinkLED->setval_gpio("1");
 							//blinkLEDoutState = true;
-							netLED->setval_gpio("1");
+							//netLED->setval_gpio("1");
+                            system("gpio write 15 1");
 							netLEDoutState = true;
 						} else {							
 							//blinkLED->setval_gpio("0");
 							//blinkLEDoutState = false;
-							netLED->setval_gpio("0");
+							//netLED->setval_gpio("0");
+                            system("gpio write 15 0");
 							netLEDoutState = false;
 						}
 					} else if(memcmp( header->typeTag, LivestreamNetwork::PLAY_NOTE, 
@@ -378,12 +381,17 @@ void ofApp::draw() {
                         currentSoundPlayer = (currentSoundPlayer + 1) % nSoundPlayers;
                         
                         // Play the note
-                        string filePath(inPacket->filePath);
-                        soundPlayers.at(currentSoundPlayer).load(filePath);
-                        soundPlayers.at(currentSoundPlayer).setMultiPlay(true);
-						soundPlayers.at(currentSoundPlayer).play();
-						soundPlayers.at(currentSoundPlayer).setVolume(volume);
+                        //string filePath(inPacket->filePath);
+						soundPlayers.at(0).play();
+						soundPlayers.at(0).setVolume(volume);
 						ofSoundSetVolume(volume);
+                        
+                        //string filePath(inPacket->filePath);
+                        //soundPlayers.at(currentSoundPlayer).load(filePath);
+                        //soundPlayers.at(currentSoundPlayer).setMultiPlay(true);
+						//soundPlayers.at(currentSoundPlayer).play();
+						//soundPlayers.at(currentSoundPlayer).setVolume(volume);
+						//ofSoundSetVolume(volume);
 					}
 				}
 			} //ipAddress.compare(maestroIpAddress) == 0

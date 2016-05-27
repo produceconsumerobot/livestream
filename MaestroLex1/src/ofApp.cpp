@@ -51,7 +51,7 @@ void ofApp::setup(){
 	//defaultSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "/livestream/data/"));
 	defaultSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "C:\\pub\\LocalDev\\Sean\\of_v0.9.3_vs_release\\of_v0.9.3_vs_release\\apps\\livestream\\MaestroLex1\\bin\\data\\data\\"));
 	//defaultSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/livestream/audio/"));
-	defaultSettingsPanel.add(soundFilesLocation.setup("soundLoc", "audio/"));
+	defaultSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/home/pi/openFrameworks/apps/livestream/IXUnitLex1/bin/data/audio/"));
 	defaultSettingsPanel.add(volumeMin.setup("volMin", 0, 0, 1));
 	defaultSettingsPanel.add(volumeMax.setup("volMax", 1, 0, 1));
 	defaultSettingsPanel.add(waterDataReadInterval.setup("dataReadInterval", 3000, 1, 60000));
@@ -64,7 +64,7 @@ void ofApp::setup(){
 	defaultSettingsPanel.add(maxDistSamplesToSmooth.setup("maxDistSamplesToSmooth", 1, 0, 60));
 	defaultSettingsPanel.add(soundOn.setup("soundOn", true));
 	// Load settings from file
-	defaultSettingsPanel.loadFromFile("defaultSettings.xml");
+	//defaultSettingsPanel.loadFromFile("defaultSettings.xml");
 	
 	interXUnit.resize(9);
 	int ixID;
