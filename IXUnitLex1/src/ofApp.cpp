@@ -6,7 +6,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    softwareVersion = "1.0"
+    softwareVersion = "1.0";
 	slaveMode = true;  // Slave mode follows UDP commands to run
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	
