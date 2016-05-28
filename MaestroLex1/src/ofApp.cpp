@@ -375,9 +375,9 @@ void ofApp::keyReleased(int key){
 		typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 		ofLog(OF_LOG_VERBOSE) << typeTag << " (" << maestroIpAddress.getParameter().toString() << ") >> " << "broadcast" << endl;
 	}
-	else if ((char) key == '!') {
-		udpSendTimersOn = !udpSendTimersOn;
-	}
+	//else if ((char) key == '!') {
+	//	udpSendTimersOn = !udpSendTimersOn;
+	//}
 
 
 }

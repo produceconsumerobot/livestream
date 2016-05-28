@@ -457,8 +457,13 @@ int LivestreamInteractionUnit::openWaterDataFile() {
 }
 
 int LivestreamInteractionUnit::closeWaterDataFile() {
-	waterDataFile->close();
-	free(waterDataFile);
-	waterDataFile = NULL;
-	return 0;
+	if (waterDataFile != NULL && waterDataFile->is_open()) {
+		waterDataFile->close();
+		free(waterDataFile);
+		waterDataFile = NULL;
+		return 0;
+	}
+	else {
+		return -1;
+	}
 }
