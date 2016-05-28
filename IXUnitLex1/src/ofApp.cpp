@@ -6,6 +6,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    softwareVersion = "1.0"
 	slaveMode = true;  // Slave mode follows UDP commands to run
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	
@@ -141,6 +142,7 @@ void ofApp::setup(){
 		logStringStream << ", LH, " << myLidarLite.hardwareVersion();
 		logStringStream << " , LV, " << myLidarLite.softwareVersion();
 		logStringStream << ", LC, " << lidarConfig;
+        logStringStream << ", SV, " << softwareVersion;
 	}
      
 	ofstream mFile;

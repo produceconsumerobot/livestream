@@ -88,6 +88,7 @@ class ofApp : public ofBaseApp{
 		float volume;
 		
 		int debugTest;
+        string softwareVersion;
 		
 		static const int NO_LIDAR = 1;
 		static const int NO_TEMP = 2;
