@@ -76,7 +76,7 @@ class ofApp : public ofBaseApp{
 		ofxLabel currentTemp;
 		ofxLabel lowTemp;
 		ofxLabel highTemp;
-		ofxFloatField frameRate;
+		ofxIntField frameRate;
 
 		int panelWidth;
 		int panelRowHeight;
