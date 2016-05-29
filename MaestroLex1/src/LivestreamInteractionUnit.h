@@ -27,7 +27,7 @@ public:
 	ofxTextField lastPong;				// Last received pong
 	ofxIntSlider rawDistance;	// Smoothed distance weighted by the signal strength
 	ofxFloatSlider guiSmoothedDistance;	// Smoothed distance weighted by the signal strength
-	ofxFloatField guiSignalStrength;		// Signal strength of distance sensor
+	ofxFloatSlider guiSignalStrength;		// Signal strength of distance sensor
 	ofxFloatSlider guiTemperature;		// Most recent temperature measurement;
 	ofxFloatSlider guiLowTemperature;	// Lowest recorded temperature
 	ofxFloatSlider guiHighTemperature;	// Highest recorded temperature
