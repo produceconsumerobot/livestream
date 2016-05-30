@@ -7,11 +7,11 @@
 void ofApp::setup(){
 	string baseIpAddress = "192.168.1.";		// Jacobson Park
 	maestroIpAddress = baseIpAddress + "201"; // Jacobson Park
-	//logDir = "/livestream/logs/";
+	logDir = "/livestream/logs/";
 
 	//string baseIpAddress = "192.168.0.";		// Sean's network
 	//maestroIpAddress = baseIpAddress + "103";	// Sean's computer
-	logDir = ofToDataPath("");
+	//logDir = ofToDataPath("");
 
 	string broadcastIpAddress = baseIpAddress + "255";
 
@@ -237,24 +237,33 @@ void ofApp::draw(){
 				// Get all temps
 				interXUnit.at(j).getAllTemps();
 				// Get Maestros CPU temp
+
+				if (j == 1) {
 #ifdef TARGET_LINUX
-				FILE *temperatureFile;
-				double T;
-				temperatureFile = fopen("/sys/class/thermal/thermal_zone0/temp", "r");
-				if (temperatureFile == NULL) {
-					cout << "Failed to read temp file\n";
-				}
-				else {
-					fscanf(temperatureFile, "%lf", &T);
-					T /= 1000;
-					fclose(temperatureFile);
-				}
-				setTemperature((int)T);
+					FILE *temperatureFile;
+					double T;
+					temperatureFile = fopen("/sys/class/thermal/thermal_zone0/temp", "r");
+					if (temperatureFile == NULL) {
+						cout << "Failed to read temp file\n";
+					}
+					else {
+						fscanf(temperatureFile, "%lf", &T);
+						T /= 1000;
+						fclose(temperatureFile);
+					}
+					setTemperature((int)T);
 #endif
+					ofstream mFile;
+					mFile.open(logDir + "livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log", ios::out | ios::app);
+					ostringstream  logStringStream;
+					logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,") << "TN," << "M" << ",C," << temperature << endl;
+					//logger->log(logStringStream.str());
+					mFile << logStringStream.str();
+					mFile.close();
 
-
-				// Set the logger path to a new file is created every month
-				logger.setPath(logDir + "livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log");
+					// Set the logger path to a new file is created every month
+					logger.setPath(logDir + "livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log");
+				}
 
 				interXUnit.at(j).heartbeatTime = ofGetElapsedTimeMillis();
 			}
