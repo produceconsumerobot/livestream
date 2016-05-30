@@ -44,14 +44,18 @@ void ofApp::setup(){
 	ofxGuiSetDefaultHeight(10);
 	ofxGuiSetDefaultWidth(panelWidth);
 
+	temperature = -100;
+	lowTemperature = -100;
+	highTemperature = -100;
+
 	maestroPanel.setup("Maestro", "maestroSettings.xml", 0, 0);
 	maestroPanel.add(maestroIpAddress.setup("IP", maestroIpAddress));
 	maestroPanel.add(softwareVersion.setup("softwareVersion", "1.0"));
 	maestroPanel.add(currentDateTime.setup("current date", ofGetTimestampString("%Y-%m-%d %H:%M:%S")));
 	maestroPanel.add(lastStartupDateTime.setup("startup date", ofGetTimestampString("%Y-%m-%d %H:%M:%S")));
-	maestroPanel.add(currentTemp.setup(string("0.0C")));
-	maestroPanel.add(lowTemp.setup(string("0.0C")));
-	maestroPanel.add(highTemp.setup(string("0.0C")));
+	maestroPanel.add(guiTemperature.setup("Temperature", -60, -60, 100));						// Celcius
+	maestroPanel.add(guiLowTemperature.setup("LowTemperature", -60, -60, 100));					// Celcius
+	maestroPanel.add(guiHighTemperature.setup("HighTemperature", -60, -60, 100));					// Celcius
 	maestroPanel.add(frameRate.setup("frameRate", 0, 0, 1000));
 	maestroPanel.add(soundOn.setup("soundOn", true));
 	//maestroPanel.add(loggingOn.setup("loggingOn", false));
@@ -232,6 +236,23 @@ void ofApp::draw(){
 				interXUnit.at(j).setMaestroAddress(maestroIpAddress);
 				// Get all temps
 				interXUnit.at(j).getAllTemps();
+				// Get Maestros CPU temp
+#ifdef TARGET_LINUX
+				FILE *temperatureFile;
+				double T;
+				temperatureFile = fopen("/sys/class/thermal/thermal_zone0/temp", "r");
+				if (temperatureFile == NULL) {
+					cout << "Failed to read temp file\n";
+				}
+				else {
+					fscanf(temperatureFile, "%lf", &T);
+					T /= 1000;
+					fclose(temperatureFile);
+				}
+				setTemperature((int)T);
+#endif
+
+
 				// Set the logger path to a new file is created every month
 				logger.setPath(logDir + "livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log");
 
@@ -250,6 +271,29 @@ void ofApp::draw(){
 	maestroPanel.draw();
 
 	frameRate = (int) ofGetFrameRate();
+}
+
+// ---------------------------------------------------------------------------- //
+// setTemperature
+// ---------------------------------------------------------------------------- //
+void ofApp::setTemperature(int temp) {
+	temperature = temp;
+	guiTemperature = temperature;
+
+	if (lowTemperature == -100)
+	{
+		lowTemperature = temperature;
+	}
+	if (highTemperature == -100)
+	{
+		highTemperature = temperature;
+	}
+
+	lowTemperature = min(temperature, lowTemperature);
+	guiLowTemperature = lowTemperature;
+
+	highTemperature = max(temperature, highTemperature);
+	guiHighTemperature = highTemperature;
 }
 
 //--------------------------------------------------------------

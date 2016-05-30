@@ -23,6 +23,7 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);		
 		void loggingOnChanged(bool & _loggingOn);
+		void setTemperature(int temp);
 
 		ofxUDPManager udpBroadcaster;
 		ofxUDPManager udpReceiver;
@@ -74,12 +75,16 @@ class ofApp : public ofBaseApp{
 		ofxLabel softwareVersion;
 		ofxLabel currentDateTime;
 		ofxLabel lastStartupDateTime;
-		ofxLabel currentTemp;
-		ofxLabel lowTemp;
-		ofxLabel highTemp;
+		ofxFloatSlider guiTemperature;		// Most recent temperature measurement;
+		ofxFloatSlider guiLowTemperature;	// Lowest recorded temperature
+		ofxFloatSlider guiHighTemperature;	// Highest recorded temperature
 		ofxIntField frameRate;
 		ofxToggle soundOn;
 		ofxToggle loggingOn;
+
+		int temperature;			// Most recent temperature measurement;
+		int lowTemperature;			// Lowest recorded temperature
+		int highTemperature;		// Highest recorded temperature
 
 		int panelWidth;
 		int panelRowHeight;
