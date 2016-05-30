@@ -1,3 +1,4 @@
 ofxNetwork
 ofxGui
 ofxInputField
+ofxThreadedLogger
