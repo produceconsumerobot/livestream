@@ -8,6 +8,7 @@
 #include "ofxInputField.h"
 #include "Range.h"
 #include "LivestreamNetwork.h"
+#include "ofxThreadedLogger.h"
 
 using namespace std;
 
@@ -60,6 +61,7 @@ public:
 	uint16_t packetProtocolVersion;
 
 	bool ledState;
+	bool loggingOn;
 
 
 	//Range volumeRange;			// Min/Max note play volume		
@@ -112,7 +114,7 @@ public:
 	// GUI
 	ofxPanel		ixPanel;
 
-
+	LoggerThread * logger;
 
 private:
 	int distSamplesToSmooth;	// 

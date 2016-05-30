@@ -8,7 +8,7 @@
 void ofApp::setup(){
     softwareVersion = "1.0";
 	slaveMode = true;  // Slave mode follows UDP commands to run
-	ofSetLogLevel(OF_LOG_VERBOSE);
+	ofSetLogLevel(OF_LOG_ERROR);
 	
 	// debugTest used to isolate parts of code
 	debugTest = 0;
@@ -132,17 +132,17 @@ void ofApp::setup(){
 	
 
 	// Write initialization to the log
-    string aligner = "";
-    if (ofGetMonth() < 10) aligner = aligner + "0";
+    //string aligner = "";
+    //if (ofGetMonth() < 10) aligner = aligner + "0";
 	//string logFileName = "/livestream/logs/livestream_" + hostname + "_" + aligner + ofToString(ofGetMonth()) + ".log";
-    string logFileName = "/logs/livestream/livestream_" + hostname + "_" + aligner + ofToString(ofGetMonth()) + ".log";
+    string logFileName = "/logs/livestream/livestream_" + hostname + "_" + ofGetTimestampString("%m") + ".log";
     ostringstream  logStringStream;
-    logStringStream << getDateTimeString() << ",INITILIZATION";
+    logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S") << ",INITILIZATION";
     if (debugTest != NO_LIDAR) {
-		logStringStream << ", LH, " << myLidarLite.hardwareVersion();
-		logStringStream << " , LV, " << myLidarLite.softwareVersion();
-		logStringStream << ", LC, " << lidarConfig;
-        logStringStream << ", SV, " << softwareVersion;
+		logStringStream << ",LH," << myLidarLite.hardwareVersion();
+		logStringStream << ",LV," << myLidarLite.softwareVersion();
+		logStringStream << ",LC," << lidarConfig;
+        logStringStream << ",SV" << softwareVersion;
 	}
      
 	ofstream mFile;

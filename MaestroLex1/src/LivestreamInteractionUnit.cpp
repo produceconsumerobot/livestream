@@ -1,6 +1,6 @@
 
 #include "LivestreamInteractionUnit.h"
-#include "logger.h"
+#include "ofxThreadedLogger.h"
 
 // ---------------------------------------------------------------------------- //
 // Constructor
@@ -67,41 +67,16 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 	nPacketsSent = 0;
 	packetProtocolVersion = 1;
 
-	//id = -1;
-	//dataName = "none";
-	//sensorLocation = "none";
-	//ipAddress = "0.0.0.0";
-	//volume = 0.f;						// 0 to 1
-	//volumeMin = 0.f;
-	//volumeMax = 1.f;
 	sustainPedal = true;
-	//waterDataMin = 0;
-	//waterDataMax = 1;
-	//noteMin = 1;
-	//noteMax = 2;
-	//waterDataReadInterval = 3000;		// ms
 	waterDataReadTime = ofGetElapsedTimeMillis();
-	//notePlayInterval = 1000;			// ms
 	notePlayTime = ofGetElapsedTimeMillis();
-	//distanceReadInterval = 1000/60;		// ms
 	distanceReadTime = ofGetElapsedTimeMillis();
 	rawDistance = 0;					// cm
 	smoothedDistance = 0;				// cm
-										//distanceMin = 30;
-										//distanceMax = 20 * 30;
-										//distanceRange = Range(30, 20*30);	// cm
-										//distanceSignalStrength = 0;			// 0 to 255
-										//signalStrengthMin = 20;
-										//signalStrengthMax = 80;
-										//signalStrengthRange = Range(20, 80);	// 0 to 255
-										//minSignalWeight = 0.05f;			// 0 to 1
-										//noiseDistance = 20;					// cm
 	distSamplesToSmooth = 0;			// Start at zero and increment to maxDistSamplesToSmooth
-										//maxDistSamplesToSmooth = 1;		
 	temperature = -100;
 	lowTemperature = -100;
 	highTemperature = -100;
-	//heartbeat = 1;
 	heartbeatInterval = 1000;			// ms
 	heartbeatTime = ofGetElapsedTimeMillis();
 	eyeSafetyOn = false;
@@ -110,15 +85,25 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 	packetProtocolVersion = 1;
 	waterDataDir = _waterDataDir;
 	openWaterDataFile();
-	//waterDataDir = "/livestream/data/";
 
 	ledState = false;
+	loggingOn = false;
 
 	// Setup the UDP 
 	udpSender.Create();
 	udpSender.SetEnableBroadcast(false);
 	udpSender.Connect(ipAddress.getParameter().toString().c_str(), 11999);
 	udpSender.SetNonBlocking(true);
+
+	if (loggingOn) {
+		// Log to file
+		ostringstream  logStringStream;
+		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "IXUnit," << id << ","
+			<< dataName.getParameter().toString() << "," 
+			<< sensorLocation.getParameter().toString() << ',' 
+			<< ipAddress.getParameter().toString() << endl;
+		logger->log(logStringStream.str());
+	}
 }
 
 // ---------------------------------------------------------------------------- //
@@ -151,6 +136,14 @@ void LivestreamInteractionUnit::setDistance(int distance, float signalStrength) 
 	// Calculate the smoothed PWM value
 	smoothedDistance = ((float)rawDistance)*newWeight + smoothedDistance*(1 - newWeight);
 	guiSmoothedDistance = smoothedDistance;
+
+	if (loggingOn) {
+		// Log to file
+		ostringstream  logStringStream;
+		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "LD," << id << ","
+			<< distance << "," << (int) (signalStrength*255) << ',' << (int) smoothedDistance << endl;
+		logger->log(logStringStream.str());
+	}
 }
 // ---------------------------------------------------------------------------- //
 // calculateVolume
@@ -261,18 +254,41 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 				sizeof(outPacket.hdr.typeTag[0]));
 			ofLog(OF_LOG_VERBOSE) << typeTag << ">>" << ipAddress.getParameter().toString() << endl;	
 
+			if (loggingOn) {
+				// Log to file
+				ostringstream  logStringStream;
+				logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "SV," << id << "," << outPacket.volume << endl;
+				logger->log(logStringStream.str());
+			}
+
 		} else if (memcmp( header->typeTag, LivestreamNetwork::TEMPERATURE, 
 			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) 
 		{
 			LivestreamNetwork::Packet_TEMPERATURE_V1* inPacket = (LivestreamNetwork::Packet_TEMPERATURE_V1 *) udpMessage;
 			ofLog(OF_LOG_VERBOSE) << ipAddress.getParameter().toString() << " >> " << typeTag 
 				<< inPacket->sensorDesignator << ", " << inPacket->temperature << endl;
-			setTemperature(inPacket->temperature);
+			if (inPacket->sensorDesignator == 'C') {
+				// raspi cpu temperature
+				setTemperature(inPacket->temperature);
+
+				if (loggingOn) {
+					// Log to file
+					ostringstream  logStringStream;
+					logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "TN," << id << ",C," << temperature << endl;
+					logger->log(logStringStream.str());
+				}
+			}
 		} else if (memcmp(header->typeTag, LivestreamNetwork::PONG,
 			sizeof header->typeTag / sizeof header->typeTag[0]) == 0) 
 		{
-			lastPong = LoggerThread::dateTimeString();
+			lastPong = ofGetTimestampString("%Y-%m-%d %H:%M:%S");
 			ofLog(OF_LOG_VERBOSE) << ipAddress.getParameter().toString() << " >> " << typeTag << endl;
+			if (loggingOn) {
+				// Log to file
+				ostringstream  logStringStream;
+				logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "PO," << id << endl;
+				logger->log(logStringStream.str());
+			}
 		}
 }
 
@@ -301,6 +317,13 @@ void LivestreamInteractionUnit::playNote(string dirPath) {
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 	ofLog(OF_LOG_VERBOSE) << typeTag << " (" << filePath << ")" << " >> " << ipAddress.getParameter().toString() << endl;
+
+	if (loggingOn) {
+		// Log to file
+		ostringstream  logStringStream;
+		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "PN," << id << "," << filePath << endl;
+		logger->log(logStringStream.str());
+	}
 }
 
 void LivestreamInteractionUnit::ping() {
@@ -316,6 +339,13 @@ void LivestreamInteractionUnit::ping() {
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << ipAddress.getParameter().toString() << endl;
+
+	if (loggingOn) {
+		// Log to file
+		ostringstream  logStringStream;
+		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "PI," << id << endl;
+		logger->log(logStringStream.str());
+	}
 }
 
 
@@ -334,6 +364,14 @@ void LivestreamInteractionUnit::getDistance() {
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << ipAddress.getParameter().toString() << endl;
+
+	if (loggingOn) {
+		// Log to file
+		ostringstream  logStringStream;
+		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << LivestreamNetwork::GET_DISTANCE << "," << id << endl;
+		//logger->log("happy\n");
+		logger->log(logStringStream.str());
+	}
 	
 	//ofLog(OF_LOG_VERBOSE)
 	//<< "nPacketsSent, " << outPacket.hdr.packetCount
@@ -361,6 +399,12 @@ void LivestreamInteractionUnit::setLed() {
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << ipAddress.getParameter().toString() << endl;
 
+	if (loggingOn) {
+		// Log to file
+		ostringstream  logStringStream;
+		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << LivestreamNetwork::SET_LED << "," << id << "," << ledState << endl;
+		logger->log(logStringStream.str());
+	}
 }
 
 void LivestreamInteractionUnit::getAllTemps() {
@@ -378,6 +422,13 @@ void LivestreamInteractionUnit::getAllTemps() {
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 	ofLog(OF_LOG_VERBOSE) << typeTag << " >> " << ipAddress.getParameter().toString() << endl;
+
+	if (loggingOn) {
+		// Log to file
+		ostringstream  logStringStream;
+		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << LivestreamNetwork::GET_ALL_TEMPS << "," << id << endl;
+		logger->log(logStringStream.str());
+	}
 }
 
 void LivestreamInteractionUnit::setMaestroAddress(string maestroIpAddress) {
@@ -396,6 +447,13 @@ void LivestreamInteractionUnit::setMaestroAddress(string maestroIpAddress) {
 	// Convert the typeTage char[2] to a string for logging
 	string typeTag = string(outPacket.hdr.typeTag, outPacket.hdr.typeTag + sizeof(outPacket.hdr.typeTag) / sizeof(outPacket.hdr.typeTag[0]));
 	ofLog(OF_LOG_VERBOSE) << typeTag << " (" << maestroIpAddress << ") >> " << ipAddress.getParameter().toString() << endl;
+
+	if (loggingOn) {
+		// Log to file
+		ostringstream  logStringStream;
+		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << LivestreamNetwork::SET_MAESTRO_ADDRESS << "," << id << "," << maestroIpAddress << endl;
+		logger->log(logStringStream.str());
+	}
 }
 
 //--------------------------------------------------------------
@@ -426,6 +484,13 @@ int LivestreamInteractionUnit::readWaterData() {
 		//cout << ofp.getCurrentExeDir() << endl;
 		//cout << ofp.getCurrentExePath() << endl;
 		//cout << ofToDataPath("", true) << endl;
+
+		if (loggingOn) {
+			// Log to file
+			ostringstream  logStringStream;
+			logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "WD," << id << "," << waterData << endl;
+			logger->log(logStringStream.str());
+		}
 
 
 		return 0;

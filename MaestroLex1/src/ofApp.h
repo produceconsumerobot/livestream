@@ -22,6 +22,7 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);		
+		void loggingOnChanged(bool & _loggingOn);
 
 		ofxUDPManager udpBroadcaster;
 		ofxUDPManager udpReceiver;
@@ -67,21 +68,25 @@ class ofApp : public ofBaseApp{
 		ofxFloatField minSignalWeight;
 		ofxIntField noiseDistance;
 		ofxIntField maxDistSamplesToSmooth;
-		ofxToggle soundOn;
 
 		ofxPanel maestroPanel;
 		ofxTextField maestroIpAddress;
+		ofxLabel softwareVersion;
 		ofxLabel currentDateTime;
 		ofxLabel lastStartupDateTime;
 		ofxLabel currentTemp;
 		ofxLabel lowTemp;
 		ofxLabel highTemp;
 		ofxIntField frameRate;
+		ofxToggle soundOn;
+		ofxToggle loggingOn;
 
 		int panelWidth;
 		int panelRowHeight;
 
 		bool udpSendTimersOn;
 
+		LoggerThread logger;
+		string logDir;
 };
 

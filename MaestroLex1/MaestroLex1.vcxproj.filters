@@ -52,8 +52,8 @@
     <ClCompile Include="..\..\..\addons\ofxInputField\src\ofxInputField.cpp">
       <Filter>addons\ofxInputField\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\LivestreamUtils\src\logger.cpp">
-      <Filter>LivestreamUtils\src</Filter>
+    <ClCompile Include="..\..\..\addons\ofxThreadedLogger\src\ofxThreadedLogger.cpp">
+      <Filter>addons\ofxThreadedLogger\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +86,12 @@
     </Filter>
     <Filter Include="addons\ofxInputField\src">
       <UniqueIdentifier>{63e96b3b-959b-4db9-afed-4d25fd69a418}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxThreadedLogger">
+      <UniqueIdentifier>{0dffcc94-fc9d-40cf-9a1e-785b9f961fb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxThreadedLogger\src">
+      <UniqueIdentifier>{78036857-18bf-49d8-9dcd-08f4421b23bb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -152,8 +158,8 @@
     <ClInclude Include="..\..\..\addons\ofxInputField\src\ofxInputField.h">
       <Filter>addons\ofxInputField\src</Filter>
     </ClInclude>
-    <ClInclude Include="..\LivestreamUtils\src\logger.h">
-      <Filter>LivestreamUtils\src</Filter>
+    <ClInclude Include="..\..\..\addons\ofxThreadedLogger\src\ofxThreadedLogger.h">
+      <Filter>addons\ofxThreadedLogger\src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

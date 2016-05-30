@@ -58,7 +58,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\LivestreamUtils\src;%(AdditionalIncludeDirectories);..\..\..\addons\ofxNetwork\libs;..\..\..\addons\ofxNetwork\src;src;..\..\..\addons\ofxInputField\src;..\..\..\addons\ofxGui\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\LivestreamUtils\src;%(AdditionalIncludeDirectories);..\..\..\addons\ofxNetwork\libs;..\..\..\addons\ofxNetwork\src;src;..\..\..\addons\ofxInputField\src;..\..\..\addons\ofxThreadedLogger\src;..\..\..\addons\ofxGui\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
@@ -75,7 +75,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>..\LivestreamUtils\src;%(AdditionalIncludeDirectories);..\..\..\addons\ofxNetwork\libs;..\..\..\addons\ofxNetwork\src;src;..\..\..\addons\ofxInputField\src;..\..\..\addons\ofxGui\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\LivestreamUtils\src;%(AdditionalIncludeDirectories);..\..\..\addons\ofxNetwork\libs;..\..\..\addons\ofxNetwork\src;src;..\..\..\addons\ofxInputField\src;..\..\..\addons\ofxThreadedLogger\src;..\..\..\addons\ofxGui\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
@@ -99,8 +99,8 @@
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp" />
     <ClCompile Include="..\..\..\addons\ofxInputField\src\ofxInputField.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxThreadedLogger\src\ofxThreadedLogger.cpp" />
     <ClCompile Include="..\LivestreamUtils\src\LivestreamNetwork.cpp" />
-    <ClCompile Include="..\LivestreamUtils\src\logger.cpp" />
     <ClCompile Include="src\LivestreamInteractionUnit.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
@@ -120,8 +120,8 @@
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h" />
     <ClInclude Include="..\..\..\addons\ofxInputField\src\ofxInputField.h" />
+    <ClInclude Include="..\..\..\addons\ofxThreadedLogger\src\ofxThreadedLogger.h" />
     <ClInclude Include="..\LivestreamUtils\src\LivestreamNetwork.h" />
-    <ClInclude Include="..\LivestreamUtils\src\logger.h" />
     <ClInclude Include="..\LivestreamUtils\src\Range.h" />
     <ClInclude Include="src\LivestreamInteractionUnit.h" />
     <ClInclude Include="src\LivestreamSettings.h" />

@@ -1,6 +1,5 @@
 #include "ofApp.h"
-#include "logger.h"
-//#include "LivestreamNetwork.h"
+#include "ofxThreadedLogger.h"
 
 #define RECONNECT_TIME 400
 
@@ -8,14 +7,20 @@
 void ofApp::setup(){
 	string baseIpAddress = "192.168.1.";		// Jacobson Park
 	maestroIpAddress = baseIpAddress + "201"; // Jacobson Park
+	//logDir = "/livestream/logs/";
+
 	//string baseIpAddress = "192.168.0.";		// Sean's network
 	//maestroIpAddress = baseIpAddress + "103";	// Sean's computer
+	logDir = ofToDataPath("");
+
 	string broadcastIpAddress = baseIpAddress + "255";
 
 	// we don't want to be running to fast
 	ofSetVerticalSync(false);
 	//ofSetFrameRate(60);
 	ofSetLogLevel(OF_LOG_ERROR);
+
+	loggingOn.addListener(this, &ofApp::loggingOnChanged);
 
     //create the socket and set to send to 127.0.0.1:11999
 	udpBroadcaster.Create();
@@ -41,14 +46,18 @@ void ofApp::setup(){
 
 	maestroPanel.setup("Maestro", "maestroSettings.xml", 0, 0);
 	maestroPanel.add(maestroIpAddress.setup("IP", maestroIpAddress));
-	maestroPanel.add(currentDateTime.setup("current date", LoggerThread::dateTimeString()));
-	maestroPanel.add(lastStartupDateTime.setup("startup date", LoggerThread::dateTimeString()));
+	maestroPanel.add(softwareVersion.setup("softwareVersion", "1.0"));
+	maestroPanel.add(currentDateTime.setup("current date", ofGetTimestampString("%Y-%m-%d %H:%M:%S")));
+	maestroPanel.add(lastStartupDateTime.setup("startup date", ofGetTimestampString("%Y-%m-%d %H:%M:%S")));
 	maestroPanel.add(currentTemp.setup(string("0.0C")));
 	maestroPanel.add(lowTemp.setup(string("0.0C")));
 	maestroPanel.add(highTemp.setup(string("0.0C")));
 	maestroPanel.add(frameRate.setup("frameRate", 0, 0, 1000));
+	maestroPanel.add(soundOn.setup("soundOn", true));
+	//maestroPanel.add(loggingOn.setup("loggingOn", false));
+	loggingOn.setup("loggingOn", true);
 	
-	defaultSettingsPanel.setup("Default Settings", "defaultSettings.xml", 0, 100);
+	defaultSettingsPanel.setup("Default Settings", "defaultSettings.xml", 0, 150);
 	defaultSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "/livestream/data/")); // Jacobson Park
 	defaultSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/livestream/audio/")); // Jacobson Park
 	//defaultSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "C:\\pub\\LocalDev\\Sean\\of_v0.9.3_vs_release\\of_v0.9.3_vs_release\\apps\\livestream\\MaestroLex1\\bin\\data\\data\\")); // Sean's network
@@ -63,9 +72,23 @@ void ofApp::setup(){
 	defaultSettingsPanel.add(minSignalWeight.setup("minSignalWeight", 0.05f, 0, 1));
 	defaultSettingsPanel.add(noiseDistance.setup("noiseDistance", 20, 0, 255));
 	defaultSettingsPanel.add(maxDistSamplesToSmooth.setup("maxDistSamplesToSmooth", 1, 0, 60));
-	defaultSettingsPanel.add(soundOn.setup("soundOn", true));
 	// Load settings from file
 	//defaultSettingsPanel.loadFromFile("defaultSettings.xml");
+
+	logger.setPath(logDir + "livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log");
+
+	if (loggingOn) {
+		// Log to file
+		ostringstream  logStringStream;
+		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "MV," << softwareVersion.getParameter().toString() << endl;
+		logger.log(logStringStream.str());
+	}
+
+	// Setup logger for each IXUnit
+	for (int j = 0; j < interXUnit.size(); j++) {
+		interXUnit.at(j).logger = &logger;
+	}
+	loggingOn = false;
 	
 	interXUnit.resize(9);
 	int ixID;
@@ -134,9 +157,9 @@ void ofApp::setup(){
 	interXUnit.at(i).noteMax = 13;
 	interXUnit.at(i).ixPanel.setPosition(panelSpacing * 4, panelRowHeight);
 
-
 	testLED = false;
 	udpSendTimersOn = true;
+	loggingOn = false;
 }
 
 //--------------------------------------------------------------
@@ -209,6 +232,8 @@ void ofApp::draw(){
 				interXUnit.at(j).setMaestroAddress(maestroIpAddress);
 				// Get all temps
 				interXUnit.at(j).getAllTemps();
+				// Set the logger path to a new file is created every month
+				logger.setPath(logDir + "livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log");
 
 				interXUnit.at(j).heartbeatTime = ofGetElapsedTimeMillis();
 			}
@@ -220,8 +245,7 @@ void ofApp::draw(){
 	}
 	
 	// Draw the run data to the screen
-
-	currentDateTime = LoggerThread::dateTimeString();
+	currentDateTime = ofGetTimestampString("%Y-%m-%d %H:%M:%S");
 	defaultSettingsPanel.draw();
 	maestroPanel.draw();
 
@@ -415,4 +439,10 @@ void ofApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
+}
+
+void ofApp::loggingOnChanged(bool & logOn) {
+	for (int j = 0; j<interXUnit.size(); j++) {
+		interXUnit.at(j).loggingOn = loggingOn;
+	}
 }
