@@ -7,11 +7,11 @@
 void ofApp::setup(){
 	string baseIpAddress = "192.168.1.";		// Jacobson Park
 	maestroIpAddress = baseIpAddress + "201"; // Jacobson Park
-	logDir = "/livestream/logs/";
+	//logDir = "/livestream/logs/";
 
 	//string baseIpAddress = "192.168.0.";		// Sean's network
 	//maestroIpAddress = baseIpAddress + "103";	// Sean's computer
-	//logDir = ofToDataPath("");
+	logDir = ofToDataPath("");
 
 	string broadcastIpAddress = baseIpAddress + "255";
 
