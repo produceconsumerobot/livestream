@@ -18,17 +18,17 @@ void ofApp::setup(){
 
 	// **** Network specific variables **** //
 
-	//string baseIpAddress = "192.168.1.";		// Jacobson Park
-	//maestroIpAddress = baseIpAddress + "201"; // Jacobson Park
+	string baseIpAddress = "192.168.1.";		// Jacobson Park
+	maestroIpAddress = baseIpAddress + "201"; // Jacobson Park
 	//logDir = "/livestream/logs/";
-	//waterDataFilesLocation.setup("dataLoc", "/livestream/data/"); // Jacobson Park
-	//soundFilesLocation.setup("soundLoc", "/livestream/audio/"); // Jacobson Park
+	waterDataFilesLocation.setup("dataLoc", "/livestream/data/"); // Jacobson Park
+	soundFilesLocation.setup("soundLoc", "/livestream/audio/"); // Jacobson Park
 																						 
-	string baseIpAddress = "192.168.0.";		// Sean's network
-	maestroIpAddress = baseIpAddress + "105";	// Sean's computer
+	//string baseIpAddress = "192.168.0.";		// Sean's network
+	//maestroIpAddress = baseIpAddress + "105";	// Sean's computer
 	logDir = ofToDataPath("");
-	waterDataFilesLocation.setup("dataLoc", ofToDataPath("") + "data\\"); // Sean's network
-	soundFilesLocation.setup("soundLoc", "/home/pi/openFrameworks/apps/livestream/IXUnitLex1/bin/data/audio/"); // Sean's network
+	//waterDataFilesLocation.setup("dataLoc", ofToDataPath("") + "data\\"); // Sean's network
+	//soundFilesLocation.setup("soundLoc", "/home/pi/openFrameworks/apps/livestream/IXUnitLex1/bin/data/audio/"); // Sean's network
 
 	// **** END Network specific variables **** //
 
