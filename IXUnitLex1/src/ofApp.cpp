@@ -133,9 +133,9 @@ void ofApp::setup(){
     ostringstream  logStringStream;
     logStringStream << "SV" << ofGetTimestampString("%Y%m%d,%H%M%S") << endl;
     if (debugTest != NO_LIDAR) {
-        logStringStream << "LH" << ofGetTimestampString("%Y%m%d,%H%M%S") << myLidarLite.hardwareVersion() << endl;
-        logStringStream << "LV" << ofGetTimestampString("%Y%m%d,%H%M%S") << myLidarLite.softwareVersion() << endl;
-        logStringStream << "LC" << ofGetTimestampString("%Y%m%d,%H%M%S") << lidarConfig << endl;
+        logStringStream << "LH," << ofGetTimestampString("%Y%m%d,%H%M%S,") << myLidarLite.hardwareVersion() << endl;
+        logStringStream << "LV," << ofGetTimestampString("%Y%m%d,%H%M%S,") << myLidarLite.softwareVersion() << endl;
+        logStringStream << "LC," << ofGetTimestampString("%Y%m%d,%H%M%S,") << lidarConfig << endl;
 	}
      
 	ofstream mFile;
