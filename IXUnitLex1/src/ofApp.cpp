@@ -131,7 +131,7 @@ void ofApp::setup(){
     string logFileName = ofToDataPath("") + hostname + "_" + ofGetTimestampString("%m") + ".log";
     //string logFileName = "/logs/livestream/livestream_" + hostname + "_" + ofGetTimestampString("%m") + ".log";
     ostringstream  logStringStream;
-    logStringStream << "SV," << ofGetTimestampString("%Y%m%d,%H%M%S",) << softwareVersion << endl;
+    logStringStream << "SV," << ofGetTimestampString("%Y%m%d,%H%M%S,") << softwareVersion << endl;
     if (debugTest != NO_LIDAR) {
         logStringStream << "LH," << ofGetTimestampString("%Y%m%d,%H%M%S,") << myLidarLite.hardwareVersion() << endl;
         logStringStream << "LV," << ofGetTimestampString("%Y%m%d,%H%M%S,") << myLidarLite.softwareVersion() << endl;
