@@ -73,10 +73,10 @@ public:
 	//int distanceReadInterval;	// Interval (ms) that the interaction distance is sampled
 	//Range distanceRange;		// Min/Max interactive distance (cm) of this unit
 
-	unsigned long long waterDataReadTime;
-	unsigned long long notePlayTime;
-	unsigned long long distanceReadTime;
-	unsigned long long heartbeatTime;
+	uint64_t waterDataReadTime;
+	uint64_t notePlayTime;
+	uint64_t distanceReadTime;
+	uint64_t heartbeatTime;
 	
 	ofxUDPManager udpSender;
 
@@ -114,7 +114,7 @@ public:
 	// GUI
 	ofxPanel		ixPanel;
 
-	LoggerThread * logger;
+	//LoggerThread * logger;
 
 private:
 	int distSamplesToSmooth;	// 

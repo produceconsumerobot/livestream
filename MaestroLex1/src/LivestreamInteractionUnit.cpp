@@ -102,7 +102,7 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 			<< dataName.getParameter().toString() << "," 
 			<< sensorLocation.getParameter().toString() << ',' 
 			<< ipAddress.getParameter().toString() << endl;
-		logger->log(logStringStream.str());
+		//logger->log(logStringStream.str());
 	}
 }
 
@@ -142,7 +142,7 @@ void LivestreamInteractionUnit::setDistance(int distance, float signalStrength) 
 		ostringstream  logStringStream;
 		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "LD," << id << ","
 			<< distance << "," << (int) (signalStrength*255) << ',' << (int) smoothedDistance << endl;
-		logger->log(logStringStream.str());
+		//logger->log(logStringStream.str());
 	}
 }
 // ---------------------------------------------------------------------------- //
@@ -258,7 +258,7 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 				// Log to file
 				ostringstream  logStringStream;
 				logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "SV," << id << "," << outPacket.volume << endl;
-				logger->log(logStringStream.str());
+				//logger->log(logStringStream.str());
 			}
 
 		} else if (memcmp( header->typeTag, LivestreamNetwork::TEMPERATURE, 
@@ -275,7 +275,7 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 					// Log to file
 					ostringstream  logStringStream;
 					logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "TN," << id << ",C," << temperature << endl;
-					logger->log(logStringStream.str());
+					//logger->log(logStringStream.str());
 				}
 			}
 		} else if (memcmp(header->typeTag, LivestreamNetwork::PONG,
@@ -287,7 +287,7 @@ void LivestreamInteractionUnit::parseUdpPacket(char * udpMessage) {
 				// Log to file
 				ostringstream  logStringStream;
 				logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "PO," << id << endl;
-				logger->log(logStringStream.str());
+				//logger->log(logStringStream.str());
 			}
 		}
 }
@@ -322,7 +322,7 @@ void LivestreamInteractionUnit::playNote(string dirPath) {
 		// Log to file
 		ostringstream  logStringStream;
 		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "PN," << id << "," << filePath << endl;
-		logger->log(logStringStream.str());
+		//logger->log(logStringStream.str());
 	}
 }
 
@@ -344,7 +344,7 @@ void LivestreamInteractionUnit::ping() {
 		// Log to file
 		ostringstream  logStringStream;
 		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "PI," << id << endl;
-		logger->log(logStringStream.str());
+		//logger->log(logStringStream.str());
 	}
 }
 
@@ -370,7 +370,7 @@ void LivestreamInteractionUnit::getDistance() {
 		ostringstream  logStringStream;
 		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << LivestreamNetwork::GET_DISTANCE << "," << id << endl;
 		//logger->log("happy\n");
-		logger->log(logStringStream.str());
+		//logger->log(logStringStream.str());
 	}
 	
 	//ofLog(OF_LOG_VERBOSE)
@@ -403,7 +403,7 @@ void LivestreamInteractionUnit::setLed() {
 		// Log to file
 		ostringstream  logStringStream;
 		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << LivestreamNetwork::SET_LED << "," << id << "," << ledState << endl;
-		logger->log(logStringStream.str());
+		//logger->log(logStringStream.str());
 	}
 }
 
@@ -427,7 +427,7 @@ void LivestreamInteractionUnit::getAllTemps() {
 		// Log to file
 		ostringstream  logStringStream;
 		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << LivestreamNetwork::GET_ALL_TEMPS << "," << id << endl;
-		logger->log(logStringStream.str());
+		//logger->log(logStringStream.str());
 	}
 }
 
@@ -452,7 +452,7 @@ void LivestreamInteractionUnit::setMaestroAddress(string maestroIpAddress) {
 		// Log to file
 		ostringstream  logStringStream;
 		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << LivestreamNetwork::SET_MAESTRO_ADDRESS << "," << id << "," << maestroIpAddress << endl;
-		logger->log(logStringStream.str());
+		//logger->log(logStringStream.str());
 	}
 }
 
@@ -489,7 +489,7 @@ int LivestreamInteractionUnit::readWaterData() {
 			// Log to file
 			ostringstream  logStringStream;
 			logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "WD," << id << "," << waterData << endl;
-			logger->log(logStringStream.str());
+			//logger->log(logStringStream.str());
 		}
 
 

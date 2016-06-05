@@ -5,22 +5,37 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	string baseIpAddress = "192.168.1.";		// Jacobson Park
-	maestroIpAddress = baseIpAddress + "201"; // Jacobson Park
-	//logDir = "/livestream/logs/";
+	// Draw the run data to the screen
+	int panelSpacing = 180;
+	panelWidth = panelSpacing - 5;
+	panelRowHeight = 350;
 
-	//string baseIpAddress = "192.168.0.";		// Sean's network
-	//maestroIpAddress = baseIpAddress + "103";	// Sean's computer
+	ofxGuiSetFont("verdana.ttf", 6);
+	ofxGuiSetDefaultHeight(10);
+	ofxGuiSetDefaultWidth(panelWidth);
+	
+	// **** Network specific variables **** //
+
+	//string baseIpAddress = "192.168.1.";		// Jacobson Park
+	//maestroIpAddress = baseIpAddress + "201"; // Jacobson Park
+	//logDir = "/livestream/logs/";
+	//waterDataFilesLocation.setup("dataLoc", "/livestream/data/"); // Jacobson Park
+	//soundFilesLocation.setup("soundLoc", "/livestream/audio/"); // Jacobson Park
+																						 
+	string baseIpAddress = "192.168.0.";		// Sean's network
+	maestroIpAddress = baseIpAddress + "105";	// Sean's computer
 	logDir = ofToDataPath("");
+	waterDataFilesLocation.setup("dataLoc", ofToDataPath("") + "data\\"); // Sean's network
+	soundFilesLocation.setup("soundLoc", "/home/pi/openFrameworks/apps/livestream/IXUnitLex1/bin/data/audio/"); // Sean's network
+
+	// **** END Network specific variables **** //
 
 	string broadcastIpAddress = baseIpAddress + "255";
 
-	// we don't want to be running to fast
-	ofSetVerticalSync(false);
-	//ofSetFrameRate(60);
-	ofSetLogLevel(OF_LOG_ERROR);
+	loggingOn.setup("loggingOn", true);
 
-	loggingOn.addListener(this, &ofApp::loggingOnChanged);
+	ofSetVerticalSync(false);
+	ofSetLogLevel(OF_LOG_ERROR);
 
     //create the socket and set to send to 127.0.0.1:11999
 	udpBroadcaster.Create();
@@ -35,22 +50,13 @@ void ofApp::setup(){
 	nPacketsSent = 0;
 	packetProtocolVersion = 1;
 
-	// Draw the run data to the screen
-	int panelSpacing = 180;
-	panelWidth = panelSpacing - 5;
-	panelRowHeight = 350;
-
-	ofxGuiSetFont("verdana.ttf", 6);
-	ofxGuiSetDefaultHeight(10);
-	ofxGuiSetDefaultWidth(panelWidth);
-
 	temperature = -100;
 	lowTemperature = -100;
 	highTemperature = -100;
 
 	maestroPanel.setup("Maestro", "maestroSettings.xml", 0, 0);
 	maestroPanel.add(maestroIpAddress.setup("IP", maestroIpAddress));
-	maestroPanel.add(softwareVersion.setup("softwareVersion", "1.0"));
+	maestroPanel.add(softwareVersion.setup("softwareVersion", "1.1"));
 	maestroPanel.add(currentDateTime.setup("current date", ofGetTimestampString("%Y-%m-%d %H:%M:%S")));
 	maestroPanel.add(lastStartupDateTime.setup("startup date", ofGetTimestampString("%Y-%m-%d %H:%M:%S")));
 	maestroPanel.add(guiTemperature.setup("Temperature", -60, -60, 100));						// Celcius
@@ -58,14 +64,12 @@ void ofApp::setup(){
 	maestroPanel.add(guiHighTemperature.setup("HighTemperature", -60, -60, 100));					// Celcius
 	maestroPanel.add(frameRate.setup("frameRate", 0, 0, 1000));
 	maestroPanel.add(soundOn.setup("soundOn", true));
-	//maestroPanel.add(loggingOn.setup("loggingOn", false));
-	loggingOn.setup("loggingOn", true);
+	maestroPanel.add(&loggingOn);
+	maestroPanel.add(temperatureLogInterval.setup("temperatureLogInterval", 60000));
 	
 	defaultSettingsPanel.setup("Default Settings", "defaultSettings.xml", 0, 150);
-	defaultSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "/livestream/data/")); // Jacobson Park
-	defaultSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/livestream/audio/")); // Jacobson Park
-	//defaultSettingsPanel.add(waterDataFilesLocation.setup("dataLoc", "C:\\pub\\LocalDev\\Sean\\of_v0.9.3_vs_release\\of_v0.9.3_vs_release\\apps\\livestream\\MaestroLex1\\bin\\data\\data\\")); // Sean's network
-	//defaultSettingsPanel.add(soundFilesLocation.setup("soundLoc", "/home/pi/openFrameworks/apps/livestream/IXUnitLex1/bin/data/audio/")); // Sean's network
+	defaultSettingsPanel.add(&waterDataFilesLocation); // Jacobson Park
+	defaultSettingsPanel.add(&soundFilesLocation); // Jacobson Park
 	defaultSettingsPanel.add(volumeMin.setup("volMin", 0, 0, 1));
 	defaultSettingsPanel.add(volumeMax.setup("volMax", 1, 0, 1));
 	defaultSettingsPanel.add(distanceReadInterval.setup("distanceReadInterval", 1000 / 5, 1, 3000));
@@ -76,23 +80,26 @@ void ofApp::setup(){
 	defaultSettingsPanel.add(minSignalWeight.setup("minSignalWeight", 0.05f, 0, 1));
 	defaultSettingsPanel.add(noiseDistance.setup("noiseDistance", 20, 0, 255));
 	defaultSettingsPanel.add(maxDistSamplesToSmooth.setup("maxDistSamplesToSmooth", 1, 0, 60));
+
 	// Load settings from file
 	//defaultSettingsPanel.loadFromFile("defaultSettings.xml");
 
-	logger.setPath(logDir + "livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log");
+	logger.setDirPath(logDir);
+	logger.setFilename("livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log");
+	logger.startThread();
 
 	if (loggingOn) {
 		// Log to file
 		ostringstream  logStringStream;
-		logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,%i,") << "MV," << softwareVersion.getParameter().toString() << endl;
-		logger.log(logStringStream.str());
+		logStringStream << "MV," << ofGetTimestampString("%Y%m%d,%H%M%S,") << softwareVersion.getParameter().toString() << endl;
+		logger.push(logStringStream.str());
 	}
 
 	// Setup logger for each IXUnit
-	for (int j = 0; j < interXUnit.size(); j++) {
-		interXUnit.at(j).logger = &logger;
-	}
-	loggingOn = false;
+	//for (int j = 0; j < interXUnit.size(); j++) {
+	//	interXUnit.at(j).logger = &logger;
+	//}
+	//loggingOn = false;
 	
 	interXUnit.resize(9);
 	int ixID;
@@ -163,7 +170,7 @@ void ofApp::setup(){
 
 	testLED = false;
 	udpSendTimersOn = true;
-	loggingOn = false;
+	//loggingOn = false;
 }
 
 //--------------------------------------------------------------
@@ -202,12 +209,12 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	//ofSleepMillis(5);
-
 	ofBackgroundGradient(ofColor::white, ofColor::gray);
 	
 	if (udpSendTimersOn)
 	{
+		bool distanceTripped = false;
+
 		for (int j = 0; j<interXUnit.size(); j++) {
 			if (ofGetElapsedTimeMillis() - interXUnit.at(j).distanceReadTime > interXUnit.at(j).distanceReadInterval) {
 				// Read the distance
@@ -227,6 +234,7 @@ void ofApp::draw(){
 				//keyReleased('n');
 				interXUnit.at(j).notePlayTime = ofGetElapsedTimeMillis();
 			}
+
 			if (ofGetElapsedTimeMillis() - interXUnit.at(j).heartbeatTime > interXUnit.at(j).heartbeatInterval) {
 				// Ping the IXUnit
 				interXUnit.at(j).ping();
@@ -236,37 +244,63 @@ void ofApp::draw(){
 				interXUnit.at(j).setMaestroAddress(maestroIpAddress);
 				// Get all temps
 				interXUnit.at(j).getAllTemps();
-				// Get Maestros CPU temp
+
+				if (interXUnit.at(j).guiSmoothedDistance > interXUnit.at(j).distanceMin
+					&& interXUnit.at(j).guiSmoothedDistance < interXUnit.at(j).distanceMax)
+				{
+					distanceTripped = true;
+				}
 
 				if (j == 1) {
-#ifdef TARGET_LINUX
-					FILE *temperatureFile;
-					double T;
-					temperatureFile = fopen("/sys/class/thermal/thermal_zone0/temp", "r");
-					if (temperatureFile == NULL) {
-						cout << "Failed to read temp file\n";
-					}
-					else {
-						fscanf(temperatureFile, "%lf", &T);
-						T /= 1000;
-						fclose(temperatureFile);
-					}
-					setTemperature((int)T);
-#endif
-					ofstream mFile;
-					mFile.open(logDir + "livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log", ios::out | ios::app);
-					ostringstream  logStringStream;
-					logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S,") << "TN," << "M" << ",C," << temperature << endl;
-					//logger->log(logStringStream.str());
-					mFile << logStringStream.str();
-					mFile.close();
-
-					// Set the logger path to a new file is created every month
-					logger.setPath(logDir + "livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log");
+					// Set the logger path so a new file is created every month
+					logger.setFilename("livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log");
 				}
 
 				interXUnit.at(j).heartbeatTime = ofGetElapsedTimeMillis();
 			}
+		}
+
+		if (distanceTripped) {
+			if (loggingOn) {
+				// Log the distances if any were "tripped" in the previous heartbeat interval
+				ostringstream  logStringStream;
+				logStringStream << "LD," << ofGetTimestampString("%Y%m%d,%H%M%S");
+				for (int j = 0; j < interXUnit.size(); j++) {
+					logStringStream << ",L" << interXUnit.at(j).id << "," << interXUnit.at(j).guiSmoothedDistance;
+				}
+				logStringStream << endl;
+				logger.push(logStringStream.str());
+			}
+		}
+
+		if (ofGetElapsedTimeMillis() - temperatureLogTime > temperatureLogInterval) {
+			// Get Maestros CPU temp
+#ifdef TARGET_LINUX
+			FILE *temperatureFile;
+			double T;
+			temperatureFile = fopen("/sys/class/thermal/thermal_zone0/temp", "r");
+			if (temperatureFile == NULL) {
+				cout << "Failed to read temp file\n";
+			}
+			else {
+				fscanf(temperatureFile, "%lf", &T);
+				T /= 1000;
+				fclose(temperatureFile);
+			}
+			setTemperature((int)T);
+#endif
+			if (loggingOn) {
+				ostringstream  logStringStream;
+				logStringStream << "TN," << ofGetTimestampString("%Y%m%d,%H%M%S,M,") << temperature;
+
+				for (int j = 0; j < interXUnit.size(); j++) {
+					logStringStream << ",L" << interXUnit.at(j).id << "," << interXUnit.at(j).guiTemperature;
+				}
+				logStringStream << endl;
+				logger.push(logStringStream.str());
+			}
+
+			temperatureLogTime = ofGetElapsedTimeMillis();
 		}
 	}
 
@@ -494,8 +528,10 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 
 }
 
+/*
 void ofApp::loggingOnChanged(bool & logOn) {
 	for (int j = 0; j<interXUnit.size(); j++) {
 		interXUnit.at(j).loggingOn = loggingOn;
 	}
 }
+*/

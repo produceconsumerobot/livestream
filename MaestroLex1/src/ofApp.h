@@ -22,7 +22,7 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);		
-		void loggingOnChanged(bool & _loggingOn);
+		//void loggingOnChanged(bool & _loggingOn);
 		void setTemperature(int temp);
 
 		ofxUDPManager udpBroadcaster;
@@ -81,6 +81,7 @@ class ofApp : public ofBaseApp{
 		ofxIntField frameRate;
 		ofxToggle soundOn;
 		ofxToggle loggingOn;
+		ofxIntField temperatureLogInterval;
 
 		int temperature;			// Most recent temperature measurement;
 		int lowTemperature;			// Lowest recorded temperature
@@ -93,5 +94,7 @@ class ofApp : public ofBaseApp{
 
 		LoggerThread logger;
 		string logDir;
+
+		uint64_t temperatureLogTime;
 };
 
