@@ -6,7 +6,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    softwareVersion = "1.0";
+    softwareVersion = "1.1.1";
 	slaveMode = true;  // Slave mode follows UDP commands to run
 	ofSetLogLevel(OF_LOG_ERROR);
 	
@@ -106,10 +106,6 @@ void ofApp::setup(){
 		myLidarLite.configure(lidarConfig);
 		// Exit if the lidar lite didn't initialize properly
 		if (!myLidarLite.hasBegun()) ofApp::exit();
-		
-		// Print the hardware version of the Lidar Lite
-		cout << "LIDAR Lite hardware version: " << myLidarLite.hardwareVersion() << endl;
-		cout << "LIDAR Lite software version: " << myLidarLite.softwareVersion() << endl;
 	}
 	
 	// Get the host name
@@ -132,25 +128,22 @@ void ofApp::setup(){
 	
 
 	// Write initialization to the log
-    //string aligner = "";
-    //if (ofGetMonth() < 10) aligner = aligner + "0";
-	//string logFileName = "/livestream/logs/livestream_" + hostname + "_" + aligner + ofToString(ofGetMonth()) + ".log";
-    string logFileName = "/logs/livestream/livestream_" + hostname + "_" + ofGetTimestampString("%m") + ".log";
+    string logFileName = ofToDataPath("") + hostname + "_" + ofGetTimestampString("%m") + ".log";
+    //string logFileName = "/logs/livestream/livestream_" + hostname + "_" + ofGetTimestampString("%m") + ".log";
     ostringstream  logStringStream;
-    logStringStream << ofGetTimestampString("%Y%m%d,%H%M%S") << ",INITILIZATION";
+    logStringStream << "SV" << ofGetTimestampString("%Y%m%d,%H%M%S") << endl;
     if (debugTest != NO_LIDAR) {
-		logStringStream << ",LH," << myLidarLite.hardwareVersion();
-		logStringStream << ",LV," << myLidarLite.softwareVersion();
-		logStringStream << ",LC," << lidarConfig;
-        logStringStream << ",SV" << softwareVersion;
+        logStringStream << "LH" << ofGetTimestampString("%Y%m%d,%H%M%S") << myLidarLite.hardwareVersion() << endl;
+        logStringStream << "LV" << ofGetTimestampString("%Y%m%d,%H%M%S") << myLidarLite.softwareVersion() << endl;
+        logStringStream << "LC" << ofGetTimestampString("%Y%m%d,%H%M%S") << lidarConfig << endl;
 	}
      
 	ofstream mFile;
 	mFile.open(logFileName.c_str(), ios::out | ios::app);
-	mFile << logStringStream.str() << endl;
+	mFile << logStringStream.str();
 	mFile.close();
 	
-	cout << logStringStream.str() << endl;
+	cout << logStringStream.str();
             
     // Start the LidarLite thread
     myLidarLite.start();
