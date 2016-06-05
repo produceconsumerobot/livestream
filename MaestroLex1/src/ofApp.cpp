@@ -14,6 +14,8 @@ void ofApp::setup(){
 	ofxGuiSetDefaultHeight(10);
 	ofxGuiSetDefaultWidth(panelWidth);
 	
+	maestroPanel.add(softwareVersion.setup("softwareVersion", "1.1.1"));
+
 	// **** Network specific variables **** //
 
 	//string baseIpAddress = "192.168.1.";		// Jacobson Park
@@ -56,7 +58,6 @@ void ofApp::setup(){
 
 	maestroPanel.setup("Maestro", "maestroSettings.xml", 0, 0);
 	maestroPanel.add(maestroIpAddress.setup("IP", maestroIpAddress));
-	maestroPanel.add(softwareVersion.setup("softwareVersion", "1.1"));
 	maestroPanel.add(currentDateTime.setup("current date", ofGetTimestampString("%Y-%m-%d %H:%M:%S")));
 	maestroPanel.add(lastStartupDateTime.setup("startup date", ofGetTimestampString("%Y-%m-%d %H:%M:%S")));
 	maestroPanel.add(guiTemperature.setup("Temperature", -60, -60, 100));						// Celcius
