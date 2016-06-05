@@ -1,0 +1,15 @@
+#!/bin/bash
+
+ipAddress=$(hostname -I)
+echo $ipAddress
+echo ""
+while read ips; do
+  if [[ $ipAddress == "$ips"* ]]; then
+    echo "*" $ips
+  else
+    echo $ips ": sudo systemctl stop IXUnitLex1.service"
+    $(ssh -t pi@$ips "sudo systemctl stop IXUnitLex1.service")
+  fi
+  #echo $ipAddress
+done <piIPs
+
