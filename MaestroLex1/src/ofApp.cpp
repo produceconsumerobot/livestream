@@ -19,10 +19,10 @@ void ofApp::setup(){
 	// **** Network specific variables **** //
 
 	string baseIpAddress = "192.168.1.";		// Jacobson Park
-	maestroIpAddress = baseIpAddress + "201"; // Jacobson Park
+	maestroIpAddress = baseIpAddress + "211"; // Jacobson Park
 	//logDir = "/livestream/logs/";
 	logDir = ofToDataPath("");
-	waterDataFilesLocation.setup("dataLoc", ofToDataPath("") + "data/data/");
+	waterDataFilesLocation.setup("dataLoc", ofToDataPath("data/waterData/"));
 	soundFilesLocation.setup("soundLoc", "/home/pi/openFrameworks/apps/livestream/IXUnitLex1/bin/data/audio/");
 	//waterDataFilesLocation.setup("dataLoc", "/livestream/data/"); // Jacobson Park
 	//soundFilesLocation.setup("soundLoc", "/livestream/audio/"); // Jacobson Park
@@ -308,14 +308,17 @@ void ofApp::draw(){
 		}
 	}
 
+	currentDateTime = ofGetTimestampString("%Y-%m-%d %H:%M:%S");
+
+#ifndef LIVESTREAM_MAESTRO_NO_HEAD
 	for (int j = 0; j < interXUnit.size(); j++) {
 		interXUnit.at(j).ixPanel.draw();
 	}
 	
 	// Draw the run data to the screen
-	currentDateTime = ofGetTimestampString("%Y-%m-%d %H:%M:%S");
 	defaultSettingsPanel.draw();
 	maestroPanel.draw();
+#endif
 
 	frameRate = (int) ofGetFrameRate();
 }

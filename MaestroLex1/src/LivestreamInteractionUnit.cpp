@@ -21,7 +21,7 @@ LivestreamInteractionUnit::~LivestreamInteractionUnit() {
 // setup
 // ---------------------------------------------------------------------------- //
 //void LivestreamInteractionUnit::setup(int _id, string _ipAddress) {
-void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataName, string _sensorLocation, string _waterDataDir) {
+void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _sensorLocation, string _dataName, string _waterDataDir) {
 	id = _id;
 	//ipAddress = _ipAddress;
 	ipAddress.addListener(this, &LivestreamInteractionUnit::ipAddressChanged);
@@ -29,8 +29,8 @@ void LivestreamInteractionUnit::setup(int _id, string _ipAddress, string _dataNa
 	ixPanel.setup("IXUnit" + ofToString(_id),
 		"IXUnit" + ofToString(_id) + ".xml", 0, 0);
 	//ixPanel.add(id.setup("ID", _id, -1, 255));
-	ixPanel.add(dataName.setup("dataName", _dataName));
 	ixPanel.add(sensorLocation.setup("sensorLoc", _sensorLocation));
+	ixPanel.add(dataName.setup("dataName", _dataName));
 	ixPanel.add(ipAddress.setup("IP", _ipAddress));
 	ixPanel.add(lastPong.setup("lastPong", "NA"));
 	ixPanel.add(rawDistance.setup("rawDistance", 0, -1, 40 * 30));
@@ -305,7 +305,7 @@ void LivestreamInteractionUnit::playNote(string dirPath) {
 
 	string aligner = "";
 	if (note < 10) aligner = aligner + "0";
-	string filename = dataName.getParameter().toString() + "_" + sensorLocation.getParameter().toString() 
+	string filename = sensorLocation.getParameter().toString() + "_" + dataName.getParameter().toString()
 		+ "_" + aligner + note.getParameter().toString() + ".mp3";
 	string filePath = dirPath + filename;
 	strncpy(outPacket.filePath, filePath.c_str(), sizeof(outPacket.filePath));
