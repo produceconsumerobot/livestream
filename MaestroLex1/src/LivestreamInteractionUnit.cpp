@@ -505,7 +505,7 @@ int LivestreamInteractionUnit::calculateNote() {
 }
 
 int LivestreamInteractionUnit::openWaterDataFile() {
-	string filename = dataName.getParameter().toString() + "_" + sensorLocation.getParameter().toString() + ".csv";
+	string filename = sensorLocation.getParameter().toString() + "_" + dataName.getParameter().toString() + ".csv";
 	waterDataFile = new fstream(waterDataDir + filename);
 	string filePath = waterDataDir + filename;
 	waterDataFile->open(filePath.c_str(), std::ios::in);
