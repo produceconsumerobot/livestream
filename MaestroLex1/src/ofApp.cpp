@@ -19,7 +19,7 @@ void ofApp::setup(){
 	// **** Network specific variables **** //
 
 	string baseIpAddress = "192.168.1.";		// Jacobson Park
-	maestroIpAddress = baseIpAddress + "211"; // Jacobson Park
+	maestroIpAddress = baseIpAddress + "212"; // Jacobson Park
 	//logDir = "/livestream/logs/";
 	logDir = ofToDataPath("");
 	waterDataFilesLocation.setup("dataLoc", ofToDataPath("") + "waterData/");
@@ -114,6 +114,7 @@ void ofApp::setup(){
 	interXUnit.at(i).waterDataMin = 318;
 	interXUnit.at(i).waterDataMax = 900;
 	interXUnit.at(i).noteMax = 13;
+	interXUnit.at(i).distanceMax = 6 * 30; // Set 6ft distance to avoid grass
 	interXUnit.at(0).ixPanel.setPosition(panelSpacing * 1, 0);
 	ixID = 17;
 	i = 1;
@@ -149,6 +150,7 @@ void ofApp::setup(){
 	interXUnit.at(i).waterDataMin = 0.1;
 	interXUnit.at(i).waterDataMax = 50;
 	interXUnit.at(i).noteMax = 13;
+	interXUnit.at(i).distanceMax = 6 * 30; // Set 6ft distance to avoid grass
 	interXUnit.at(i).ixPanel.setPosition(panelSpacing * 1, panelRowHeight);
 	ixID = 22;
 	i = 6;
