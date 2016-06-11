@@ -8,7 +8,11 @@ while read ips; do
     echo "*" $ips
   else
     echo $ips ": sudo systemctl stop IXUnitLex1.service"
-    $(ssh -t pi@$ips "sudo systemctl stop IXUnitLex1.service")
+    #$(cat sudo systemctl stop IXUnitLex1.service | ssh pi@$ips)
+    ssh pi@$ips -T 'sudo systemctl stop IXUnitLex1.service'
+    #ssh -t pi@$ips << HERE
+    #  sudo systemctl stop IXUnitLex1.service
+    #HERE
   fi
   #echo $ipAddress
 done <piIPs
