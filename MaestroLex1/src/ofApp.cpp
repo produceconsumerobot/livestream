@@ -14,14 +14,14 @@ void ofApp::setup(){
 	ofxGuiSetDefaultHeight(10);
 	ofxGuiSetDefaultWidth(panelWidth);
 	
-	maestroPanel.add(softwareVersion.setup("softwareVersion", "1.1.1"));
+	maestroPanel.add(softwareVersion.setup("softwareVersion", "1.2.0"));
 
 	// **** Network specific variables **** //
 
 	string baseIpAddress = "192.168.1.";		// Jacobson Park
 	maestroIpAddress = baseIpAddress + "212"; // Jacobson Park
 	//logDir = "/livestream/logs/";
-	logDir = ofToDataPath("");
+	logDir = ofToDataPath("" + "logs/");
 	waterDataFilesLocation.setup("dataLoc", ofToDataPath("") + "waterData/");
 	soundFilesLocation.setup("soundLoc", "/home/pi/openFrameworks/apps/livestream/IXUnitLex1/bin/data/audio/");
 	//waterDataFilesLocation.setup("dataLoc", "/livestream/data/"); // Jacobson Park
@@ -29,7 +29,7 @@ void ofApp::setup(){
 																						 
 	//string baseIpAddress = "192.168.0.";		// Sean's network
 	//maestroIpAddress = baseIpAddress + "105";	// Sean's computer
-	logDir = ofToDataPath("");
+	//logDir = ofToDataPath("");
 	//waterDataFilesLocation.setup("dataLoc", ofToDataPath("") + "data\\"); // Sean's network
 	//soundFilesLocation.setup("soundLoc", "/home/pi/openFrameworks/apps/livestream/IXUnitLex1/bin/data/audio/"); // Sean's network
 
@@ -89,13 +89,13 @@ void ofApp::setup(){
 	//defaultSettingsPanel.loadFromFile("defaultSettings.xml");
 
 	logger.setDirPath(logDir);
-	logger.setFilename("livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log");
+	logger.setFilename("livestream_MaestroLex1_" + ofGetTimestampString("%m-%d") + ".log");
 	logger.startThread();
 
 	if (loggingOn) {
 		// Log to file
 		ostringstream  logStringStream;
-		logStringStream << "MV," << ofGetTimestampString("%Y%m%d,%H%M%S,") << softwareVersion.getParameter().toString() << endl;
+		logStringStream << "MV," << ofGetTimestampString("%H%M%S,") << softwareVersion.getParameter().toString() << endl;
 		logger.push(logStringStream.str());
 	}
 
@@ -258,8 +258,8 @@ void ofApp::draw(){
 				}
 
 				if (j == 1) {
-					// Set the logger path so a new file is created every month
-					logger.setFilename("livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log");
+					// Set the logger path so a new file is created every day
+					logger.setFilename("livestream_MaestroLex1_" + ofGetTimestampString("%m-%d") + ".log");
 				}
 
 				interXUnit.at(j).heartbeatTime = ofGetElapsedTimeMillis();
@@ -270,7 +270,7 @@ void ofApp::draw(){
 			if (loggingOn) {
 				// Log the distances if any were "tripped" in the previous heartbeat interval
 				ostringstream  logStringStream;
-				logStringStream << "LD," << ofGetTimestampString("%Y%m%d,%H%M%S");
+				logStringStream << "LD," << ofGetTimestampString("%H%M%S");
 				for (int j = 0; j < interXUnit.size(); j++) {
 					logStringStream << ",L" << interXUnit.at(j).id << "," << interXUnit.at(j).guiSmoothedDistance;
 				}
@@ -297,7 +297,7 @@ void ofApp::draw(){
 #endif
 			if (loggingOn) {
 				ostringstream  logStringStream;
-				logStringStream << "TN," << ofGetTimestampString("%Y%m%d,%H%M%S,M,") << temperature;
+				logStringStream << "TN," << ofGetTimestampString("%H%M%S,M,") << temperature;
 
 				for (int j = 0; j < interXUnit.size(); j++) {
 					logStringStream << ",L" << interXUnit.at(j).id << "," << interXUnit.at(j).guiTemperature;
