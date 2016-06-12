@@ -21,7 +21,7 @@ void ofApp::setup(){
 	string baseIpAddress = "192.168.1.";		// Jacobson Park
 	maestroIpAddress = baseIpAddress + "212"; // Jacobson Park
 	//logDir = "/livestream/logs/";
-	logDir = ofToDataPath("" + "logs/");
+	logDir = ofToDataPath("") + "logs/";
 	waterDataFilesLocation.setup("dataLoc", ofToDataPath("") + "waterData/");
 	soundFilesLocation.setup("soundLoc", "/home/pi/openFrameworks/apps/livestream/IXUnitLex1/bin/data/audio/");
 	//waterDataFilesLocation.setup("dataLoc", "/livestream/data/"); // Jacobson Park
